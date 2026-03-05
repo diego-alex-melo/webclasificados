@@ -2,7 +2,7 @@
 
 Last updated: 2026-03-06
 
-## Implementados (24 escenarios)
+## Implementados (25 escenarios)
 
 | # | Escenario | Evidencia |
 |---|---|---|
@@ -18,33 +18,45 @@ Last updated: 2026-03-06
 | 11 | Limite de anuncios por cuenta | `spam-pipeline.ts` step 0: `checkAdLimit()` — max 1 activo/cuenta |
 | 12 | Compartir anuncio (WhatsApp preview) | `ShareButton.tsx`, OG meta tags en `anuncio/[slug]/page.tsx` |
 | 13 | Google indexa correctamente | `sitemap.ts` (dinamico con ads + blog), `robots.ts`, JSON-LD breadcrumbs |
+| 14 | Favoritos | localStorage — suficiente para el flujo anonimo del visitante. No requiere cuenta. |
 | 15 | Anuncios relacionados | `RelatedAds.tsx` (query por servicios + pais, 6 ads) |
 | 16 | Pagina 404 personalizada | `not-found.tsx` (custom con SearchBar + categorias) |
 | 17 | Paginas legales | `legal/terminos`, `privacidad`, `responsabilidad`, `faq` (contenido real) |
-| 18 | Version machine (markdown) | `api/markdown/*` (5 rutas), `markdown-renderer.ts` |
+| 18 | Version machine (markdown) | Middleware content negotiation (`Accept: text/markdown`) + `api/markdown/*` (5 rutas) |
 | 19 | Push notifications | `api/push/route.ts`, `push-service.ts` (VAPID, 3 tipos de notificacion) |
 | 20 | Backlink progresivo por reputacion | `anuncio/[slug]/page.tsx:175`: `rel={reputation >= 150 ? 'ugc' : 'ugc nofollow'}` |
 | 21 | SEO programatico por ciudad | `servicios/[slug]/page.tsx` — 225+ pages (8 profesionales x 20 ciudades), FAQs, JSON-LD, internal links |
 | 22 | Referral "Invita a un colega" | `referral-service.ts`, `api/referrals`, `dashboard/referidos` (+5 rep, boost) |
 | 23 | PWA instalable | `manifest.ts` (standalone, iconos, colores) |
-| 25 | Badge de verificacion (parcial) | `dashboard/badge` genera HTML snippet, pero sin verificacion automatica |
+| 25 | Badge de verificacion (parcial) | `dashboard/badge` genera HTML snippet. Falta cron de verificacion automatica |
 | 27 | Blog con contenido SEO | `blog/page.tsx`, `blog/[slug]`, `blog-service.ts` (DB, categorias, paginacion) |
 
-## No implementados (3 escenarios)
+## Implementados (pipeline anti-spam completo)
+
+| Step | Check | Estado |
+|---|---|---|
+| 0 | Limite de anuncios (max 1 activo/cuenta) | Real |
+| 1 | Rate limit (5 min entre publicaciones) | Real (Redis, fail-open) |
+| 2 | Validacion de texto (mayusculas, telefonos, URLs) | Real |
+| 3 | Duplicado exacto (hash titulo+desc+whatsapp) | Real |
+| 4 | Similitud de texto (>80% = rechazado) | Real |
+| 5 | OCR de imagen | STUB — falta Google Cloud Vision |
+| 6 | AI moderation (OpenAI moderacion + GPT-4o-mini) | Real |
+| 7 | Reputacion (< 50 revision, < 20 bloqueado) | Real |
+
+## No implementados (2 escenarios)
 
 | # | Escenario | Que falta |
 |---|---|---|
-| 4 | OCR bloquea imagen con telefono | `checkOcr()` es stub (siempre `passed: true`). Falta Google Cloud Vision API |
-| 24 | Auto-publicacion en redes sociales | `social-publisher.ts` es stub completo (console.log + return null en todas) |
-| 26 | Google Business Profile y resenas | Solo existe email de solicitud (dia 7). No hay proceso de reviews ni banner |
+| 24 | Auto-publicacion en redes sociales | `social-publisher.ts` es stub (console.log). Requiere apps aprobadas en Facebook, IG, X, Pinterest |
+| 26 | Google Business Profile y resenas | Solo existe email de solicitud (dia 7). Requiere crear perfil de negocio en Google |
 
-## Stubs parciales (implementados pero incompletos)
+## Pendiente menor
 
-| Area | Estado | Detalle |
-|---|---|---|
-| Favoritos (#14) | STUB | Solo localStorage (`useFavorites.ts`). Sin persistencia en BD, sin sync entre dispositivos |
-| Badge verificacion (#25) | STUB | Genera snippet HTML pero NO verifica si el badge esta en el sitio externo. No aplica boost |
-| AI moderation (pipeline step 6) | STUB | `checkAiModeration()` siempre retorna `passed: true`. Falta OpenAI API |
+| Area | Detalle |
+|---|---|
+| OCR (#4) | `checkOcr()` stub. Requiere Google Cloud Vision API key (~$1.50/1000 imagenes) |
+| Badge verificacion (#25) | Genera snippet pero no verifica automaticamente si el badge esta en el sitio externo |
 
 ## Cron scheduling
 
