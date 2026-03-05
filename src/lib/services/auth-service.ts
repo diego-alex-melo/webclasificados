@@ -158,6 +158,68 @@ export async function login(email: string, password: string) {
 }
 
 /**
+ * Initiate a password reset flow.
+ * Generates a secure token with 1-hour expiry and stores it on the advertiser.
+ * Returns the token regardless of whether the email exists (caller decides email behavior).
+ */
+export async function requestPasswordReset(email: string): Promise<string | null> {
+  const advertiser = await prisma.advertiser.findUnique({
+    where: { email: email.toLowerCase().trim() },
+  });
+
+  if (!advertiser) {
+    // Return null to signal "no account found" without exposing that to callers
+    return null;
+  }
+
+  const token = randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  await prisma.advertiser.update({
+    where: { id: advertiser.id },
+    data: {
+      passwordResetToken: token,
+      passwordResetExpiresAt: expiresAt,
+    },
+  });
+
+  return token;
+}
+
+/**
+ * Complete a password reset using the token issued by requestPasswordReset.
+ * Validates token existence and expiry, hashes the new password, and clears the token.
+ */
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  if (!token) {
+    throw new AuthError('Token de recuperación requerido', 400);
+  }
+
+  const advertiser = await prisma.advertiser.findFirst({
+    where: { passwordResetToken: token },
+  });
+
+  if (!advertiser) {
+    throw new AuthError('Token de recuperación inválido o expirado', 400);
+  }
+
+  if (!advertiser.passwordResetExpiresAt || advertiser.passwordResetExpiresAt < new Date()) {
+    throw new AuthError('Token de recuperación inválido o expirado', 400);
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+
+  await prisma.advertiser.update({
+    where: { id: advertiser.id },
+    data: {
+      passwordHash,
+      passwordResetToken: null,
+      passwordResetExpiresAt: null,
+    },
+  });
+}
+
+/**
  * Verify a JWT and return the advertiser from the database.
  */
 export async function getAdvertiserFromToken(token: string) {

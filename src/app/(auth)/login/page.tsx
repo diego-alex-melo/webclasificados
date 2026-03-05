@@ -12,10 +12,14 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
+  const [passwordReset, setPasswordReset] = useState(false);
 
   useEffect(() => {
     if (searchParams.get('verified') === 'true') {
       setVerified(true);
+    }
+    if (searchParams.get('reset') === 'true') {
+      setPasswordReset(true);
     }
     const token = localStorage.getItem('token');
     if (token) {
@@ -66,6 +70,12 @@ function LoginForm() {
         </div>
       )}
 
+      {passwordReset && (
+        <div className="mb-6 rounded-lg bg-green-500/10 px-4 py-3 text-sm text-green-400">
+          Contraseña actualizada exitosamente. Ya puedes iniciar sesión.
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm text-text-secondary">
@@ -110,6 +120,12 @@ function LoginForm() {
         >
           {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
         </button>
+
+        <div className="text-center">
+          <Link href="/forgot-password" className="text-sm text-text-secondary hover:text-accent-gold transition-colors">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
       </form>
 
       <p className="mt-6 text-center text-sm text-text-secondary">

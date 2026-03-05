@@ -52,8 +52,10 @@ model Advertiser {
   referralCode     String  @unique
   referredById     String? @db.Uuid
   pushSubscription Json?
-  emailVerified    Boolean @default(false)
-  emailVerifyToken String?
+  emailVerified          Boolean   @default(false)
+  emailVerifyToken       String?
+  passwordResetToken     String?
+  passwordResetExpiresAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

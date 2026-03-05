@@ -270,6 +270,43 @@ export async function sendGoogleReviewRequest(email: string) {
 }
 
 /**
+ * Send a password reset email with a secure link valid for 1 hour.
+ */
+export async function sendPasswordResetEmail(email: string, token: string) {
+  const resetUrl = `${APP_URL}/reset-password?token=${token}`;
+
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    to: email,
+    subject: 'Recupera tu contraseña — WebClasificados',
+    html: `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head><meta charset="utf-8"></head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
+        <h1 style="font-size: 24px; margin-bottom: 16px;">Recupera tu contraseña</h1>
+        <p style="font-size: 16px; line-height: 1.5;">
+          Recibimos una solicitud para restablecer la contraseña de tu cuenta en WebClasificados.
+          Si fuiste tú, haz clic en el botón de abajo:
+        </p>
+        <a href="${resetUrl}"
+           style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 24px 0;">
+          Restablecer contraseña
+        </a>
+        <p style="font-size: 14px; color: #6b7280; line-height: 1.5;">
+          Este enlace es válido por <strong>1 hora</strong>. Si no solicitaste este cambio,
+          puedes ignorar este mensaje — tu contraseña no será modificada.
+        </p>
+        <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
+          — Equipo WebClasificados
+        </p>
+      </body>
+      </html>
+    `,
+  });
+}
+
+/**
  * Send reactivation confirmation email after an ad is successfully reactivated.
  */
 export async function sendReactivationConfirmation(email: string, adTitle: string) {
