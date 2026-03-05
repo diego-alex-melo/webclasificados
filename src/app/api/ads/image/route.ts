@@ -12,7 +12,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export async function POST(
   request: NextRequest,
-): Promise<NextResponse<ApiResponse<{ url: string; hash: string }>>> {
+): Promise<NextResponse<ApiResponse>> {
   try {
     // Auth check
     const authHeader = request.headers.get('authorization');
