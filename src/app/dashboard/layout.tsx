@@ -66,7 +66,7 @@ export default function DashboardLayout({
     }
 
     // Validate token with a lightweight request
-    fetch('/api/auth/verify', {
+    fetch('/api/auth/me', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
