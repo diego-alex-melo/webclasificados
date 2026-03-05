@@ -17,14 +17,20 @@ const ALLOWED_MIMES = new Set([
   'image/gif',
 ]);
 
-const s3 = new S3Client({
-  region: 'auto',
-  endpoint: process.env.R2_ENDPOINT!,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-});
+let _s3: S3Client | null = null;
+function getS3(): S3Client {
+  if (!_s3) {
+    _s3 = new S3Client({
+      region: 'auto',
+      endpoint: process.env.R2_ENDPOINT!,
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+      },
+    });
+  }
+  return _s3;
+}
 
 const R2_BUCKET = process.env.R2_BUCKET || 'clasificados';
 const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || '';
@@ -90,7 +96,7 @@ export async function processAndUpload(
   // 4. Upload to R2
   const key = `ads/${randomUUID()}.webp`;
 
-  await s3.send(
+  await getS3().send(
     new PutObjectCommand({
       Bucket: R2_BUCKET,
       Key: key,
