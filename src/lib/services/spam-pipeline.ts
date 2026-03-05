@@ -184,16 +184,95 @@ async function checkOcr(_imageUrl?: string): Promise<SpamCheckResult> {
 // ── Step 6: AI moderation ───────────────────────────────────────────────────
 
 async function checkAiModeration(
-  _title: string,
-  _description: string,
+  title: string,
+  description: string,
 ): Promise<SpamCheckResult> {
   const step = 'ai_moderation';
+  const apiKey = process.env.OPENAI_API_KEY;
 
-  // TODO: Integrate OpenAI moderation API
-  // 1. Send title + description to OpenAI for content analysis
-  // 2. Check for spam, scams, prohibited content
-  // 3. Block if flagged
-  return { passed: true, step };
+  if (!apiKey) {
+    console.warn('[SpamPipeline] OPENAI_API_KEY not set, skipping AI moderation');
+    return { passed: true, step };
+  }
+
+  try {
+    const text = `${title}\n\n${description}`;
+
+    // Step 6a: Free moderation endpoint — catches violence, hate, sexual, self-harm
+    const modRes = await fetch('https://api.openai.com/v1/moderations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({ input: text }),
+    });
+
+    if (modRes.ok) {
+      const modData = await modRes.json();
+      const result = modData.results?.[0];
+      if (result?.flagged) {
+        const categories = Object.entries(result.categories)
+          .filter(([, v]) => v)
+          .map(([k]) => k)
+          .join(', ');
+        return {
+          passed: false,
+          step,
+          reason: `Contenido rechazado por moderación automática (${categories})`,
+        };
+      }
+    }
+
+    // Step 6b: GPT-4o-mini — catches spam, scams, fake promises specific to esoteric niche
+    const chatRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        temperature: 0,
+        max_tokens: 100,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Eres un moderador de una plataforma de clasificados de servicios esotéricos. Analiza el anuncio y responde SOLO con JSON: {"spam": true/false, "reason": "motivo breve"}. Marca spam=true si: es estafa obvia, promete resultados garantizados en tiempo específico (ej: "resultados en 24 horas"), pide transferencias bancarias, incluye contenido sexual explícito, o no tiene relación con servicios esotéricos. Servicios esotéricos legítimos (tarot, santería, limpiezas, amarres, etc.) son válidos.',
+          },
+          {
+            role: 'user',
+            content: `Título: ${title}\nDescripción: ${description}`,
+          },
+        ],
+      }),
+    });
+
+    if (chatRes.ok) {
+      const chatData = await chatRes.json();
+      const content = chatData.choices?.[0]?.message?.content ?? '';
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed.spam === true) {
+          return {
+            passed: false,
+            step,
+            reason: parsed.reason || 'Contenido detectado como spam por IA',
+          };
+        }
+      } catch {
+        // If GPT response isn't valid JSON, allow (fail-open)
+        console.warn('[SpamPipeline] Could not parse GPT moderation response:', content);
+      }
+    }
+
+    return { passed: true, step };
+  } catch (err) {
+    // Fail-open: if OpenAI is down, allow the ad through
+    console.error('[SpamPipeline] AI moderation error:', err);
+    return { passed: true, step };
+  }
 }
 
 // ── Step 7: Reputation check ────────────────────────────────────────────────
