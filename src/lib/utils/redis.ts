@@ -1,5 +1,13 @@
 import Redis from 'ioredis';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+let _redis: Redis | null = null;
 
-export default redis;
+function getRedis(): Redis | null {
+  if (!process.env.REDIS_URL) return null;
+  if (!_redis) {
+    _redis = new Redis(process.env.REDIS_URL);
+  }
+  return _redis;
+}
+
+export default getRedis;

@@ -42,18 +42,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-// ── Static params ───────────────────────────────────────────────────────────
-
-export async function generateStaticParams() {
-  const professionalSlugs = Object.values(PROFESSIONAL_SLUGS);
-  const allCities = Object.values(CITIES).flat();
-
-  return allCities.flatMap((city) =>
-    professionalSlugs.map((prof) => ({
-      slug: `${prof}-en-${city.slug}`,
-    })),
-  );
-}
+// Render on-demand, not at build time (225+ combos would require DB during build)
+export const dynamic = 'force-dynamic';
 
 // ── Metadata ────────────────────────────────────────────────────────────────
 

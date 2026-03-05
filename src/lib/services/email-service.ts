@@ -1,8 +1,10 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY || 'dummy_key');
+}
 const EMAIL_FROM = process.env.EMAIL_FROM || 'WebClasificados <noreply@webclasificados.com>';
-const APP_URL = process.env.APP_URL || 'http://localhost:3000';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
 
 /**
  * Send a verification email with a magic link.
@@ -10,7 +12,7 @@ const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${APP_URL}/api/auth/verify?token=${token}`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: 'Verifica tu cuenta en WebClasificados',
@@ -43,7 +45,7 @@ export async function sendVerificationEmail(email: string, token: string) {
  * Send a welcome email after successful email verification.
  */
 export async function sendWelcome(email: string, name: string) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: '¡Tu cuenta está verificada! — WebClasificados',
@@ -78,7 +80,7 @@ export async function sendExpirationWarning(
   daysLeft: number,
   metrics: { views: number; clicks: number },
 ) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: `Tu anuncio expira en ${daysLeft} días — WebClasificados`,
@@ -117,7 +119,7 @@ export async function sendExpiredNotice(
 ) {
   const reactivateUrl = `${APP_URL}/reactivar?token=${reactivationToken}`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: 'Tu anuncio ha expirado — WebClasificados',
@@ -154,7 +156,7 @@ export async function sendExpiredNotice(
  * Teaches advertisers how to improve their ad visibility.
  */
 export async function sendOnboardingTips(email: string, adTitle: string) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: 'Cómo mejorar tu anuncio — WebClasificados',
@@ -195,7 +197,7 @@ export async function sendMetricsReminder(
   adTitle: string,
   metrics: { views: number; clicks: number },
 ) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: '¿Ya revisaste tus métricas? — WebClasificados',
@@ -234,7 +236,7 @@ export async function sendMetricsReminder(
 export async function sendGoogleReviewRequest(email: string) {
   const GOOGLE_REVIEW_URL = process.env.GOOGLE_REVIEW_URL || 'https://g.page/webclasificados/review';
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: '¿Nos dejas una reseña en Google? — WebClasificados',
@@ -271,7 +273,7 @@ export async function sendGoogleReviewRequest(email: string) {
  * Send reactivation confirmation email after an ad is successfully reactivated.
  */
 export async function sendReactivationConfirmation(email: string, adTitle: string) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: '¡Tu anuncio fue reactivado! — WebClasificados',

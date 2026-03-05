@@ -4,6 +4,8 @@ import { COUNTRY_MAP } from '@/lib/utils/countries';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import { CITIES, PROFESSIONAL_SLUGS } from '@/lib/utils/cities';
 
+export const dynamic = 'force-dynamic';
+
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
 

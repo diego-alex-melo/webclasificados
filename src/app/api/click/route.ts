@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import redis from '@/lib/utils/redis';
+import getRedis from '@/lib/utils/redis';
 import { trackClick } from '@/lib/services/click-tracker';
 
 import type { ApiResponse } from '@/types';
@@ -36,16 +36,19 @@ export async function POST(
       'unknown';
 
     // Rate limit: max 1 view per IP per ad per hour
-    const rateLimitKey = `view_limit:${adId}:${ip}`;
-    const existing = await redis.get(rateLimitKey);
+    const redis = getRedis();
+    if (redis) {
+      const rateLimitKey = `view_limit:${adId}:${ip}`;
+      const existing = await redis.get(rateLimitKey);
 
-    if (existing) {
-      // Already tracked recently — silently succeed (no error to client)
-      return NextResponse.json({ data: { tracked: false } });
+      if (existing) {
+        // Already tracked recently — silently succeed (no error to client)
+        return NextResponse.json({ data: { tracked: false } });
+      }
+
+      // Set rate limit key with TTL
+      await redis.set(rateLimitKey, '1', 'EX', VIEW_RATE_LIMIT_SECONDS);
     }
-
-    // Set rate limit key with TTL
-    await redis.set(rateLimitKey, '1', 'EX', VIEW_RATE_LIMIT_SECONDS);
 
     // Track the view
     await trackClick(adId, 'VIEW', request.headers);

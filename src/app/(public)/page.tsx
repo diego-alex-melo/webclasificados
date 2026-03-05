@@ -4,6 +4,8 @@ import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import SearchBar from '@/components/SearchBar';
 import AdCard from '@/components/AdCard';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const recentAds = await prisma.ad.findMany({
     where: { status: 'ACTIVE' },
