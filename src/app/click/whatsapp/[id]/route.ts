@@ -31,7 +31,7 @@ export async function GET(
   // Fire-and-forget: push notification to advertiser
   notifyNewContact(ad.advertiserId, ad.title).catch(() => {});
 
-  const message = `Hola, vi tu anuncio '${ad.title}' en BrujosClassifieds y quiero más información.`;
+  const message = `Hola, vi tu anuncio en www.brujosclassifieds.com y deseo una consulta.`;
   const whatsappUrl = `https://wa.me/${ad.advertiser.whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   return NextResponse.redirect(whatsappUrl, 307);
