@@ -12,7 +12,7 @@ import {
   searchAds,
   AdError,
 } from '@/lib/services/ad-service';
-import { serverError } from '@/lib/services/error-logger';
+import { serverError, logError } from '@/lib/services/error-logger';
 import { PROFESSIONAL_TYPES } from '@/types';
 
 import type { ApiResponse, PaginatedResponse } from '@/types';
@@ -211,6 +211,13 @@ export async function GET(request: NextRequest): Promise<NextResponse<PaginatedR
       },
     });
   } catch (err) {
-    return serverError('/api/ads', 'GET', err);
+    logError('/api/ads', 'GET', err);
+    return NextResponse.json(
+      {
+        error: 'Error interno del servidor',
+        meta: { total: 0, page: 1, pageSize: 20, totalPages: 0 },
+      },
+      { status: 500 },
+    );
   }
 }
