@@ -191,7 +191,7 @@ export async function getAdsByCountry(
 
   const where = {
     status: 'ACTIVE' as const,
-    advertiser: { countryCode },
+    ...(countryCode ? { advertiser: { countryCode } } : {}),
   };
 
   const [ads, total] = await Promise.all([
