@@ -177,9 +177,14 @@ export default function RegistroPage() {
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">
-              {error}
-            </p>
+            <div className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">
+              <p>{error}</p>
+              {error.toLowerCase().includes('ya existe') && (
+                <Link href="/forgot-password" className="mt-2 inline-block text-accent-gold hover:underline">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              )}
+            </div>
           )}
 
           <button
