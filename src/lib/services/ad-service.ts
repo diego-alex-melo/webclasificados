@@ -112,14 +112,20 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
   const hash = contentHash(title, description, advertiser.whatsappNumber);
 
   // 4. Run spam pipeline
-  const spamResult = await runSpamPipeline({
-    title,
-    description,
-    whatsappNumber: advertiser.whatsappNumber,
-    imageUrl,
-    advertiserId,
-    ip,
-  });
+  let spamResult;
+  try {
+    spamResult = await runSpamPipeline({
+      title,
+      description,
+      whatsappNumber: advertiser.whatsappNumber,
+      imageUrl,
+      advertiserId,
+      ip,
+    });
+  } catch (err) {
+    console.error('[createAd] Spam pipeline error:', err);
+    throw new AdError('Error en el sistema de verificación. Intenta de nuevo.', 500);
+  }
 
   // 5. Resolve service and tradition IDs
   const serviceRecords = await prisma.service.findMany({
@@ -131,11 +137,13 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
   });
 
   // 6. Create ad — status depends on spam result
+  // Note: PrismaNeonHttp does not support implicit transactions (nested creates),
+  // so we create the ad first, then link services/traditions separately.
   const now = new Date();
   const adId = randomUUID();
   const slug = generateAdSlug(title, adId);
 
-  const ad = await prisma.ad.create({
+  await prisma.ad.create({
     data: {
       id: adId,
       advertiserId,
@@ -149,13 +157,29 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
       expiresAt: spamResult.passed ? expiresAt() : null,
       rejectionReason: spamResult.passed ? null : spamResult.reason,
       slug,
-      services: {
-        create: serviceRecords.map((s) => ({ serviceId: s.id })),
-      },
-      traditions: {
-        create: traditionRecords.map((t) => ({ traditionId: t.id })),
-      },
     },
+  });
+
+  // 7. Link services and traditions
+  if (serviceRecords.length > 0) {
+    await Promise.all(
+      serviceRecords.map((s) =>
+        prisma.adService.create({ data: { adId, serviceId: s.id } }),
+      ),
+    );
+  }
+
+  if (traditionRecords.length > 0) {
+    await Promise.all(
+      traditionRecords.map((t) =>
+        prisma.adTradition.create({ data: { adId, traditionId: t.id } }),
+      ),
+    );
+  }
+
+  // 8. Fetch complete ad with relations
+  const ad = await prisma.ad.findUniqueOrThrow({
+    where: { id: adId },
     include: activeAdIncludes,
   });
 

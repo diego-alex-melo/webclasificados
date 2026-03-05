@@ -93,9 +93,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     if (err instanceof AdError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    console.error('POST /api/ads error:', err instanceof Error ? { message: err.message, stack: err.stack } : err);
+    const errMsg = err instanceof Error ? err.message : String(err);
+    const errStack = err instanceof Error ? err.stack : undefined;
+    console.error('POST /api/ads error:', { message: errMsg, stack: errStack });
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error interno del servidor', debug: process.env.NODE_ENV !== 'production' ? errMsg : undefined },
       { status: 500 },
     );
   }
