@@ -3,14 +3,14 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Preguntas Frecuentes',
-  description: 'Preguntas frecuentes sobre WebClasificados, la plataforma de servicios esotéricos.',
+  description: 'Preguntas frecuentes sobre BrujosClassifieds, la plataforma de servicios esotéricos.',
 };
 
 const faqs = [
   {
-    question: '¿Qué es WebClasificados?',
+    question: '¿Qué es BrujosClassifieds?',
     answer:
-      'WebClasificados es una plataforma de clasificados en línea especializada en servicios esotéricos. Conectamos a profesionales esotéricos (brujos, tarotistas, santeros, videntes, etc.) con personas que buscan sus servicios en toda Latinoamérica.',
+      'BrujosClassifieds es una plataforma de clasificados en línea especializada en servicios esotéricos. Conectamos a profesionales esotéricos (brujos, tarotistas, santeros, videntes, etc.) con personas que buscan sus servicios en toda Latinoamérica.',
   },
   {
     question: '¿Cómo publico un anuncio?',
@@ -20,7 +20,7 @@ const faqs = [
   {
     question: '¿Cuánto cuesta publicar un anuncio?',
     answer:
-      'Publicar un anuncio en WebClasificados es completamente gratis. No cobramos por la publicación ni por los contactos que recibas.',
+      'Publicar un anuncio en BrujosClassifieds es completamente gratis. No cobramos por la publicación ni por los contactos que recibas.',
   },
   {
     question: '¿Cuántos anuncios puedo tener?',
@@ -40,7 +40,7 @@ const faqs = [
   {
     question: '¿Cómo me contactan los interesados?',
     answer:
-      'Los usuarios interesados hacen clic en el botón "Contactar por WhatsApp" en tu anuncio, lo que abre WhatsApp con un mensaje predeterminado: "Hola, vi tu anuncio \'[TÍTULO]\' en WebClasificados y quiero más información." También puedes incluir un enlace a tu sitio web.',
+      'Los usuarios interesados hacen clic en el botón "Contactar por WhatsApp" en tu anuncio, lo que abre WhatsApp con un mensaje predeterminado: "Hola, vi tu anuncio \'[TÍTULO]\' en BrujosClassifieds y quiero más información." También puedes incluir un enlace a tu sitio web.',
   },
   {
     question: '¿Qué es el botón de "destacar" anuncio?',
@@ -55,12 +55,12 @@ const faqs = [
   {
     question: '¿Qué países están disponibles?',
     answer:
-      'WebClasificados está disponible para toda Latinoamérica y España. Los principales países incluyen Colombia, México, Argentina, Perú, Chile, Ecuador, Venezuela, y más.',
+      'BrujosClassifieds está disponible para toda Latinoamérica y España. Los principales países incluyen Colombia, México, Argentina, Perú, Chile, Ecuador, Venezuela, y más.',
   },
   {
-    question: '¿WebClasificados garantiza los servicios de los anunciantes?',
+    question: '¿BrujosClassifieds garantiza los servicios de los anunciantes?',
     answer:
-      'No. WebClasificados es únicamente una plataforma de clasificados. No ofrecemos, respaldamos ni garantizamos los servicios publicados. Te recomendamos investigar al profesional antes de contratar cualquier servicio. Consulta nuestro Descargo de Responsabilidad para más información.',
+      'No. BrujosClassifieds es únicamente una plataforma de clasificados. No ofrecemos, respaldamos ni garantizamos los servicios publicados. Te recomendamos investigar al profesional antes de contratar cualquier servicio. Consulta nuestro Descargo de Responsabilidad para más información.',
   },
   {
     question: '¿Cómo reporto un anuncio fraudulento?',

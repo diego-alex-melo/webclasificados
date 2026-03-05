@@ -174,6 +174,6 @@ export function generateReferralLink(referralCode: string): string {
  */
 export function generateWhatsAppShareLink(referralCode: string): string {
   const link = generateReferralLink(referralCode);
-  const message = `Te invito a publicar tu servicio esotérico en WebClasificados. Regístrate con mi enlace: ${link}`;
+  const message = `Te invito a publicar tu servicio esotérico en BrujosClassifieds. Regístrate con mi enlace: ${link}`;
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }

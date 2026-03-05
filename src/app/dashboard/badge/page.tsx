@@ -34,7 +34,7 @@ export default function BadgePage() {
   }, []);
 
   const badgeHtml = adSlug
-    ? `<a href="${APP_URL}/anuncio/${adSlug}" target="_blank" rel="noopener">\n  <img src="${APP_URL}/badge.svg" alt="Verificado en WebClasificados" width="120" height="40" />\n</a>`
+    ? `<a href="${APP_URL}/anuncio/${adSlug}" target="_blank" rel="noopener">\n  <img src="${APP_URL}/badge.svg" alt="Verificado en BrujosClassifieds" width="120" height="40" />\n</a>`
     : '';
 
   async function handleCopy() {
@@ -70,7 +70,7 @@ export default function BadgePage() {
       <div>
         <h1 className="text-2xl font-bold text-[#e8e0f0]">Sello de Verificacion</h1>
         <p className="text-[#a090b8] text-sm mt-1">
-          Agrega el sello de WebClasificados a tu sitio web.
+          Agrega el sello de BrujosClassifieds a tu sitio web.
         </p>
       </div>
 
@@ -80,7 +80,7 @@ export default function BadgePage() {
         <div className="flex items-center justify-center py-8 bg-white/5 rounded-lg">
           <img
             src={`${APP_URL}/badge.svg`}
-            alt="Verificado en WebClasificados"
+            alt="Verificado en BrujosClassifieds"
             width={120}
             height={40}
           />

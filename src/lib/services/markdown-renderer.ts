@@ -83,7 +83,7 @@ export function renderAdMarkdown(ad: MarkdownAd): string {
   lines.push(
     '',
     '---',
-    `*Publicado en [WebClasificados](${APP_URL}) | Expira: ${formatDate(ad.expiresAt)}*`,
+    `*Publicado en [BrujosClassifieds](${APP_URL}) | Expira: ${formatDate(ad.expiresAt)}*`,
   );
 
   return lines.join('\n');
@@ -121,7 +121,7 @@ export function renderCategoryMarkdown(
   lines.push(
     '',
     '---',
-    `*[WebClasificados](${APP_URL})*`,
+    `*[BrujosClassifieds](${APP_URL})*`,
   );
 
   return lines.join('\n');
@@ -171,7 +171,7 @@ export function renderSearchMarkdown(
   lines.push(
     '',
     '---',
-    `*[WebClasificados](${APP_URL})*`,
+    `*[BrujosClassifieds](${APP_URL})*`,
   );
 
   return lines.join('\n');
@@ -186,7 +186,7 @@ export function renderBlogMarkdown(post: MarkdownBlogPost): string {
     truncate(post.content, 4000),
     '',
     '---',
-    `*Publicado en [WebClasificados Blog](${APP_URL}/blog) | ${formatDate(post.publishedAt)}*`,
+    `*Publicado en [BrujosClassifieds Blog](${APP_URL}/blog) | ${formatDate(post.publishedAt)}*`,
   ];
 
   return lines.join('\n');

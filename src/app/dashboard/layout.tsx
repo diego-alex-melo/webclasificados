@@ -101,7 +101,7 @@ export default function DashboardLayout({
       {/* Mobile header */}
       <header className="lg:hidden flex items-center justify-between p-4 border-b border-[#1a0e2e]">
         <Link href="/dashboard" className="text-[#d4af37] font-bold text-lg">
-          WebClasificados
+          BrujosClassifieds
         </Link>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -128,7 +128,7 @@ export default function DashboardLayout({
           <nav className="absolute left-0 top-0 bottom-0 w-64 bg-[#0d0015] border-r border-[#1a0e2e] p-6 flex flex-col gap-2">
             <div className="mb-6">
               <span className="text-[#d4af37] font-bold text-lg">
-                WebClasificados
+                BrujosClassifieds
               </span>
             </div>
             {NAV_ITEMS.map((item) => (
@@ -163,7 +163,7 @@ export default function DashboardLayout({
         <aside className="hidden lg:flex flex-col w-60 min-h-screen border-r border-[#1a0e2e] p-6 gap-2 sticky top-0 h-screen">
           <div className="mb-6">
             <Link href="/dashboard" className="text-[#d4af37] font-bold text-lg">
-              WebClasificados
+              BrujosClassifieds
             </Link>
           </div>
           {NAV_ITEMS.map((item) => (

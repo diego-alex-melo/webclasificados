@@ -80,7 +80,7 @@ function getFaqs(label: string, cityName: string) {
   return [
     {
       q: `¿Cómo encontrar ${label.toLowerCase()} confiables en ${cityName}?`,
-      a: `En WebClasificados verificamos a cada profesional antes de publicar su anuncio. Revisa las reseñas, el tipo de servicio que ofrecen y contacta directamente por WhatsApp para una consulta inicial.`,
+      a: `En BrujosClassifieds verificamos a cada profesional antes de publicar su anuncio. Revisa las reseñas, el tipo de servicio que ofrecen y contacta directamente por WhatsApp para una consulta inicial.`,
     },
     {
       q: `¿Cuánto cobran los ${label.toLowerCase()} en ${cityName}?`,
@@ -92,7 +92,7 @@ function getFaqs(label: string, cityName: string) {
     },
     {
       q: `¿Cómo publicar mi anuncio como ${label.toLowerCase().replace(/s$/, '')} en ${cityName}?`,
-      a: `Regístrate gratis en WebClasificados, verifica tu número de WhatsApp y publica tu anuncio. Aparecerás en las búsquedas de ${cityName} automáticamente.`,
+      a: `Regístrate gratis en BrujosClassifieds, verifica tu número de WhatsApp y publica tu anuncio. Aparecerás en las búsquedas de ${cityName} automáticamente.`,
     },
   ];
 }

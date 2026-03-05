@@ -3,7 +3,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Política de Privacidad',
-  description: 'Política de privacidad y tratamiento de datos personales de WebClasificados.',
+  description: 'Política de privacidad y tratamiento de datos personales de BrujosClassifieds.',
 };
 
 export default function PrivacidadPage() {

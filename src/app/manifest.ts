@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'WebClasificados — Servicios Esotéricos',
-    short_name: 'WebClasificados',
+    name: 'BrujosClassifieds — Servicios Esotéricos',
+    short_name: 'BrujosClassifieds',
     description: 'Encuentra servicios esotéricos profesionales en Latinoamérica',
     start_url: '/',
     display: 'standalone',

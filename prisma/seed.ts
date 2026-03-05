@@ -75,7 +75,7 @@ async function main() {
       .digest('hex');
   }
 
-  const DEFAULT_PASSWORD = 'WebClasificados2024';
+  const DEFAULT_PASSWORD = 'BrujosClassifieds2024';
   const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
 
   const now = new Date();

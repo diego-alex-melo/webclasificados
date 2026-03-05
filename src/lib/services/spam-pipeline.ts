@@ -35,6 +35,31 @@ function getRedis(): Redis {
   return redis;
 }
 
+// ── Step 0: Ad limit per account ─────────────────────────────────────────────
+
+const MAX_ACTIVE_ADS = 1;
+
+async function checkAdLimit(advertiserId: string): Promise<SpamCheckResult> {
+  const step = 'ad_limit';
+
+  const activeCount = await prisma.ad.count({
+    where: {
+      advertiserId,
+      status: { in: ['ACTIVE', 'PENDING'] },
+    },
+  });
+
+  if (activeCount >= MAX_ACTIVE_ADS) {
+    return {
+      passed: false,
+      step,
+      reason: `Solo puedes tener ${MAX_ACTIVE_ADS} anuncio activo. Elimina o espera a que expire el actual.`,
+    };
+  }
+
+  return { passed: true, step };
+}
+
 // ── Step 1: Rate limit ──────────────────────────────────────────────────────
 
 async function checkRateLimit(ip?: string, advertiserId?: string): Promise<SpamCheckResult> {
@@ -212,6 +237,10 @@ async function checkReputation(advertiserId: string): Promise<SpamCheckResult> {
 
 export async function runSpamPipeline(input: SpamCheckInput): Promise<SpamCheckResult> {
   const { title, description, whatsappNumber, imageUrl, advertiserId, ip } = input;
+
+  // Step 0: Ad limit per account
+  const limitResult = await checkAdLimit(advertiserId);
+  if (!limitResult.passed) return limitResult;
 
   // Step 1: Rate limit
   const rateResult = await checkRateLimit(ip, advertiserId);

@@ -42,7 +42,7 @@ export function generateHashtags(ad: AdWithRelations): string[] {
   const tags = new Set<string>();
 
   tags.add('#esoterico');
-  tags.add('#WebClasificados');
+  tags.add('#BrujosClassifieds');
 
   // Professional type tag
   const typeTag = ad.professionalType

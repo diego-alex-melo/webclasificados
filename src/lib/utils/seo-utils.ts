@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
-const SITE_NAME = 'WebClasificados';
+const SITE_NAME = 'BrujosClassifieds';
 
 // ── Types for function inputs ───────────────────────────────────────────────
 

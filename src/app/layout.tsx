@@ -8,14 +8,14 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'WebClasificados — Servicios Esotéricos',
-    template: '%s | WebClasificados',
+    default: 'BrujosClassifieds — Servicios Esotéricos',
+    template: '%s | BrujosClassifieds',
   },
   description:
     'Encuentra servicios esotéricos profesionales en Latinoamérica. Brujos, tarotistas, santeros, videntes y más. Publica tu anuncio gratis.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com'),
   openGraph: {
-    siteName: 'WebClasificados',
+    siteName: 'BrujosClassifieds',
     locale: 'es_CO',
     type: 'website',
   },
@@ -33,7 +33,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
-        <link rel="alternate" type="application/rss+xml" title="WebClasificados" href="/feed.xml" />
+        <link rel="alternate" type="application/rss+xml" title="BrujosClassifieds" href="/feed.xml" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -66,7 +66,7 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-accent-purple/15 bg-bg-primary/90 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="text-gradient-gold text-xl font-bold tracking-tight">
-          WebClasificados
+          BrujosClassifieds
         </Link>
         <ul className="flex items-center gap-6 text-sm">
           <li>
@@ -110,7 +110,7 @@ function Footer() {
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-8 sm:grid-cols-3">
           <div>
-            <p className="text-gradient-gold mb-2 font-bold">WebClasificados</p>
+            <p className="text-gradient-gold mb-2 font-bold">BrujosClassifieds</p>
             <p className="text-sm text-text-secondary">
               Plataforma de servicios esotéricos profesionales para Latinoamérica.
             </p>
@@ -162,9 +162,9 @@ function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-accent-purple/10 pt-6 text-center text-xs text-text-secondary">
-          <p>&copy; {new Date().getFullYear()} WebClasificados. Todos los derechos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} BrujosClassifieds. Todos los derechos reservados.</p>
           <p className="mt-1">
-            WebClasificados no se hace responsable de los servicios ofrecidos por los anunciantes.
+            BrujosClassifieds no se hace responsable de los servicios ofrecidos por los anunciantes.
           </p>
         </div>
       </div>

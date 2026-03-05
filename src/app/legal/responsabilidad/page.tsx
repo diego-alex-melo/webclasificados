@@ -3,7 +3,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Descargo de Responsabilidad',
-  description: 'Descargo de responsabilidad sobre los servicios esotéricos publicados en WebClasificados.',
+  description: 'Descargo de responsabilidad sobre los servicios esotéricos publicados en BrujosClassifieds.',
 };
 
 export default function ResponsabilidadPage() {
@@ -23,9 +23,9 @@ export default function ResponsabilidadPage() {
         <div className="rounded-xl border border-accent-gold/20 bg-accent-gold/5 p-6">
           <p className="font-semibold text-accent-gold">Aviso Importante</p>
           <p className="mt-2">
-            WebClasificados es una plataforma de clasificados que facilita el contacto entre
+            BrujosClassifieds es una plataforma de clasificados que facilita el contacto entre
             profesionales esotéricos y personas interesadas en sus servicios.
-            <strong> WebClasificados NO ofrece, respalda, garantiza ni se hace responsable de
+            <strong> BrujosClassifieds NO ofrece, respalda, garantiza ni se hace responsable de
             ningún servicio esotérico publicado en la Plataforma.</strong>
           </p>
         </div>
@@ -34,12 +34,12 @@ export default function ResponsabilidadPage() {
         <p>
           Los servicios esotéricos publicados en la Plataforma (incluyendo pero no limitado a
           tarot, brujería, santería, chamanismo, videncia, astrología, curandería y trabajos
-          espirituales) son ofrecidos por terceros independientes. WebClasificados no verifica
+          espirituales) son ofrecidos por terceros independientes. BrujosClassifieds no verifica
           la efectividad, autenticidad o resultados de dichos servicios.
         </p>
 
         <h2 className="text-xl font-semibold text-text-primary">2. Sin Garantías</h2>
-        <p>WebClasificados NO garantiza:</p>
+        <p>BrujosClassifieds NO garantiza:</p>
         <ul className="list-disc space-y-2 pl-6">
           <li>La efectividad o resultados de los servicios anunciados.</li>
           <li>La veracidad de las afirmaciones hechas por los anunciantes.</li>
@@ -71,7 +71,7 @@ export default function ResponsabilidadPage() {
         <p>
           Cualquier pago o transacción económica entre usuarios y anunciantes se realiza fuera
           de la Plataforma y bajo la exclusiva responsabilidad de las partes involucradas.
-          WebClasificados no procesa pagos ni media en disputas económicas.
+          BrujosClassifieds no procesa pagos ni media en disputas económicas.
         </p>
 
         <h2 className="text-xl font-semibold text-text-primary">6. Reporte de Fraude</h2>
@@ -83,7 +83,7 @@ export default function ResponsabilidadPage() {
 
         <h2 className="text-xl font-semibold text-text-primary">7. Limitación de Responsabilidad</h2>
         <p>
-          En la máxima medida permitida por la ley, WebClasificados, sus propietarios, empleados
+          En la máxima medida permitida por la ley, BrujosClassifieds, sus propietarios, empleados
           y afiliados no serán responsables por daños directos, indirectos, incidentales o
           consecuentes derivados del uso de la Plataforma o de la contratación de servicios
           publicados en ella.

@@ -3,7 +3,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Términos de Servicio',
-  description: 'Términos y condiciones de uso de WebClasificados, plataforma de servicios esotéricos.',
+  description: 'Términos y condiciones de uso de BrujosClassifieds, plataforma de servicios esotéricos.',
 };
 
 export default function TerminosPage() {
@@ -22,13 +22,13 @@ export default function TerminosPage() {
 
         <h2 className="text-xl font-semibold text-text-primary">1. Aceptación de los Términos</h2>
         <p>
-          Al acceder y utilizar WebClasificados (&ldquo;la Plataforma&rdquo;), aceptas cumplir con estos
+          Al acceder y utilizar BrujosClassifieds (&ldquo;la Plataforma&rdquo;), aceptas cumplir con estos
           Términos de Servicio. Si no estás de acuerdo, no utilices la Plataforma.
         </p>
 
         <h2 className="text-xl font-semibold text-text-primary">2. Descripción del Servicio</h2>
         <p>
-          WebClasificados es una plataforma de clasificados en línea que permite a profesionales
+          BrujosClassifieds es una plataforma de clasificados en línea que permite a profesionales
           esotéricos publicar anuncios de sus servicios. La Plataforma actúa únicamente como
           intermediario de contacto entre anunciantes y usuarios.
         </p>
@@ -62,14 +62,14 @@ export default function TerminosPage() {
 
         <h2 className="text-xl font-semibold text-text-primary">6. Propiedad Intelectual</h2>
         <p>
-          Al publicar contenido en la Plataforma, otorgas a WebClasificados una licencia no exclusiva,
+          Al publicar contenido en la Plataforma, otorgas a BrujosClassifieds una licencia no exclusiva,
           gratuita y mundial para mostrar, distribuir y promocionar tu contenido dentro de la Plataforma
           y en redes sociales asociadas.
         </p>
 
         <h2 className="text-xl font-semibold text-text-primary">7. Limitación de Responsabilidad</h2>
         <p>
-          WebClasificados NO es responsable de los servicios ofrecidos por los anunciantes.
+          BrujosClassifieds NO es responsable de los servicios ofrecidos por los anunciantes.
           La Plataforma no garantiza la veracidad, calidad o efectividad de los servicios publicados.
           Los usuarios contratan servicios bajo su propia responsabilidad.
         </p>
