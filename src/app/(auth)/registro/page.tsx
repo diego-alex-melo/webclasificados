@@ -11,6 +11,8 @@ export default function RegistroPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,9 +58,41 @@ export default function RegistroPage() {
             Enviamos un enlace de verificación a <strong className="text-text-primary">{email}</strong>.
             Haz clic en el enlace para activar tu cuenta.
           </p>
+          <p className="mb-4 text-xs text-text-secondary/60">
+            ¿No recibiste el correo? Revisa tu carpeta de spam.
+          </p>
+          {resent ? (
+            <p className="mb-4 text-sm text-green-400">
+              Correo reenviado. Revisa tu bandeja de entrada.
+            </p>
+          ) : (
+            <button
+              type="button"
+              disabled={resending}
+              onClick={async () => {
+                setResending(true);
+                try {
+                  await fetch('/api/auth/resend-verification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                  });
+                  setResent(true);
+                } catch {
+                  // silently fail
+                } finally {
+                  setResending(false);
+                }
+              }}
+              className="mb-4 text-sm text-accent-gold hover:underline disabled:opacity-50"
+            >
+              {resending ? 'Enviando...' : 'Reenviar correo de verificación'}
+            </button>
+          )}
+          <br />
           <Link
             href="/login"
-            className="text-sm text-accent-gold hover:underline"
+            className="text-sm text-text-secondary hover:text-accent-gold transition-colors"
           >
             Ir a iniciar sesión
           </Link>
@@ -74,7 +108,7 @@ export default function RegistroPage() {
           Crear cuenta
         </h1>
         <p className="mb-8 text-center text-sm text-text-secondary">
-          Publica tu anuncio gratis en WebClasificados
+          Publica tu anuncio gratis en BrujosClassifieds
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
