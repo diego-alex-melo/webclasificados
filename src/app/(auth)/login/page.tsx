@@ -13,6 +13,9 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
   const [passwordReset, setPasswordReset] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
 
   useEffect(() => {
     if (searchParams.get('verified') === 'true') {
@@ -42,6 +45,9 @@ function LoginForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 403) {
+          setNeedsVerification(true);
+        }
         setError(data.error || 'Error al iniciar sesión');
         return;
       }
@@ -108,9 +114,40 @@ function LoginForm() {
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">
-            {error}
-          </p>
+          <div className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">
+            <p>{error}</p>
+            {needsVerification && !resent && (
+              <button
+                type="button"
+                disabled={resending}
+                onClick={async () => {
+                  setResending(true);
+                  try {
+                    await fetch('/api/auth/resend-verification', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email }),
+                    });
+                    setResent(true);
+                    setError('');
+                    setNeedsVerification(false);
+                  } catch {
+                    setError('Error al reenviar. Intenta de nuevo.');
+                  } finally {
+                    setResending(false);
+                  }
+                }}
+                className="mt-2 text-accent-gold hover:underline disabled:opacity-50"
+              >
+                {resending ? 'Enviando...' : 'Reenviar correo de verificación'}
+              </button>
+            )}
+            {resent && (
+              <p className="mt-2 text-green-400">
+                Correo reenviado. Revisa tu bandeja de entrada y spam.
+              </p>
+            )}
+          </div>
         )}
 
         <button
