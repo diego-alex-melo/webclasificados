@@ -1,0 +1,194 @@
+// ============================================================================
+// WebClasificados — Prisma Schema
+// PostgreSQL provider, snake_case table mapping, camelCase Prisma fields
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum AdStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  REJECTED
+}
+
+enum ClickType {
+  WHATSAPP
+  WEBSITE
+  VIEW
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  TWITTER
+  PINTEREST
+  GOOGLE_BUSINESS
+}
+
+// ============================================================================
+// Models
+// ============================================================================
+
+model Advertiser {
+  id               String  @id @default(uuid()) @db.Uuid
+  email            String  @unique
+  passwordHash     String
+  whatsappNumber   String
+  countryCode      String  @db.VarChar(2)
+  reputation       Int     @default(100)
+  websiteUrl       String?
+  referralCode     String  @unique
+  referredById     String? @db.Uuid
+  pushSubscription Json?
+  emailVerified    Boolean @default(false)
+  emailVerifyToken String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  referredBy Advertiser?  @relation("AdvertiserReferral", fields: [referredById], references: [id])
+  referrals  Advertiser[] @relation("AdvertiserReferral")
+  ads        Ad[]
+
+  @@index([email])
+  @@index([referralCode])
+  @@index([whatsappNumber])
+  @@map("advertisers")
+}
+
+model Ad {
+  id              String   @id @default(uuid()) @db.Uuid
+  advertiserId    String   @db.Uuid
+  title           String   @db.VarChar(100)
+  description     String   @db.VarChar(2000)
+  slug            String   @unique
+  imageUrl        String?
+  imageHash       String?
+  contentHash     String
+  status          AdStatus @default(PENDING)
+  professionalType String
+  publishedAt     DateTime?
+  expiresAt       DateTime?
+  lastBumpedAt    DateTime?
+  rejectionReason    String?
+  reactivationToken  String?   @map("reactivation_token")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  advertiser  Advertiser    @relation(fields: [advertiserId], references: [id])
+  services    AdService[]
+  traditions  AdTradition[]
+  clickEvents ClickEvent[]
+  socialPosts SocialPost[]
+
+  @@index([advertiserId])
+  @@index([status])
+  @@index([slug])
+  @@index([contentHash])
+  @@index([reactivationToken])
+  @@map("ads")
+}
+
+model Service {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  slug String @unique
+
+  ads AdService[]
+
+  @@map("services")
+}
+
+model Tradition {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  slug String @unique
+
+  ads AdTradition[]
+
+  @@map("traditions")
+}
+
+model AdService {
+  adId      String @db.Uuid
+  serviceId Int
+
+  ad      Ad      @relation(fields: [adId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([adId, serviceId])
+  @@map("ad_services")
+}
+
+model AdTradition {
+  adId        String @db.Uuid
+  traditionId Int
+
+  ad        Ad        @relation(fields: [adId], references: [id], onDelete: Cascade)
+  tradition Tradition @relation(fields: [traditionId], references: [id], onDelete: Cascade)
+
+  @@id([adId, traditionId])
+  @@map("ad_traditions")
+}
+
+model ClickEvent {
+  id        String    @id @default(uuid()) @db.Uuid
+  adId      String    @db.Uuid
+  type      ClickType
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+
+  createdAt DateTime @default(now())
+
+  ad Ad @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  @@index([adId])
+  @@index([createdAt])
+  @@map("click_events")
+}
+
+model BlogPost {
+  id              String    @id @default(uuid()) @db.Uuid
+  slug            String    @unique
+  title           String
+  content         String    @db.Text
+  category        String
+  metaTitle       String?
+  metaDescription String?
+  publishedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@map("blog_posts")
+}
+
+model SocialPost {
+  id             String         @id @default(uuid()) @db.Uuid
+  adId           String         @db.Uuid
+  platform       SocialPlatform
+  externalPostId String?
+  postedAt       DateTime
+
+  ad Ad @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  @@map("social_posts")
+}

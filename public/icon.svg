@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#1a0a2e"/>
+  <text x="256" y="300" font-size="200" text-anchor="middle" fill="#d4af37" font-family="serif">W</text>
+  <text x="256" y="420" font-size="60" text-anchor="middle" fill="#a89bc2" font-family="serif">Clasificados</text>
+</svg>

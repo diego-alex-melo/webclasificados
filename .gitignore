@@ -1,0 +1,34 @@
+# AI Framework - Minimal .gitignore
+# Only framework-specific rules. Add your project rules below.
+
+/.claude/*
+!/.claude/rules/
+/.claude/rules/.manifest-checksums
+/CLAUDE.md
+/hooks/*.db
+/hooks/__pycache__/
+
+# Ralph orchestrator (operational, per-objective)
+/.ralph/
+
+# Deep research artifacts (per-investigation)
+/.research/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+
+# Database
+prisma/*.db
+
+# Coverage
+coverage/
+.env.local
+src/generated/
