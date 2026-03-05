@@ -186,6 +186,85 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
   return ad;
 }
 
+// ── Update ──────────────────────────────────────────────────────────────────
+
+interface UpdateAdInput {
+  title: string;
+  description: string;
+  imageUrl?: string;
+  services: string[];
+  professionalType: string;
+  traditions: string[];
+  advertiserId: string;
+}
+
+export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
+  const { title, description, imageUrl, services, professionalType, traditions, advertiserId } = data;
+
+  // 1. Verify ad exists and belongs to this advertiser
+  const existing = await prisma.ad.findFirst({
+    where: { id: adId, advertiserId, status: { in: ['ACTIVE', 'PENDING'] } },
+  });
+
+  if (!existing) {
+    throw new AdError('Anuncio no encontrado o no te pertenece', 404);
+  }
+
+  // 2. Resolve service and tradition IDs
+  const serviceRecords = await prisma.service.findMany({
+    where: { slug: { in: services } },
+  });
+
+  const traditionRecords = await prisma.tradition.findMany({
+    where: { slug: { in: traditions } },
+  });
+
+  // 3. Update ad fields
+  const advertiser = await prisma.advertiser.findUnique({
+    where: { id: advertiserId },
+    select: { whatsappNumber: true },
+  });
+
+  const hash = contentHash(title, description, advertiser!.whatsappNumber);
+
+  await prisma.ad.update({
+    where: { id: adId },
+    data: {
+      title,
+      description,
+      imageUrl: imageUrl ?? null,
+      contentHash: hash,
+      professionalType,
+    },
+  });
+
+  // 4. Replace services (delete old, create new) — no transactions in NeonHttp
+  await prisma.adService.deleteMany({ where: { adId } });
+  if (serviceRecords.length > 0) {
+    await Promise.all(
+      serviceRecords.map((s) =>
+        prisma.adService.create({ data: { adId, serviceId: s.id } }),
+      ),
+    );
+  }
+
+  // 5. Replace traditions
+  await prisma.adTradition.deleteMany({ where: { adId } });
+  if (traditionRecords.length > 0) {
+    await Promise.all(
+      traditionRecords.map((t) =>
+        prisma.adTradition.create({ data: { adId, traditionId: t.id } }),
+      ),
+    );
+  }
+
+  // 6. Return updated ad with relations
+  return prisma.ad.findUniqueOrThrow({
+    where: { id: adId },
+    include: activeAdIncludes,
+  });
+}
+
 // ── Read by slug ────────────────────────────────────────────────────────────
 
 export async function getAdBySlug(slug: string) {

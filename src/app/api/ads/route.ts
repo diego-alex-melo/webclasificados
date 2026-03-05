@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import {
   createAd,
+  updateAd,
   getAdsByCountry,
   getAdsByService,
   getAdsByTradition,
@@ -98,6 +99,72 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     console.error('POST /api/ads error:', { message: errMsg, stack: errStack });
     return NextResponse.json(
       { error: 'Error interno del servidor', debug: process.env.NODE_ENV !== 'production' ? errMsg : undefined },
+      { status: 500 },
+    );
+  }
+}
+
+// ── PUT /api/ads — Update existing ad ────────────────────────────────────────
+
+const updateAdSchema = z.object({
+  adId: z.string().uuid('ID de anuncio inválido'),
+  title: z
+    .string()
+    .min(10, 'El título debe tener al menos 10 caracteres')
+    .max(100, 'El título no puede tener más de 100 caracteres'),
+  description: z
+    .string()
+    .min(50, 'La descripción debe tener al menos 50 caracteres')
+    .max(2000, 'La descripción no puede tener más de 2000 caracteres'),
+  services: z
+    .array(z.string())
+    .min(1, 'Debes seleccionar al menos un servicio'),
+  professionalType: z.enum(PROFESSIONAL_TYPES),
+  traditions: z
+    .array(z.string())
+    .min(1, 'Debes seleccionar al menos una tradición'),
+  imageUrl: z.string().url('URL de imagen inválida').optional(),
+});
+
+export async function PUT(request: NextRequest): Promise<NextResponse<ApiResponse>> {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Token de autenticación requerido' },
+        { status: 401 },
+      );
+    }
+
+    const token = authHeader.slice(7);
+    const advertiser = await getAdvertiserFromToken(token);
+
+    const body = await request.json();
+    const parsed = updateAdSchema.safeParse(body);
+
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? 'Datos inválidos';
+      return NextResponse.json({ error: firstError }, { status: 400 });
+    }
+
+    const { adId, ...updateData } = parsed.data;
+
+    const ad = await updateAd(adId, {
+      ...updateData,
+      advertiserId: advertiser.id,
+    });
+
+    return NextResponse.json({ data: ad });
+  } catch (err) {
+    if (err instanceof AuthError) {
+      return NextResponse.json({ error: err.message }, { status: err.statusCode });
+    }
+    if (err instanceof AdError) {
+      return NextResponse.json({ error: err.message }, { status: err.statusCode });
+    }
+    console.error('PUT /api/ads error:', err instanceof Error ? err.message : err);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
       { status: 500 },
     );
   }

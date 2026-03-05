@@ -183,7 +183,10 @@ export default function AnuncioPage() {
     try {
       const token = localStorage.getItem('token');
 
+      const isUpdating = existingAd && existingAd.status !== 'REJECTED';
+
       const body = {
+        ...(isUpdating ? { adId: existingAd.id } : {}),
         title: title.trim(),
         description: description.trim(),
         professionalType,
@@ -193,7 +196,7 @@ export default function AnuncioPage() {
       };
 
       const res = await fetch('/api/ads', {
-        method: 'POST',
+        method: isUpdating ? 'PUT' : 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -214,7 +217,7 @@ export default function AnuncioPage() {
         return;
       }
 
-      setSuccess('Anuncio publicado exitosamente.');
+      setSuccess(isUpdating ? 'Anuncio actualizado exitosamente.' : 'Anuncio publicado exitosamente.');
       setExistingAd(json.data);
     } catch {
       setError('Error de conexion. Intenta de nuevo.');
