@@ -32,3 +32,6 @@ prisma/*.db
 coverage/
 .env.local
 src/generated/
+
+.vercel
+.env*.local
