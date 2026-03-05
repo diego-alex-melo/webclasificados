@@ -12,6 +12,7 @@ import {
   searchAds,
   AdError,
 } from '@/lib/services/ad-service';
+import { serverError } from '@/lib/services/error-logger';
 import { PROFESSIONAL_TYPES } from '@/types';
 
 import type { ApiResponse, PaginatedResponse } from '@/types';
@@ -94,13 +95,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     if (err instanceof AdError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    const errMsg = err instanceof Error ? err.message : String(err);
-    const errStack = err instanceof Error ? err.stack : undefined;
-    console.error('POST /api/ads error:', { message: errMsg, stack: errStack });
-    return NextResponse.json(
-      { error: 'Error interno del servidor', debug: process.env.NODE_ENV !== 'production' ? errMsg : undefined },
-      { status: 500 },
-    );
+    return serverError('/api/ads', 'POST', err);
   }
 }
 
@@ -162,11 +157,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse<ApiRespons
     if (err instanceof AdError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    console.error('PUT /api/ads error:', err instanceof Error ? err.message : err);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 },
-    );
+    return serverError('/api/ads', 'PUT', err);
   }
 }
 
@@ -220,13 +211,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<PaginatedR
       },
     });
   } catch (err) {
-    console.error('GET /api/ads error:', err);
-    return NextResponse.json(
-      {
-        error: 'Error interno del servidor',
-        meta: { total: 0, page: 1, pageSize: 20, totalPages: 0 },
-      },
-      { status: 500 },
-    );
+    return serverError('/api/ads', 'GET', err);
   }
 }

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { login, AuthError } from '@/lib/services/auth-service';
+import { serverError } from '@/lib/services/error-logger';
 import type { ApiResponse } from '@/types';
 
 const loginSchema = z.object({
@@ -43,8 +44,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: err.statusCode });
     }
 
-    console.error('Login error:', err);
-    const response: ApiResponse = { error: 'Error interno del servidor' };
-    return NextResponse.json(response, { status: 500 });
+    return serverError('/api/auth/login', 'POST', err);
   }
 }

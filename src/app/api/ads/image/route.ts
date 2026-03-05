@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import { processAndUpload, ImageError } from '@/lib/services/image-service';
+import { serverError } from '@/lib/services/error-logger';
 
 import type { ApiResponse } from '@/types';
 
@@ -55,10 +56,6 @@ export async function POST(
     if (err instanceof ImageError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    console.error('POST /api/ads/image error:', err);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 },
-    );
+    return serverError('/api/ads/image', 'POST', err);
   }
 }

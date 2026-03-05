@@ -183,6 +183,18 @@ model BlogPost {
   @@map("blog_posts")
 }
 
+model ErrorLog {
+  id        Int      @id @default(autoincrement())
+  route     String   @db.VarChar(200)
+  method    String   @db.VarChar(10)
+  message   String   @db.Text
+  stack     String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("error_logs")
+}
+
 model SocialPost {
   id             String         @id @default(uuid()) @db.Uuid
   adId           String         @db.Uuid

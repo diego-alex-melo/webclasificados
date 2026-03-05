@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { register, AuthError } from '@/lib/services/auth-service';
+import { serverError } from '@/lib/services/error-logger';
 import { sendVerificationEmail } from '@/lib/services/email-service';
 import { processReferral, validateReferralCode } from '@/lib/services/referral-service';
 import type { ApiResponse } from '@/types';
@@ -63,8 +64,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: err.statusCode });
     }
 
-    console.error('Registration error:', err);
-    const response: ApiResponse = { error: 'Error interno del servidor' };
-    return NextResponse.json(response, { status: 500 });
+    return serverError('/api/auth/register', 'POST', err);
   }
 }

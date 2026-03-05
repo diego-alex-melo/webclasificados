@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
+import { serverError } from '@/lib/services/error-logger';
 import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_CODES } from '@/types';
 import type { ApiResponse } from '@/types';
@@ -114,7 +115,6 @@ export async function PUT(request: NextRequest): Promise<NextResponse<ApiRespons
     if (err instanceof AuthError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    console.error('PUT /api/profile error:', err);
-    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
+    return serverError('/api/profile', 'PUT', err);
   }
 }

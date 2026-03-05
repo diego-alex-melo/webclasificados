@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import { getAdvertiserAd } from '@/lib/services/ad-service';
+import { serverError } from '@/lib/services/error-logger';
 import type { ApiResponse } from '@/types';
 
 /**
@@ -34,10 +35,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     if (err instanceof AuthError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    console.error('GET /api/ads/mine error:', err);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 },
-    );
+    return serverError('/api/ads/mine', 'GET', err);
   }
 }
