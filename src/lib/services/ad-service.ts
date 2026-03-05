@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import { prisma } from '@/lib/db/prisma';
 import { contentHash } from '@/lib/utils/content-hash';
 import { generateAdSlug } from '@/lib/utils/slug';
@@ -130,9 +132,12 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
 
   // 6. Create ad — status depends on spam result
   const now = new Date();
+  const adId = randomUUID();
+  const slug = generateAdSlug(title, adId);
 
   const ad = await prisma.ad.create({
     data: {
+      id: adId,
       advertiserId,
       title,
       description,
@@ -143,7 +148,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
       publishedAt: spamResult.passed ? now : null,
       expiresAt: spamResult.passed ? expiresAt() : null,
       rejectionReason: spamResult.passed ? null : spamResult.reason,
-      slug: '', // placeholder, updated below
+      slug,
       services: {
         create: serviceRecords.map((s) => ({ serviceId: s.id })),
       },
@@ -154,15 +159,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     include: activeAdIncludes,
   });
 
-  // 7. Generate slug with real ID and update
-  const slug = generateAdSlug(title, ad.id);
-  const updatedAd = await prisma.ad.update({
-    where: { id: ad.id },
-    data: { slug },
-    include: activeAdIncludes,
-  });
-
-  return updatedAd;
+  return ad;
 }
 
 // ── Read by slug ────────────────────────────────────────────────────────────

@@ -93,7 +93,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     if (err instanceof AdError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    console.error('POST /api/ads error:', err);
+    console.error('POST /api/ads error:', err instanceof Error ? { message: err.message, stack: err.stack } : err);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 },
