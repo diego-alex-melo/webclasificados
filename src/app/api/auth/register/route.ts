@@ -64,7 +64,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Registration error:', err);
-    const response: ApiResponse = { error: 'Error interno del servidor' };
+    const errMsg = err instanceof Error ? err.message : String(err);
+    const response: ApiResponse = { error: `Error interno: ${errMsg}` };
     return NextResponse.json(response, { status: 500 });
   }
 }
