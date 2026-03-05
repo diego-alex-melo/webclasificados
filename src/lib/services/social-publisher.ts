@@ -26,7 +26,7 @@ interface SocialPostResult {
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
+const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 
 const PLATFORM_CONFIGS: Record<SocialPlatform, boolean> = {
   FACEBOOK: !!process.env.FACEBOOK_PAGE_ID,

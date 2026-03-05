@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
   description:
     'Encuentra servicios esotéricos profesionales en Latinoamérica. Brujos, tarotistas, santeros, videntes y más. Publica tu anuncio gratis.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com'),
   openGraph: {
     siteName: 'WebClasificados',
     locale: 'es_CO',

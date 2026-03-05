@@ -1,9 +1,13 @@
 import { Resend } from 'resend';
 
 function getResend() {
-  return new Resend(process.env.RESEND_API_KEY || 'dummy_key');
+  const key = process.env.RESEND_API_KEY;
+  if (!key) {
+    throw new Error('RESEND_API_KEY environment variable is required');
+  }
+  return new Resend(key);
 }
-const EMAIL_FROM = process.env.EMAIL_FROM || 'WebClasificados <noreply@webclasificados.com>';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'BrujosClassifieds <noreply@brujosclassifieds.com>';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
 
 /**
@@ -15,13 +19,13 @@ export async function sendVerificationEmail(email: string, token: string) {
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: 'Verifica tu cuenta en WebClasificados',
+    subject: 'Verifica tu cuenta en BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
       <head><meta charset="utf-8"></head>
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
-        <h1 style="font-size: 24px; margin-bottom: 16px;">¡Bienvenido a WebClasificados!</h1>
+        <h1 style="font-size: 24px; margin-bottom: 16px;">¡Bienvenido a BrujosClassifieds!</h1>
         <p style="font-size: 16px; line-height: 1.5;">
           Gracias por registrarte. Para activar tu cuenta, haz clic en el siguiente botón:
         </p>
@@ -33,7 +37,7 @@ export async function sendVerificationEmail(email: string, token: string) {
           Si no creaste esta cuenta, puedes ignorar este mensaje.
         </p>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -48,7 +52,7 @@ export async function sendWelcome(email: string, name: string) {
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: '¡Tu cuenta está verificada! — WebClasificados',
+    subject: '¡Tu cuenta está verificada! — BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -56,14 +60,14 @@ export async function sendWelcome(email: string, name: string) {
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
         <h1 style="font-size: 24px; margin-bottom: 16px;">¡Hola${name ? `, ${name}` : ''}!</h1>
         <p style="font-size: 16px; line-height: 1.5;">
-          Tu cuenta en WebClasificados ha sido verificada exitosamente. Ya puedes publicar tus anuncios.
+          Tu cuenta en BrujosClassifieds ha sido verificada exitosamente. Ya puedes publicar tus anuncios.
         </p>
         <a href="${APP_URL}/dashboard"
            style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 24px 0;">
           Ir a mi panel
         </a>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -83,7 +87,7 @@ export async function sendExpirationWarning(
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: `Tu anuncio expira en ${daysLeft} días — WebClasificados`,
+    subject: `Tu anuncio expira en ${daysLeft} días — BrujosClassifieds`,
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -101,7 +105,7 @@ export async function sendExpirationWarning(
           Te notificaremos cuando expire para que puedas reactivarlo.
         </p>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -122,7 +126,7 @@ export async function sendExpiredNotice(
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: 'Tu anuncio ha expirado — WebClasificados',
+    subject: 'Tu anuncio ha expirado — BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -143,7 +147,7 @@ export async function sendExpiredNotice(
           Este enlace es válido por 7 días.
         </p>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -159,7 +163,7 @@ export async function sendOnboardingTips(email: string, adTitle: string) {
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: 'Cómo mejorar tu anuncio — WebClasificados',
+    subject: 'Cómo mejorar tu anuncio — BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -180,7 +184,7 @@ export async function sendOnboardingTips(email: string, adTitle: string) {
           Editar mi anuncio
         </a>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -200,7 +204,7 @@ export async function sendMetricsReminder(
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: '¿Ya revisaste tus métricas? — WebClasificados',
+    subject: '¿Ya revisaste tus métricas? — BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -222,7 +226,7 @@ export async function sendMetricsReminder(
           Ver mis métricas
         </a>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -234,12 +238,12 @@ export async function sendMetricsReminder(
  * Send Google Business review request email (Day 7 after first ad).
  */
 export async function sendGoogleReviewRequest(email: string) {
-  const GOOGLE_REVIEW_URL = process.env.GOOGLE_REVIEW_URL || 'https://g.page/webclasificados/review';
+  const GOOGLE_REVIEW_URL = process.env.GOOGLE_REVIEW_URL || 'https://g.page/brujosclassifieds/review';
 
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: '¿Nos dejas una reseña en Google? — WebClasificados',
+    subject: '¿Nos dejas una reseña en Google? — BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -247,7 +251,7 @@ export async function sendGoogleReviewRequest(email: string) {
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
         <h1 style="font-size: 24px; margin-bottom: 16px;">¿Cómo ha sido tu experiencia?</h1>
         <p style="font-size: 16px; line-height: 1.5;">
-          Llevas una semana usando WebClasificados. Tu opinión nos ayuda a mejorar
+          Llevas una semana usando BrujosClassifieds. Tu opinión nos ayuda a mejorar
           y a que más personas conozcan la plataforma.
         </p>
         <p style="font-size: 16px; line-height: 1.5;">
@@ -258,10 +262,10 @@ export async function sendGoogleReviewRequest(email: string) {
           Dejar reseña en Google
         </a>
         <p style="font-size: 14px; color: #6b7280; line-height: 1.5;">
-          ¡Gracias por ser parte de WebClasificados!
+          ¡Gracias por ser parte de BrujosClassifieds!
         </p>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -278,7 +282,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: 'Recupera tu contraseña — WebClasificados',
+    subject: 'Recupera tu contraseña — BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -286,7 +290,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
         <h1 style="font-size: 24px; margin-bottom: 16px;">Recupera tu contraseña</h1>
         <p style="font-size: 16px; line-height: 1.5;">
-          Recibimos una solicitud para restablecer la contraseña de tu cuenta en WebClasificados.
+          Recibimos una solicitud para restablecer la contraseña de tu cuenta en BrujosClassifieds.
           Si fuiste tú, haz clic en el botón de abajo:
         </p>
         <a href="${resetUrl}"
@@ -298,7 +302,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
           puedes ignorar este mensaje — tu contraseña no será modificada.
         </p>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>
@@ -313,7 +317,7 @@ export async function sendReactivationConfirmation(email: string, adTitle: strin
   await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: '¡Tu anuncio fue reactivado! — WebClasificados',
+    subject: '¡Tu anuncio fue reactivado! — BrujosClassifieds',
     html: `
       <!DOCTYPE html>
       <html lang="es">
@@ -329,7 +333,7 @@ export async function sendReactivationConfirmation(email: string, adTitle: strin
           Ver mi anuncio
         </a>
         <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
-          — Equipo WebClasificados
+          — Equipo BrujosClassifieds
         </p>
       </body>
       </html>

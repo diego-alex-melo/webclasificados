@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 
 /**
  * RSS feed of the latest 50 active ads.

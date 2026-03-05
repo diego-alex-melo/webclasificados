@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const countryName = getCountryName(ad.advertiser.countryCode);
   const description = ad.description.slice(0, 160);
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
   const url = `${baseUrl}/anuncio/${ad.slug}`;
 
   return {
@@ -77,7 +77,7 @@ export default async function AdDetailPage({ params }: PageProps) {
   const countrySlug = ad.advertiser.countryCode.toLowerCase();
   const serviceSlugs = ad.services.map((s) => s.service.slug);
   const firstService = ad.services[0]?.service;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 
   const breadcrumbs = [
     { label: 'Inicio', href: '/' },

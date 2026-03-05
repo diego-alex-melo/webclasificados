@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
+const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 
 export default function BadgePage() {
   const [adSlug, setAdSlug] = useState<string | null>(null);

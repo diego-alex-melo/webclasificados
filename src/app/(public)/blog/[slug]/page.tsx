@@ -10,7 +10,7 @@ import {
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 
 interface PageProps {
   params: Promise<{ slug: string }>;

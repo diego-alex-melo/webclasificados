@@ -2,7 +2,7 @@ import { prisma } from '@/lib/db/prisma';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webclasificados.com';
+const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 const BOOST_DAYS = 3;
 
 // ── Types ───────────────────────────────────────────────────────────────────
