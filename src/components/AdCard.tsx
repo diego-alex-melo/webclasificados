@@ -33,7 +33,7 @@ export default function AdCard({ ad }: AdCardProps) {
   return (
     <article className="card-gradient group relative flex flex-col overflow-hidden rounded-xl transition-all">
       {/* Image or Placeholder */}
-      <Link href={`/anuncio/${ad.slug}`} className="relative aspect-[4/3] overflow-hidden">
+      <Link href={`/anuncio/${ad.slug}`} prefetch={false} className="relative aspect-[4/3] overflow-hidden">
         {ad.imageUrl ? (
           <img
             src={ad.imageUrl}
@@ -77,7 +77,7 @@ export default function AdCard({ ad }: AdCardProps) {
         </div>
 
         {/* Title */}
-        <Link href={`/anuncio/${ad.slug}`}>
+        <Link href={`/anuncio/${ad.slug}`} prefetch={false}>
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-text-primary transition-colors group-hover:text-accent-gold">
             {ad.title}
           </h3>
@@ -90,6 +90,7 @@ export default function AdCard({ ad }: AdCardProps) {
               <Link
                 key={s.service.slug}
                 href={`/${countrySlug}/${s.service.slug}`}
+                prefetch={false}
                 className="rounded-full bg-accent-gold/10 px-2 py-0.5 text-[11px] text-accent-gold transition-colors hover:bg-accent-gold/20"
               >
                 {s.service.name}

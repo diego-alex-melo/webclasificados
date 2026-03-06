@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <meta name="theme-color" content="#1a0a2e" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link rel="alternate" type="application/rss+xml" title="BrujosClassifieds" href="/feed.xml" />
@@ -119,17 +119,17 @@ function Footer() {
             <p className="mb-2 text-sm font-semibold text-text-primary">Categorías</p>
             <ul className="space-y-1 text-sm text-text-secondary">
               <li>
-                <Link href="/buscar?service=amor-y-relaciones" className="hover:text-accent-gold">
+                <Link href="/buscar?service=amor-y-relaciones" prefetch={false} className="hover:text-accent-gold">
                   Amor y Relaciones
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=proteccion-y-limpieza" className="hover:text-accent-gold">
+                <Link href="/buscar?service=proteccion-y-limpieza" prefetch={false} className="hover:text-accent-gold">
                   Protección y Limpieza
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=lectura-y-adivinacion" className="hover:text-accent-gold">
+                <Link href="/buscar?service=lectura-y-adivinacion" prefetch={false} className="hover:text-accent-gold">
                   Lectura y Adivinación
                 </Link>
               </li>

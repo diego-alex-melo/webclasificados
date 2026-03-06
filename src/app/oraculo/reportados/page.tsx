@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 interface Ad {
   id: string;
   title: string;
+  slug: string;
   status: string;
   rejectionReason: string | null;
   createdAt: string;
@@ -23,10 +24,26 @@ interface Meta {
   totalPages: number;
 }
 
-export default function ReportadosPage() {
+const STATUS_OPTIONS = ['ALL', 'ACTIVE', 'PENDING', 'REJECTED', 'EXPIRED'] as const;
+const STATUS_LABELS: Record<string, string> = {
+  ALL: 'Todos',
+  ACTIVE: 'Activos',
+  PENDING: 'Pendientes',
+  REJECTED: 'Rechazados',
+  EXPIRED: 'Expirados',
+};
+
+const STATUS_BADGE: Record<string, string> = {
+  ACTIVE: 'bg-green-500/15 text-green-400',
+  PENDING: 'bg-yellow-500/15 text-yellow-400',
+  REJECTED: 'bg-red-500/15 text-red-400',
+  EXPIRED: 'bg-gray-500/15 text-gray-400',
+};
+
+export default function AnunciosPage() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [meta, setMeta] = useState<Meta>({ total: 0, page: 1, pageSize: 20, totalPages: 0 });
-  const [statusFilter, setStatusFilter] = useState<'REJECTED' | 'PENDING'>('PENDING');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState('');
@@ -38,10 +55,12 @@ export default function ReportadosPage() {
       setError('');
       const token = localStorage.getItem('token');
       const params = new URLSearchParams({
-        status: statusFilter,
         page: String(page),
         pageSize: '20',
       });
+      if (statusFilter !== 'ALL') {
+        params.set('status', statusFilter);
+      }
       fetch(`/api/admin/ads?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -95,28 +114,29 @@ export default function ReportadosPage() {
     }
   }
 
-  async function handleBlockUser(advertiserId: string) {
-    setActionLoading(advertiserId);
+  async function handleDelete(adId: string, title: string) {
+    if (!confirm(`Eliminar permanentemente "${title}"?`)) return;
+    setActionLoading(adId);
     setMessage('');
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
+      const res = await fetch('/api/admin/ads', {
+        method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ advertiserId, action: 'block' }),
+        body: JSON.stringify({ adId }),
       });
       const json = await res.json();
       if (json.error) {
         setError(json.error);
       } else {
-        setMessage('Usuario bloqueado (reputacion = 0)');
+        setMessage('Anuncio eliminado');
         fetchAds(meta.page);
       }
     } catch {
-      setError('Error al bloquear usuario');
+      setError('Error al eliminar anuncio');
     } finally {
       setActionLoading(null);
     }
@@ -133,12 +153,12 @@ export default function ReportadosPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-[#d4af37] mb-6">
-        Anuncios Reportados
+        Gestion de Anuncios
       </h1>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-6">
-        {(['PENDING', 'REJECTED'] as const).map((s) => (
+      <div className="flex flex-wrap gap-2 mb-6">
+        {STATUS_OPTIONS.map((s) => (
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
@@ -148,7 +168,7 @@ export default function ReportadosPage() {
                 : 'bg-[#1a0e2e] text-[#a090b8] hover:text-[#e8e0f0]'
             }`}
           >
-            {s === 'PENDING' ? 'Pendientes' : 'Rechazados'}
+            {STATUS_LABELS[s]}
           </button>
         ))}
       </div>
@@ -171,11 +191,10 @@ export default function ReportadosPage() {
         </div>
       ) : ads.length === 0 ? (
         <p className="text-[#a090b8] text-center py-10">
-          No hay anuncios con estado {statusFilter === 'PENDING' ? 'pendiente' : 'rechazado'}
+          No hay anuncios {statusFilter !== 'ALL' ? `con estado ${STATUS_LABELS[statusFilter]?.toLowerCase()}` : ''}
         </p>
       ) : (
         <>
-          {/* Responsive table */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -183,7 +202,6 @@ export default function ReportadosPage() {
                   <th className="pb-3 text-[#a090b8] font-medium">Titulo</th>
                   <th className="pb-3 text-[#a090b8] font-medium">Email</th>
                   <th className="pb-3 text-[#a090b8] font-medium">Estado</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Razon</th>
                   <th className="pb-3 text-[#a090b8] font-medium">Fecha</th>
                   <th className="pb-3 text-[#a090b8] font-medium">Acciones</th>
                 </tr>
@@ -194,18 +212,9 @@ export default function ReportadosPage() {
                     <td className="py-3 pr-4 max-w-[200px] truncate">{ad.title}</td>
                     <td className="py-3 pr-4 text-[#a090b8]">{ad.advertiser.email}</td>
                     <td className="py-3 pr-4">
-                      <span
-                        className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          ad.status === 'PENDING'
-                            ? 'bg-yellow-500/15 text-yellow-400'
-                            : 'bg-red-500/15 text-red-400'
-                        }`}
-                      >
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_BADGE[ad.status] ?? 'bg-gray-500/15 text-gray-400'}`}>
                         {ad.status}
                       </span>
-                    </td>
-                    <td className="py-3 pr-4 text-[#a090b8] max-w-[200px] truncate">
-                      {ad.rejectionReason ?? '-'}
                     </td>
                     <td className="py-3 pr-4 text-[#a090b8] whitespace-nowrap">
                       {formatDate(ad.createdAt)}
@@ -213,6 +222,24 @@ export default function ReportadosPage() {
                     <td className="py-3">
                       <div className="flex gap-2">
                         {ad.status === 'PENDING' && (
+                          <>
+                            <button
+                              onClick={() => handleAction(ad.id, 'approve')}
+                              disabled={actionLoading === ad.id}
+                              className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition-colors disabled:opacity-50"
+                            >
+                              Aprobar
+                            </button>
+                            <button
+                              onClick={() => handleAction(ad.id, 'reject')}
+                              disabled={actionLoading === ad.id}
+                              className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-xs font-medium transition-colors disabled:opacity-50"
+                            >
+                              Rechazar
+                            </button>
+                          </>
+                        )}
+                        {ad.status === 'REJECTED' && (
                           <button
                             onClick={() => handleAction(ad.id, 'approve')}
                             disabled={actionLoading === ad.id}
@@ -221,21 +248,12 @@ export default function ReportadosPage() {
                             Aprobar
                           </button>
                         )}
-                        {ad.status === 'PENDING' && (
-                          <button
-                            onClick={() => handleAction(ad.id, 'reject')}
-                            disabled={actionLoading === ad.id}
-                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition-colors disabled:opacity-50"
-                          >
-                            Rechazar
-                          </button>
-                        )}
                         <button
-                          onClick={() => handleBlockUser(ad.advertiser.id)}
-                          disabled={actionLoading === ad.advertiser.id}
-                          className="px-3 py-1 bg-[#1a0e2e] hover:bg-[#2a1640] text-red-400 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                          onClick={() => handleDelete(ad.id, ad.title)}
+                          disabled={actionLoading === ad.id}
+                          className="px-3 py-1 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded text-xs font-medium transition-colors disabled:opacity-50"
                         >
-                          Bloquear usuario
+                          Eliminar
                         </button>
                       </div>
                     </td>

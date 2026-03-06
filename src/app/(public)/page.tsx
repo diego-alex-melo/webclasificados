@@ -4,7 +4,7 @@ import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import SearchBar from '@/components/SearchBar';
 import AdCard from '@/components/AdCard';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // ISR: revalidate every 60 seconds
 
 export default async function HomePage() {
   const recentAds = await prisma.ad.findMany({
@@ -55,6 +55,7 @@ export default async function HomePage() {
             <Link
               key={cat.slug}
               href={`/buscar?service=${cat.slug}`}
+              prefetch={false}
               className="card-gradient flex items-start gap-4 rounded-xl p-5 transition-all"
             >
               <span className="text-3xl">{cat.emoji}</span>

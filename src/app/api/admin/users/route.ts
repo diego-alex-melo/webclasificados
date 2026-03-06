@@ -91,7 +91,8 @@ export async function GET(
 
 const patchSchema = z.object({
   advertiserId: z.string().uuid(),
-  action: z.enum(['block', 'unblock']),
+  action: z.enum(['block', 'unblock', 'set-reputation']),
+  reputation: z.number().min(0).max(100).optional(),
 });
 
 export async function PATCH(
@@ -121,7 +122,18 @@ export async function PATCH(
       );
     }
 
-    const reputation = action === 'block' ? 0 : 100;
+    let reputation: number;
+    if (action === 'set-reputation') {
+      if (parsed.data.reputation === undefined) {
+        return NextResponse.json(
+          { error: 'Se requiere el valor de reputacion' },
+          { status: 400 },
+        );
+      }
+      reputation = parsed.data.reputation;
+    } else {
+      reputation = action === 'block' ? 0 : 100;
+    }
 
     const updated = await prisma.advertiser.update({
       where: { id: advertiserId },

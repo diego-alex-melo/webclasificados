@@ -30,6 +30,8 @@ export default function UsuariosPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [editingRep, setEditingRep] = useState<string | null>(null);
+  const [repValue, setRepValue] = useState('');
 
   const fetchUsers = useCallback(
     (page = 1) => {
@@ -96,6 +98,40 @@ export default function UsuariosPage() {
       }
     } catch {
       setError('Error al realizar la accion');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleSetReputation(advertiserId: string) {
+    const val = parseInt(repValue, 10);
+    if (isNaN(val) || val < 0 || val > 100) {
+      setError('Reputacion debe ser entre 0 y 100');
+      return;
+    }
+    setActionLoading(advertiserId);
+    setMessage('');
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ advertiserId, action: 'set-reputation', reputation: val }),
+      });
+      const json = await res.json();
+      if (json.error) {
+        setError(json.error);
+      } else {
+        setMessage(`Reputacion actualizada a ${val}`);
+        setEditingRep(null);
+        setRepValue('');
+        fetchUsers(meta.page);
+      }
+    } catch {
+      setError('Error al cambiar reputacion');
     } finally {
       setActionLoading(null);
     }
@@ -193,7 +229,6 @@ export default function UsuariosPage() {
         </p>
       ) : (
         <>
-          {/* Responsive table */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -214,7 +249,42 @@ export default function UsuariosPage() {
                     <td className="py-3 pr-4 max-w-[200px] truncate">{user.email}</td>
                     <td className="py-3 pr-4 text-[#a090b8]">{user.whatsappNumber}</td>
                     <td className="py-3 pr-4 text-[#a090b8]">{user.countryCode}</td>
-                    <td className="py-3 pr-4">{reputationBadge(user.reputation)}</td>
+                    <td className="py-3 pr-4">
+                      {editingRep === user.id ? (
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={repValue}
+                            onChange={(e) => setRepValue(e.target.value)}
+                            className="w-16 bg-[#0d0015] border border-[#7b2ff2] rounded px-2 py-0.5 text-xs text-[#e8e0f0]"
+                            autoFocus
+                          />
+                          <button
+                            onClick={() => handleSetReputation(user.id)}
+                            disabled={actionLoading === user.id}
+                            className="px-2 py-0.5 bg-[#7b2ff2] text-white rounded text-xs disabled:opacity-50"
+                          >
+                            OK
+                          </button>
+                          <button
+                            onClick={() => { setEditingRep(null); setRepValue(''); }}
+                            className="px-2 py-0.5 bg-[#1a0e2e] text-[#a090b8] rounded text-xs"
+                          >
+                            X
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => { setEditingRep(user.id); setRepValue(String(user.reputation)); }}
+                          className="hover:opacity-80 transition-opacity"
+                          title="Click para editar reputacion"
+                        >
+                          {reputationBadge(user.reputation)}
+                        </button>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 text-[#a090b8]">{user._count.ads}</td>
                     <td className="py-3 pr-4">
                       {user.emailVerified ? (

@@ -475,13 +475,14 @@ export async function searchAds(
 
 // ── Bump ────────────────────────────────────────────────────────────────────
 
-export async function bumpAd(adId: string, advertiserId: string): Promise<Ad> {
+export async function bumpAd(advertiserId: string): Promise<Ad> {
   const ad = await prisma.ad.findFirst({
-    where: { id: adId, advertiserId, status: 'ACTIVE' },
+    where: { advertiserId, status: 'ACTIVE' },
+    orderBy: { createdAt: 'desc' },
   });
 
   if (!ad) {
-    throw new AdError('Anuncio no encontrado o no te pertenece', 404);
+    throw new AdError('No tienes un anuncio activo para republicar', 404);
   }
 
   // Check 48h cooldown
@@ -498,7 +499,7 @@ export async function bumpAd(adId: string, advertiserId: string): Promise<Ad> {
   }
 
   return prisma.ad.update({
-    where: { id: adId },
+    where: { id: ad.id },
     data: { lastBumpedAt: new Date() },
     include: activeAdIncludes,
   });

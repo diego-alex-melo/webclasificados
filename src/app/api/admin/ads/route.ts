@@ -87,6 +87,51 @@ const patchSchema = z.object({
   reason: z.string().optional(),
 });
 
+// ── DELETE /api/admin/ads — Delete an ad ──────────────────────────────────
+
+const deleteSchema = z.object({
+  adId: z.string().uuid(),
+});
+
+export async function DELETE(
+  request: NextRequest,
+): Promise<NextResponse<ApiResponse>> {
+  try {
+    await requireAdmin(request);
+
+    const body = await request.json();
+    const parsed = deleteSchema.safeParse(body);
+
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? 'Datos inválidos';
+      return NextResponse.json({ error: firstError }, { status: 400 });
+    }
+
+    const { adId } = parsed.data;
+
+    const ad = await prisma.ad.findUnique({ where: { id: adId } });
+    if (!ad) {
+      return NextResponse.json({ error: 'Anuncio no encontrado' }, { status: 404 });
+    }
+
+    await prisma.ad.delete({ where: { id: adId } });
+
+    return NextResponse.json({ data: { deleted: true } });
+  } catch (err) {
+    if (err instanceof AuthError) {
+      return NextResponse.json(
+        { error: err.message },
+        { status: err.statusCode },
+      );
+    }
+    console.error('DELETE /api/admin/ads error:', err);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 },
+    );
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
 ): Promise<NextResponse<ApiResponse>> {

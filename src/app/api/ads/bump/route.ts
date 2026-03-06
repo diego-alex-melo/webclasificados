@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
-import { getAdvertiserAd, bumpAd, AdError } from '@/lib/services/ad-service';
+import { bumpAd, AdError } from '@/lib/services/ad-service';
+import { serverError } from '@/lib/services/error-logger';
 
 import type { ApiResponse } from '@/types';
 
@@ -23,16 +24,8 @@ export async function POST(
     const token = authHeader.slice(7);
     const advertiser = await getAdvertiserFromToken(token);
 
-    // Find advertiser's active ad
-    const ad = await getAdvertiserAd(advertiser.id);
-    if (!ad) {
-      return NextResponse.json(
-        { error: 'No tienes un anuncio activo para republicar' },
-        { status: 404 },
-      );
-    }
-
-    const bumped = await bumpAd(ad.id, advertiser.id);
+    // bumpAd finds the active ad and validates cooldown
+    const bumped = await bumpAd(advertiser.id);
 
     return NextResponse.json({ data: bumped });
   } catch (err) {
@@ -42,10 +35,6 @@ export async function POST(
     if (err instanceof AdError) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
-    console.error('POST /api/ads/bump error:', err);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 },
-    );
+    return serverError('/api/ads/bump', 'POST', err);
   }
 }

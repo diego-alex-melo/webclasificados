@@ -1,18 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function RegistroPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20">
+        <div className="w-6 h-6 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <RegistroForm />
+    </Suspense>
+  );
+}
+
+function RegistroForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [referral, setReferral] = useState('');
+  const searchParams = useSearchParams();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) setReferral(ref);
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

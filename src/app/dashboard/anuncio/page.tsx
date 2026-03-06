@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
+/* eslint-disable @next/next/no-img-element */
 
 import { PROFESSIONAL_TYPES } from '@/types';
 
@@ -51,6 +51,7 @@ export default function AnuncioPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [existingAd, setExistingAd] = useState<ExistingAd | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const submitRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -219,6 +220,7 @@ export default function AnuncioPage() {
 
       setSuccess(isUpdating ? 'Anuncio actualizado exitosamente.' : 'Anuncio publicado exitosamente.');
       setExistingAd(json.data);
+      submitRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch {
       setError('Error de conexion. Intenta de nuevo.');
     } finally {
@@ -325,11 +327,10 @@ export default function AnuncioPage() {
           <div className="flex items-start gap-4">
             {imagePreview ? (
               <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[#2a1a4e]">
-                <Image
+                <img
                   src={imagePreview}
                   alt="Preview"
-                  fill
-                  className="object-cover"
+                  className="h-full w-full object-cover"
                 />
                 <button
                   type="button"
@@ -443,19 +444,33 @@ export default function AnuncioPage() {
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {submitting
-            ? 'Enviando...'
-            : isEdit
-              ? 'Guardar cambios'
-              : isRejected
-                ? 'Reenviar anuncio'
-                : 'Publicar anuncio'}
-        </button>
+        <div ref={submitRef}>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitting
+              ? 'Enviando...'
+              : isEdit
+                ? 'Guardar cambios'
+                : isRejected
+                  ? 'Reenviar anuncio'
+                  : 'Publicar anuncio'}
+          </button>
+
+          {success && (
+            <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-lg p-4 mt-4">
+              <p className="text-[#25D366] text-sm">{success}</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mt-4">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+        </div>
       </form>
     </div>
   );
