@@ -154,6 +154,13 @@ export default function DashboardLayout({
               </Link>
             ))}
             <div className="mt-auto">
+              <Link
+                href="/ayuda"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0] transition-colors"
+              >
+                ¿Necesitas ayuda?
+              </Link>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-400/10 transition-colors w-full"
@@ -188,6 +195,12 @@ export default function DashboardLayout({
             </Link>
           ))}
           <div className="mt-auto">
+            <Link
+              href="/ayuda"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0] transition-colors"
+            >
+              ¿Necesitas ayuda?
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-400/10 transition-colors w-full"

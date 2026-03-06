@@ -158,6 +158,11 @@ function Footer() {
                   Preguntas Frecuentes
                 </Link>
               </li>
+              <li>
+                <Link href="/ayuda" className="hover:text-accent-gold">
+                  Ayuda
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

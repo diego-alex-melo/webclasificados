@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import ContactForm from './ContactForm';
 
 export const metadata: Metadata = {
-  title: 'Preguntas Frecuentes',
-  description: 'Preguntas frecuentes sobre BrujosClassifieds, la plataforma de servicios esotéricos.',
+  title: 'Ayuda',
+  description: 'Preguntas frecuentes y formulario de contacto de BrujosClassifieds.',
 };
 
 const faqs = [
@@ -25,7 +26,7 @@ const faqs = [
   {
     question: '¿Cuántos anuncios puedo tener?',
     answer:
-      'Cada cuenta puede tener máximo 1 anuncio activo a la vez. Esto nos permite mantener la calidad de la plataforma y asegurar que cada anuncio reciba visibilidad.',
+      'Cada cuenta puede tener máximo 3 anuncios activos (1 por país). Esto nos permite mantener la calidad de la plataforma y asegurar que cada anuncio reciba visibilidad.',
   },
   {
     question: '¿Cuánto tiempo dura mi anuncio?',
@@ -69,13 +70,13 @@ const faqs = [
   },
 ];
 
-export default function FAQPage() {
+export default function AyudaPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Breadcrumbs
         items={[
           { label: 'Inicio', href: '/' },
-          { label: 'Preguntas Frecuentes' },
+          { label: 'Ayuda' },
         ]}
       />
 
@@ -90,11 +91,12 @@ export default function FAQPage() {
         ))}
       </div>
 
-      <div className="mt-8 text-center">
-        <p className="text-text-secondary mb-3">¿No encontraste respuesta?</p>
-        <a href="/ayuda#contacto" className="text-accent-gold hover:underline font-medium">
-          Escríbenos y te responderemos en 48 horas
-        </a>
+      <div id="contacto" className="mt-16">
+        <h2 className="mb-2 text-2xl font-bold text-text-primary">¿No encontraste respuesta?</h2>
+        <p className="mb-8 text-text-secondary">
+          Envíanos un mensaje y te responderemos en 48 horas.
+        </p>
+        <ContactForm />
       </div>
     </div>
   );

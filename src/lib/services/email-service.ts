@@ -313,6 +313,93 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 /**
  * Send reactivation confirmation email after an ad is successfully reactivated.
  */
+const CATEGORY_LABELS: Record<string, string> = {
+  BUG: 'Reportar error',
+  AD_ISSUE: 'Problema con anuncio',
+  SUGGESTION: 'Sugerencia',
+  OTHER: 'Otro',
+};
+
+/**
+ * Send a notification to admin(s) when a new support ticket is created.
+ */
+export async function sendSupportTicketNotification(ticket: {
+  id: string;
+  category: string;
+  email: string;
+  message: string;
+}) {
+  const adminEmails = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim())
+    .filter(Boolean);
+
+  if (adminEmails.length === 0) {
+    console.warn('ADMIN_EMAILS not configured — skipping support ticket notification');
+    return;
+  }
+
+  const categoryLabel = CATEGORY_LABELS[ticket.category] || ticket.category;
+
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    to: adminEmails,
+    subject: `[Soporte] Nuevo ticket: ${categoryLabel}`,
+    html: `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head><meta charset="utf-8"></head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
+        <h1 style="font-size: 24px; margin-bottom: 16px;">Nuevo ticket de soporte</h1>
+        <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="font-size: 14px; margin: 8px 0;"><strong>Categoría:</strong> ${categoryLabel}</p>
+          <p style="font-size: 14px; margin: 8px 0;"><strong>Email:</strong> ${ticket.email}</p>
+          <p style="font-size: 14px; margin: 8px 0;"><strong>Mensaje:</strong></p>
+          <p style="font-size: 14px; margin: 8px 0; white-space: pre-wrap;">${ticket.message}</p>
+        </div>
+        <a href="${APP_URL}/admin/tickets/${ticket.id}"
+           style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 24px 0;">
+          Ver en panel de admin
+        </a>
+        <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
+          — Sistema BrujosClassifieds
+        </p>
+      </body>
+      </html>
+    `,
+  });
+}
+
+/**
+ * Send an auto-reply to the user after submitting a support ticket.
+ */
+export async function sendSupportAutoReply(email: string) {
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    to: email,
+    subject: 'Recibimos tu mensaje — BrujosClassifieds',
+    html: `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head><meta charset="utf-8"></head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a;">
+        <h1 style="font-size: 24px; margin-bottom: 16px;">Recibimos tu mensaje</h1>
+        <p style="font-size: 16px; line-height: 1.5;">
+          Hemos recibido tu mensaje y te responderemos en un plazo de 48 horas.
+          Gracias por contactarnos.
+        </p>
+        <p style="font-size: 12px; color: #9ca3af; margin-top: 32px;">
+          — Equipo BrujosClassifieds
+        </p>
+      </body>
+      </html>
+    `,
+  });
+}
+
+/**
+ * Send reactivation confirmation email after an ad is successfully reactivated.
+ */
 export async function sendReactivationConfirmation(email: string, adTitle: string) {
   await getResend().emails.send({
     from: EMAIL_FROM,
