@@ -5,6 +5,7 @@ import { contentHash } from '@/lib/utils/content-hash';
 import { generateAdSlug } from '@/lib/utils/slug';
 import { runSpamPipeline } from '@/lib/services/spam-pipeline';
 import { countryFromPhone } from '@/lib/utils/country-from-phone';
+import { isAdmin } from '@/lib/utils/admin-auth';
 
 import type { Ad } from '@/generated/prisma';
 
@@ -90,6 +91,13 @@ function paginate(page: number, pageSize: number) {
 // ── Validate ad limits ──────────────────────────────────────────────────────
 
 async function validateAdLimits(advertiserId: string, countryCode: string, excludeAdId?: string) {
+  // Admins have no limits
+  const advertiser = await prisma.advertiser.findUnique({
+    where: { id: advertiserId },
+    select: { email: true },
+  });
+  if (advertiser && isAdmin(advertiser.email)) return;
+
   const where: Record<string, unknown> = {
     advertiserId,
     status: { in: ['ACTIVE', 'PENDING'] },
