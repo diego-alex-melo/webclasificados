@@ -189,7 +189,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     throw new AdError('Debes verificar tu email antes de publicar', 403);
   }
 
-  // 2. Validate limits: max 3 ads, max 1 per country
+  // 2. Validate limits: max 3 ads per account
   await validateAdLimits(advertiserId);
 
   // 3. Validate WhatsApp and website uniqueness (ACTIVE/PENDING from other advertisers)
@@ -633,7 +633,7 @@ export async function reactivateAd(adId: string): Promise<Ad> {
     throw new AdError('Solo se pueden reactivar anuncios expirados', 400);
   }
 
-  // Validate ad limits (max 3 ads, 1 per country)
+  // Validate ad limits (max 3 ads per account)
   await validateAdLimits(ad.advertiserId, ad.id);
 
   // Validate WhatsApp not taken by another advertiser

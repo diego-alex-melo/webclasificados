@@ -27,7 +27,7 @@ const faqs = [
   {
     question: '¿Cuántos anuncios puedo tener?',
     answer:
-      'Cada cuenta puede tener máximo 3 anuncios activos (1 por país). Esto nos permite mantener la calidad de la plataforma y asegurar que cada anuncio reciba visibilidad.',
+      'Cada cuenta puede tener máximo 3 anuncios activos, cada uno con un número de WhatsApp diferente. Esto nos permite mantener la calidad de la plataforma y asegurar que cada anuncio reciba visibilidad.',
   },
   {
     question: '¿Cuánto tiempo dura mi anuncio?',

@@ -64,7 +64,7 @@ export default function GuiaPage() {
       {/* 2. Tus anuncios */}
       <Section id="tus-anuncios" title="2. Tus anuncios">
         <div className="space-y-4 text-text-secondary leading-relaxed">
-          <InfoRow label="Anuncios activos" value="Maximo 3 por cuenta (1 por pais)" />
+          <InfoRow label="Anuncios activos" value="Maximo 3 por cuenta, cada uno con un numero de WhatsApp diferente" />
           <InfoRow label="Duracion" value="60 dias desde la publicacion" />
           <InfoRow
             label="Expiracion"
