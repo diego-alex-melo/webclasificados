@@ -324,68 +324,68 @@ export default function AnuncioPage() {
   const canCreateNew = existingAds.filter((a) => a.status !== 'REJECTED').length < 3;
 
   return (
-    <div className="max-w-2xl">
-      {/* Existing ads list */}
-      {existingAds.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-[#e8e0f0] mb-3">
-            Mis anuncios ({existingAds.filter((a) => a.status !== 'REJECTED').length}/3)
-          </h2>
-          <div className="space-y-3">
+    <div className="flex flex-col lg:flex-row lg:gap-6">
+      {/* Left column: Ad list */}
+      <div className="lg:w-1/3 lg:sticky lg:top-24 lg:self-start mb-6 lg:mb-0">
+        <h2 className="text-lg font-semibold text-[#e8e0f0] mb-3">
+          Mis anuncios ({existingAds.filter((a) => a.status !== 'REJECTED').length}/3)
+        </h2>
+        {existingAds.length > 0 && (
+          <div className="space-y-2">
             {existingAds.map((ad) => {
               const country = COUNTRY_MAP[ad.countryCode];
               return (
-                <div
+                <button
                   key={ad.id}
-                  className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                  type="button"
+                  onClick={() => editingAd?.id === ad.id ? resetForm() : loadAdIntoForm(ad)}
+                  className={`w-full text-left p-3 rounded-lg border transition-colors ${
                     editingAd?.id === ad.id
                       ? 'border-[#7b2ff2] bg-[#7b2ff2]/10'
                       : 'border-[#2a1a4e] bg-[#0d0015] hover:border-[#7b2ff2]/50'
                   }`}
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <CountryFlag code={ad.countryCode} size={16} />
-                      <p className="text-sm text-[#e8e0f0] truncate">{ad.title}</p>
-                    </div>
-                    <p className="text-xs text-[#6b5a80] mt-0.5">
-                      {country?.name ?? ad.countryCode} &middot;{' '}
-                      <span className={
-                        ad.status === 'ACTIVE' ? 'text-[#25D366]' :
-                        ad.status === 'REJECTED' ? 'text-red-400' :
-                        'text-[#d4af37]'
-                      }>
-                        {ad.status === 'ACTIVE' ? 'Activo' :
-                         ad.status === 'REJECTED' ? 'Rechazado' :
-                         ad.status === 'PENDING' ? 'Pendiente' : ad.status}
-                      </span>
-                    </p>
+                  <div className="flex items-center gap-2">
+                    <CountryFlag code={ad.countryCode} size={16} />
+                    <p className="text-sm text-[#e8e0f0] truncate">{ad.title}</p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => editingAd?.id === ad.id ? resetForm() : loadAdIntoForm(ad)}
-                    className="ml-3 px-3 py-1.5 text-xs rounded-lg border border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2] transition-colors"
-                  >
-                    {editingAd?.id === ad.id ? 'Cancelar' : 'Editar'}
-                  </button>
-                </div>
+                  <p className="text-xs text-[#6b5a80] mt-0.5">
+                    {country?.name ?? ad.countryCode} &middot;{' '}
+                    <span className={
+                      ad.status === 'ACTIVE' ? 'text-[#25D366]' :
+                      ad.status === 'REJECTED' ? 'text-red-400' :
+                      'text-[#d4af37]'
+                    }>
+                      {ad.status === 'ACTIVE' ? 'Activo' :
+                       ad.status === 'REJECTED' ? 'Rechazado' :
+                       ad.status === 'PENDING' ? 'Pendiente' : ad.status}
+                    </span>
+                  </p>
+                </button>
               );
             })}
           </div>
+        )}
 
-          {canCreateNew && !editingAd && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="mt-3 w-full py-2.5 border border-dashed border-[#2a1a4e] rounded-lg text-sm text-[#a090b8] hover:border-[#7b2ff2] hover:text-[#e8e0f0] transition-colors"
-            >
-              + Crear nuevo anuncio
-            </button>
-          )}
-        </div>
-      )}
+        {canCreateNew && !editingAd && (
+          <button
+            type="button"
+            onClick={resetForm}
+            className="mt-3 w-full py-2.5 border border-dashed border-[#2a1a4e] rounded-lg text-sm text-[#a090b8] hover:border-[#7b2ff2] hover:text-[#e8e0f0] transition-colors"
+          >
+            + Crear nuevo anuncio
+          </button>
+        )}
 
-      {/* Show form only if editing or can create new */}
+        {!canCreateNew && !editingAd && existingAds.length > 0 && (
+          <p className="mt-4 text-[#6b5a80] text-xs text-center">
+            Limite de 3 anuncios alcanzado
+          </p>
+        )}
+      </div>
+
+      {/* Right column: Form */}
+      <div className="lg:w-2/3">
       {(editingAd || canCreateNew || existingAds.length === 0) && (
         <>
           <h1 className="text-2xl font-bold text-[#e8e0f0] mb-2">
@@ -658,14 +658,7 @@ export default function AnuncioPage() {
           </form>
         </>
       )}
-
-      {!canCreateNew && !editingAd && existingAds.length > 0 && (
-        <div className="text-center py-8">
-          <p className="text-[#a090b8] text-sm">
-            Has alcanzado el limite de 3 anuncios. Edita uno existente o espera a que expire.
-          </p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
