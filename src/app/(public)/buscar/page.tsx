@@ -6,6 +6,7 @@ import SearchBar from '@/components/SearchBar';
 import AdCard from '@/components/AdCard';
 import Pagination from '@/components/Pagination';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import CountryFlag from '@/components/CountryFlag';
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -90,21 +91,60 @@ export default async function SearchPage({ searchParams }: PageProps) {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <Breadcrumbs items={[{ label: 'Inicio', href: '/' }, { label: 'Buscar' }]} />
 
-      <div className="mb-8">
+      <div className="mb-6">
         <SearchBar defaultValue={query} large />
       </div>
+
+      {/* Active filters chips */}
+      {(countryFilter || serviceFilter || traditionFilter || professionalFilter) && (
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-text-secondary">Filtros:</span>
+          {countryFilter && (
+            <ActiveFilter
+              label={COUNTRY_MAP[countryFilter.toUpperCase()]?.name ?? countryFilter}
+              removeHref={buildFilterUrl({ ...paginationParams, country: '' })}
+            />
+          )}
+          {serviceFilter && (
+            <ActiveFilter
+              label={services.find((s) => s.slug === serviceFilter)?.name ?? serviceFilter}
+              removeHref={buildFilterUrl({ ...paginationParams, service: '' })}
+            />
+          )}
+          {traditionFilter && (
+            <ActiveFilter
+              label={traditions.find((t) => t.slug === traditionFilter)?.name ?? traditionFilter}
+              removeHref={buildFilterUrl({ ...paginationParams, tradition: '' })}
+            />
+          )}
+          {professionalFilter && (
+            <ActiveFilter
+              label={professionalFilter}
+              removeHref={buildFilterUrl({ ...paginationParams, professional: '' })}
+            />
+          )}
+          <a
+            href={query ? `/buscar?q=${encodeURIComponent(query)}` : '/buscar'}
+            className="text-xs text-accent-gold hover:text-accent-gold-light transition-colors"
+          >
+            Limpiar todo
+          </a>
+        </div>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
         {/* Filters Sidebar */}
         <aside className="space-y-6">
           <FilterSection title="País">
-            {Object.entries(COUNTRY_MAP).map(([code, { name, flag }]) => (
+            {Object.entries(COUNTRY_MAP).map(([code, { name }]) => (
               <FilterLink
                 key={code}
                 href={buildFilterUrl({ ...paginationParams, country: code })}
                 active={countryFilter.toUpperCase() === code}
               >
-                {flag} {name}
+                <span className="inline-flex items-center gap-1.5">
+                  <CountryFlag code={code} size={14} /> {name}
+                </span>
               </FilterLink>
             ))}
           </FilterSection>
@@ -135,15 +175,6 @@ export default async function SearchPage({ searchParams }: PageProps) {
             </FilterSection>
           )}
 
-          {/* Clear filters */}
-          {(serviceFilter || countryFilter || traditionFilter || professionalFilter) && (
-            <a
-              href={query ? `/buscar?q=${encodeURIComponent(query)}` : '/buscar'}
-              className="block text-center text-sm text-accent-gold transition-colors hover:text-accent-gold-light"
-            >
-              Limpiar filtros
-            </a>
-          )}
         </aside>
 
         {/* Results */}
@@ -231,6 +262,18 @@ function FilterLink({
       }`}
     >
       {children}
+    </a>
+  );
+}
+
+function ActiveFilter({ label, removeHref }: { label: string; removeHref: string }) {
+  return (
+    <a
+      href={removeHref}
+      className="inline-flex items-center gap-1.5 rounded-full bg-accent-purple/15 px-3 py-1 text-xs font-medium text-accent-purple-light transition-colors hover:bg-accent-purple/25"
+    >
+      {label}
+      <span className="text-accent-purple-light/60">&times;</span>
     </a>
   );
 }
