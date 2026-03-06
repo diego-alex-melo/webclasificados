@@ -90,7 +90,7 @@ function paginate(page: number, pageSize: number) {
 
 // ── Validate ad limits ──────────────────────────────────────────────────────
 
-async function validateAdLimits(advertiserId: string, countryCode: string, excludeAdId?: string) {
+async function validateAdLimits(advertiserId: string, excludeAdId?: string) {
   // Admins have no limits
   const advertiser = await prisma.advertiser.findUnique({
     where: { id: advertiserId },
@@ -106,18 +106,10 @@ async function validateAdLimits(advertiserId: string, countryCode: string, exclu
     where.id = { not: excludeAdId };
   }
 
-  const existingAds = await prisma.ad.findMany({
-    where,
-    select: { id: true, countryCode: true },
-  });
+  const count = await prisma.ad.count({ where });
 
-  if (existingAds.length >= MAX_ADS_PER_ACCOUNT) {
+  if (count >= MAX_ADS_PER_ACCOUNT) {
     throw new AdError(`Solo puedes tener ${MAX_ADS_PER_ACCOUNT} anuncios activos`, 409);
-  }
-
-  const hasCountry = existingAds.some((a) => a.countryCode === countryCode);
-  if (hasCountry) {
-    throw new AdError('Ya tienes un anuncio en este pais', 409);
   }
 }
 
@@ -198,7 +190,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
   }
 
   // 2. Validate limits: max 3 ads, max 1 per country
-  await validateAdLimits(advertiserId, countryCode);
+  await validateAdLimits(advertiserId);
 
   // 3. Validate WhatsApp and website uniqueness (ACTIVE/PENDING from other advertisers)
   await validateWhatsAppUnique(whatsappNumber, advertiserId);
@@ -298,12 +290,7 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     throw new AdError('Anuncio no encontrado o no te pertenece', 404);
   }
 
-  // 2. If country changed, validate limits
-  if (countryCode !== existing.countryCode) {
-    await validateAdLimits(advertiserId, countryCode, adId);
-  }
-
-  // 3. Validate WhatsApp and website uniqueness
+  // 2. Validate WhatsApp and website uniqueness
   if (whatsappNumber !== existing.whatsappNumber) {
     await validateWhatsAppUnique(whatsappNumber, advertiserId, adId);
   }
@@ -647,7 +634,7 @@ export async function reactivateAd(adId: string): Promise<Ad> {
   }
 
   // Validate ad limits (max 3 ads, 1 per country)
-  await validateAdLimits(ad.advertiserId, ad.countryCode, ad.id);
+  await validateAdLimits(ad.advertiserId, ad.id);
 
   // Validate WhatsApp not taken by another advertiser
   await validateWhatsAppUnique(ad.whatsappNumber, ad.advertiserId, ad.id);
