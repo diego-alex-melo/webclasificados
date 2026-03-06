@@ -129,8 +129,23 @@ function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/buscar?service=prosperidad-y-dinero" prefetch={false} className="hover:text-accent-gold">
+                  Prosperidad y Dinero
+                </Link>
+              </li>
+              <li>
+                <Link href="/buscar?service=salud-y-bienestar" prefetch={false} className="hover:text-accent-gold">
+                  Salud y Bienestar
+                </Link>
+              </li>
+              <li>
                 <Link href="/buscar?service=lectura-y-adivinacion" prefetch={false} className="hover:text-accent-gold">
                   Lectura y Adivinación
+                </Link>
+              </li>
+              <li>
+                <Link href="/buscar?service=trabajos-especiales" prefetch={false} className="hover:text-accent-gold">
+                  Trabajos Especiales
                 </Link>
               </li>
             </ul>
@@ -154,13 +169,13 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/legal/faq" className="hover:text-accent-gold">
-                  Preguntas Frecuentes
+                <Link href="/guia" className="hover:text-accent-gold">
+                  Guia del Anunciante
                 </Link>
               </li>
               <li>
                 <Link href="/ayuda" className="hover:text-accent-gold">
-                  Ayuda
+                  Ayuda y FAQ
                 </Link>
               </li>
             </ul>

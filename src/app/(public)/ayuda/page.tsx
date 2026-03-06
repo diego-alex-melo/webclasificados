@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ContactForm from './ContactForm';
 
@@ -82,13 +83,28 @@ export default function AyudaPage() {
 
       <h1 className="mb-8 text-3xl font-bold text-text-primary">Preguntas Frecuentes</h1>
 
-      <div className="space-y-6">
+      <div className="divide-y divide-white/5 rounded-xl border border-white/10">
         {faqs.map((faq, i) => (
-          <div key={i} className="card-gradient rounded-xl p-6">
-            <h2 className="mb-2 text-lg font-semibold text-text-primary">{faq.question}</h2>
-            <p className="text-text-secondary leading-relaxed">{faq.answer}</p>
-          </div>
+          <details key={i} className="group">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-4 text-text-primary transition-colors hover:bg-white/[0.03] [&::-webkit-details-marker]:hidden">
+              <h2 className="text-base font-semibold">{faq.question}</h2>
+              <span className="shrink-0 text-text-secondary transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <div className="px-6 pb-5 pt-0">
+              <p className="text-sm text-text-secondary leading-relaxed">{faq.answer}</p>
+            </div>
+          </details>
         ))}
+      </div>
+
+      <div className="mt-8 rounded-xl border border-accent-purple/20 bg-accent-purple/5 p-5 text-center">
+        <p className="text-sm text-text-secondary">
+          Si eres anunciante, consulta nuestra{' '}
+          <Link href="/guia" className="font-medium text-accent-purple-light hover:text-accent-gold transition-colors">
+            Guia del Anunciante
+          </Link>{' '}
+          para conocer todo sobre reputacion, limites, sello verificado y mas.
+        </p>
       </div>
 
       <div id="contacto" className="mt-16">

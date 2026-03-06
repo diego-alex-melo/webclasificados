@@ -165,7 +165,9 @@ export default async function AdDetailPage({ params }: PageProps) {
             <p className="mb-4 text-center text-sm text-text-secondary">
               ¿Te interesa este servicio?
             </p>
-            <WhatsAppButton adId={ad.id} clickCount={ad._count.clickEvents} />
+            <div className="flex justify-center">
+              <WhatsAppButton adId={ad.id} clickCount={ad._count.clickEvents} />
+            </div>
             {ad.websiteUrl && (
               <a
                 href={`/click/web/${ad.id}`}

@@ -155,11 +155,11 @@ export default function DashboardLayout({
             ))}
             <div className="mt-auto">
               <Link
-                href="/ayuda"
+                href="/guia"
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0] transition-colors"
               >
-                ¿Necesitas ayuda?
+                Guia / Ayuda
               </Link>
               <button
                 onClick={handleLogout}
@@ -196,10 +196,10 @@ export default function DashboardLayout({
           ))}
           <div className="mt-auto">
             <Link
-              href="/ayuda"
+              href="/guia"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0] transition-colors"
             >
-              ¿Necesitas ayuda?
+              Guia / Ayuda
             </Link>
             <button
               onClick={handleLogout}
