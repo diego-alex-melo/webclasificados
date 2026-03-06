@@ -61,8 +61,9 @@ export default function DashboardPage() {
         setAds(allAds);
 
         // Auto-select first active ad
-        if (activeAds.length > 0) {
-          const first = activeAds[0];
+        const active = allAds.filter((a) => a.status === 'ACTIVE' || a.status === 'PENDING');
+        if (active.length > 0) {
+          const first = active[0];
           setSelectedAd(first);
           await loadMetrics(first, token);
         }
