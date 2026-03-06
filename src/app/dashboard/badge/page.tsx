@@ -4,13 +4,19 @@ import { useEffect, useState } from 'react';
 
 const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 
+interface AdOption {
+  slug: string;
+  title: string;
+}
+
 export default function BadgePage() {
-  const [adSlug, setAdSlug] = useState<string | null>(null);
+  const [ads, setAds] = useState<AdOption[]>([]);
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    async function loadAd() {
+    async function loadAds() {
       const token = localStorage.getItem('token');
       if (!token) return;
 
@@ -21,7 +27,11 @@ export default function BadgePage() {
 
         if (res.ok) {
           const json = await res.json();
-          setAdSlug(json.data?.slug ?? null);
+          const activeAds = (json.data ?? [])
+            .filter((ad: { status: string }) => ad.status === 'ACTIVE')
+            .map((ad: { slug: string; title: string }) => ({ slug: ad.slug, title: ad.title }));
+          setAds(activeAds);
+          if (activeAds.length > 0) setSelectedSlug(activeAds[0].slug);
         }
       } catch {
         // Silently handle
@@ -30,11 +40,11 @@ export default function BadgePage() {
       }
     }
 
-    loadAd();
+    loadAds();
   }, []);
 
-  const badgeHtml = adSlug
-    ? `<a href="${APP_URL}/anuncio/${adSlug}" target="_blank" rel="noopener">\n  <img src="${APP_URL}/badge.svg" alt="Verificado en BrujosClassifieds" width="120" height="40" />\n</a>`
+  const badgeHtml = selectedSlug
+    ? `<a href="${APP_URL}/anuncio/${selectedSlug}" target="_blank" rel="noopener">\n  <img src="${APP_URL}/badge.svg" alt="Verificado en BrujosClassifieds" width="120" height="40" />\n</a>`
     : '';
 
   async function handleCopy() {
@@ -88,12 +98,23 @@ export default function BadgePage() {
       </section>
 
       {/* HTML snippet */}
-      {adSlug ? (
+      {selectedSlug ? (
         <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6 space-y-4">
           <h2 className="text-sm font-medium text-[#a090b8]">Codigo HTML</h2>
           <p className="text-xs text-[#6b5a80]">
             Copia y pega este codigo en tu sitio web para mostrar el sello.
           </p>
+          {ads.length > 1 && (
+            <select
+              value={selectedSlug}
+              onChange={(e) => setSelectedSlug(e.target.value)}
+              className="w-full rounded-lg border border-[#2a1a4e] bg-[#1a0e2e] px-3 py-2 text-sm text-[#e8e0f0]"
+            >
+              {ads.map((ad) => (
+                <option key={ad.slug} value={ad.slug}>{ad.title}</option>
+              ))}
+            </select>
+          )}
           <div className="relative">
             <pre className="bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg p-4 text-sm text-[#e8e0f0] font-mono overflow-x-auto whitespace-pre-wrap break-all">
               {badgeHtml}

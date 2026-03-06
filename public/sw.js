@@ -1,4 +1,4 @@
-// WebClasificados Service Worker — PWA + Push Notifications
+// BrujosClassifieds Service Worker — PWA + Push Notifications
 const CACHE_NAME = 'wc-v1';
 const STATIC_ASSETS = ['/', '/icon-192.png', '/icon-512.png', '/icon.svg'];
 
@@ -50,10 +50,10 @@ self.addEventListener('push', (event) => {
   try {
     data = event.data.json();
   } catch {
-    data = { title: 'WebClasificados', body: event.data.text() };
+    data = { title: 'BrujosClassifieds', body: event.data.text() };
   }
 
-  const { title = 'WebClasificados', body = '', url = '/', icon = '/icon-192.png' } = data;
+  const { title = 'BrujosClassifieds', body = '', url = '/', icon = '/icon-192.png' } = data;
 
   event.waitUntil(
     self.registration.showNotification(title, {
