@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
         advertiser: {
           id: result.advertiser.id,
           email: result.advertiser.email,
-          countryCode: result.advertiser.countryCode,
           reputation: result.advertiser.reputation,
         },
       },

@@ -4,15 +4,13 @@ import { useEffect, useState } from 'react';
 
 interface Profile {
   email: string;
-  whatsappNumber: string;
-  countryCode: string;
+  whatsappNumber: string | null;
   websiteUrl: string | null;
   referralCode: string;
 }
 
 export default function PerfilPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [whatsapp, setWhatsapp] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -32,7 +30,6 @@ export default function PerfilPage() {
           const json = await res.json();
           const data: Profile = json.data;
           setProfile(data);
-          setWhatsapp(data.whatsappNumber);
           setWebsiteUrl(data.websiteUrl ?? '');
         }
       } catch {
@@ -59,7 +56,6 @@ export default function PerfilPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          whatsappNumber: whatsapp.trim(),
           websiteUrl: websiteUrl.trim() || undefined,
         }),
       });
@@ -123,23 +119,6 @@ export default function PerfilPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm text-[#a090b8] mb-1.5">
-            WhatsApp (con codigo de pais)
-          </label>
-          <input
-            type="tel"
-            value={whatsapp}
-            onChange={(e) => setWhatsapp(e.target.value)}
-            required
-            placeholder="+573001234567"
-            className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
-          />
-          <p className="text-xs text-[#6b5a80] mt-1">
-            Este es el numero que veran los visitantes en tu anuncio.
-          </p>
-        </div>
-
         <div>
           <label className="block text-sm text-[#a090b8] mb-1.5">
             Sitio web <span className="text-[#6b5a80]">(opcional)</span>

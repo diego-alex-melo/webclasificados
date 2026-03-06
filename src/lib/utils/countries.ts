@@ -2,6 +2,8 @@ export const COUNTRY_MAP: Record<string, { name: string; flag: string }> = {
   CO: { name: 'Colombia', flag: '\u{1F1E8}\u{1F1F4}' },
   MX: { name: 'México', flag: '\u{1F1F2}\u{1F1FD}' },
   US: { name: 'Estados Unidos', flag: '\u{1F1FA}\u{1F1F8}' },
+  CA: { name: 'Canada', flag: '\u{1F1E8}\u{1F1E6}' },
+  PR: { name: 'Puerto Rico', flag: '\u{1F1F5}\u{1F1F7}' },
   ES: { name: 'España', flag: '\u{1F1EA}\u{1F1F8}' },
   PE: { name: 'Perú', flag: '\u{1F1F5}\u{1F1EA}' },
   CL: { name: 'Chile', flag: '\u{1F1E8}\u{1F1F1}' },

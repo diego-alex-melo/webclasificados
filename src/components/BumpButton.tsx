@@ -3,13 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 
 interface BumpButtonProps {
+  adId: string;
   lastBumpedAt: string | null;
   cooldownHours?: number;
 }
 
-const COOLDOWN_MS_DEFAULT = 48 * 60 * 60 * 1000; // 48 hours
-
 export default function BumpButton({
+  adId,
   lastBumpedAt,
   cooldownHours = 48,
 }: BumpButtonProps) {
@@ -49,6 +49,7 @@ export default function BumpButton({
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ adId }),
       });
 
       const json = await res.json();

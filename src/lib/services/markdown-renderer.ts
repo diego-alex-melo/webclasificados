@@ -9,12 +9,14 @@ export interface MarkdownAd {
   title: string;
   description: string;
   professionalType: string;
+  countryCode: string;
+  websiteUrl: string | null;
   expiresAt: Date | null;
   services: { service: { name: string; slug: string } }[];
   traditions: { tradition: { name: string; slug: string } }[];
   advertiser: {
-    countryCode: string;
-    websiteUrl: string | null;
+    id: string;
+    reputation: number;
   };
 }
 
@@ -54,7 +56,7 @@ function truncate(text: string, maxLength: number): string {
 export function renderAdMarkdown(ad: MarkdownAd): string {
   const services = ad.services.map((s) => s.service.name).join(', ');
   const traditions = ad.traditions.map((t) => t.tradition.name).join(', ');
-  const countryCode = ad.advertiser.countryCode.toUpperCase();
+  const countryCode = ad.countryCode.toUpperCase();
 
   const lines: string[] = [
     `# ${ad.title}`,
@@ -76,7 +78,7 @@ export function renderAdMarkdown(ad: MarkdownAd): string {
   lines.push(
     `- [Contactar por WhatsApp](${APP_URL}/click/whatsapp/${ad.id})`,
   );
-  if (ad.advertiser.websiteUrl) {
+  if (ad.websiteUrl) {
     lines.push(`- [Visitar sitio web](${APP_URL}/click/web/${ad.id})`);
   }
 

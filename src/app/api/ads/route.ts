@@ -22,20 +22,25 @@ import type { ApiResponse, PaginatedResponse } from '@/types';
 const createAdSchema = z.object({
   title: z
     .string()
-    .min(10, 'El título debe tener al menos 10 caracteres')
-    .max(100, 'El título no puede tener más de 100 caracteres'),
+    .min(10, 'El titulo debe tener al menos 10 caracteres')
+    .max(100, 'El titulo no puede tener mas de 100 caracteres'),
   description: z
     .string()
-    .min(50, 'La descripción debe tener al menos 50 caracteres')
-    .max(2000, 'La descripción no puede tener más de 2000 caracteres'),
+    .min(50, 'La descripcion debe tener al menos 50 caracteres')
+    .max(2000, 'La descripcion no puede tener mas de 2000 caracteres'),
   services: z
     .array(z.string())
     .min(1, 'Debes seleccionar al menos un servicio'),
   professionalType: z.enum(PROFESSIONAL_TYPES),
   traditions: z
     .array(z.string())
-    .min(1, 'Debes seleccionar al menos una tradición'),
-  imageUrl: z.string().url('URL de imagen inválida').optional(),
+    .min(1, 'Debes seleccionar al menos una tradicion'),
+  imageUrl: z.string().url('URL de imagen invalida').optional(),
+  whatsappNumber: z
+    .string()
+    .regex(/^\+\d{8,}$/, 'Numero de WhatsApp invalido. Incluye codigo de pais (ej: +573001234567)'),
+  countryCode: z.string().length(2, 'Codigo de pais invalido'),
+  websiteUrl: z.string().url('URL de sitio web invalida').optional(),
 });
 
 // ── POST /api/ads — Create ad ───────────────────────────────────────────────
@@ -102,23 +107,28 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 // ── PUT /api/ads — Update existing ad ────────────────────────────────────────
 
 const updateAdSchema = z.object({
-  adId: z.string().uuid('ID de anuncio inválido'),
+  adId: z.string().uuid('ID de anuncio invalido'),
   title: z
     .string()
-    .min(10, 'El título debe tener al menos 10 caracteres')
-    .max(100, 'El título no puede tener más de 100 caracteres'),
+    .min(10, 'El titulo debe tener al menos 10 caracteres')
+    .max(100, 'El titulo no puede tener mas de 100 caracteres'),
   description: z
     .string()
-    .min(50, 'La descripción debe tener al menos 50 caracteres')
-    .max(2000, 'La descripción no puede tener más de 2000 caracteres'),
+    .min(50, 'La descripcion debe tener al menos 50 caracteres')
+    .max(2000, 'La descripcion no puede tener mas de 2000 caracteres'),
   services: z
     .array(z.string())
     .min(1, 'Debes seleccionar al menos un servicio'),
   professionalType: z.enum(PROFESSIONAL_TYPES),
   traditions: z
     .array(z.string())
-    .min(1, 'Debes seleccionar al menos una tradición'),
-  imageUrl: z.string().url('URL de imagen inválida').optional(),
+    .min(1, 'Debes seleccionar al menos una tradicion'),
+  imageUrl: z.string().url('URL de imagen invalida').optional(),
+  whatsappNumber: z
+    .string()
+    .regex(/^\+\d{8,}$/, 'Numero de WhatsApp invalido. Incluye codigo de pais (ej: +573001234567)'),
+  countryCode: z.string().length(2, 'Codigo de pais invalido'),
+  websiteUrl: z.string().url('URL de sitio web invalida').optional(),
 });
 
 export async function PUT(request: NextRequest): Promise<NextResponse<ApiResponse>> {

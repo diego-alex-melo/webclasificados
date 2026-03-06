@@ -1,4 +1,4 @@
-const COUNTRY_CODES: Record<string, string> = {
+export const COUNTRY_CODES: Record<string, string> = {
   '+57': 'CO',
   '+52': 'MX',
   '+1': 'US',
@@ -18,6 +18,12 @@ const COUNTRY_CODES: Record<string, string> = {
   '+595': 'PY',
   '+598': 'UY',
   '+809': 'DO',
+  '+829': 'DO',
+  '+849': 'DO',
+};
+
+const AMBIGUOUS_PREFIXES: Record<string, string[]> = {
+  '+1': ['US', 'CA', 'PR'],
 };
 
 export function countryFromPhone(whatsappNumber: string): string {
@@ -28,4 +34,14 @@ export function countryFromPhone(whatsappNumber: string): string {
     }
   }
   return 'XX';
+}
+
+export function countriesFromPhone(whatsappNumber: string): string[] {
+  const sorted = Object.keys(COUNTRY_CODES).sort((a, b) => b.length - a.length);
+  for (const prefix of sorted) {
+    if (whatsappNumber.startsWith(prefix)) {
+      return AMBIGUOUS_PREFIXES[prefix] ?? [COUNTRY_CODES[prefix]];
+    }
+  }
+  return ['XX'];
 }

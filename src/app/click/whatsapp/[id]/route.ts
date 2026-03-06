@@ -12,10 +12,12 @@ export async function GET(
 
   const ad = await prisma.ad.findUnique({
     where: { id },
-    include: {
-      advertiser: {
-        select: { whatsappNumber: true },
-      },
+    select: {
+      id: true,
+      status: true,
+      title: true,
+      whatsappNumber: true,
+      advertiserId: true,
     },
   });
 
@@ -32,7 +34,7 @@ export async function GET(
   notifyNewContact(ad.advertiserId, ad.title).catch(() => {});
 
   const message = `Hola, vi tu anuncio en www.brujosclassifieds.com y deseo una consulta.`;
-  const whatsappUrl = `https://wa.me/${ad.advertiser.whatsappNumber}?text=${encodeURIComponent(message)}`;
+  const whatsappUrl = `https://wa.me/${ad.whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   return NextResponse.redirect(whatsappUrl, 307);
 }

@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import { prisma } from '@/lib/db/prisma';
-import { countryFromPhone } from '@/lib/utils/country-from-phone';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 const JWT_EXPIRES_IN = '30d';
@@ -13,13 +12,12 @@ const BCRYPT_ROUNDS = 12;
 interface RegisterInput {
   email: string;
   password: string;
-  whatsappNumber: string;
+  whatsappNumber?: string;
 }
 
 interface JwtPayload {
   advertiserId: string;
   email: string;
-  countryCode: string;
 }
 
 /**
@@ -64,16 +62,7 @@ export async function register({ email, password, whatsappNumber }: RegisterInpu
     throw new AuthError('Ya existe una cuenta con este email', 409);
   }
 
-  // Check for duplicate WhatsApp number
-  const existingPhone = await prisma.advertiser.findFirst({
-    where: { whatsappNumber },
-  });
-  if (existingPhone) {
-    throw new AuthError('Ya existe una cuenta con este número de WhatsApp', 409);
-  }
-
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
-  const countryCode = countryFromPhone(whatsappNumber);
   const referralCode = await generateReferralCode();
   const emailVerifyToken = randomBytes(32).toString('hex');
 
@@ -81,8 +70,7 @@ export async function register({ email, password, whatsappNumber }: RegisterInpu
     data: {
       email: email.toLowerCase().trim(),
       passwordHash,
-      whatsappNumber,
-      countryCode,
+      ...(whatsappNumber ? { whatsappNumber } : {}),
       reputation: 100,
       referralCode,
       emailVerified: false,
@@ -148,7 +136,6 @@ export async function login(email: string, password: string) {
   const payload: JwtPayload = {
     advertiserId: advertiser.id,
     email: advertiser.email,
-    countryCode: advertiser.countryCode,
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });

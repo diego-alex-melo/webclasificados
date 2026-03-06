@@ -11,9 +11,7 @@ interface AdWithRelations {
   slug: string;
   imageUrl: string | null;
   professionalType: string;
-  advertiser: {
-    countryCode: string;
-  };
+  countryCode: string;
   services: Array<{ service: { name: string; slug: string } }>;
 }
 
@@ -83,7 +81,7 @@ export function generateHashtags(ad: AdWithRelations): string[] {
     DO: 'republicadominicana',
   };
 
-  const countryTag = countryMap[ad.advertiser.countryCode];
+  const countryTag = countryMap[ad.countryCode];
   if (countryTag) tags.add(`#${countryTag}`);
 
   return Array.from(tags);
@@ -105,7 +103,7 @@ function generateCaption(ad: AdWithRelations): string {
     PA: 'Panamá',
   };
 
-  const country = countryMap[ad.advertiser.countryCode] ?? ad.advertiser.countryCode;
+  const country = countryMap[ad.countryCode] ?? ad.countryCode;
   const adUrl = `${APP_URL}/anuncio/${ad.slug}`;
   const hashtags = generateHashtags(ad).join(' ');
 

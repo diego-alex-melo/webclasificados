@@ -13,11 +13,13 @@ interface FavoriteAd {
   imageUrl: string | null;
   professionalType: string;
   publishedAt: string | null;
+  countryCode: string;
+  websiteUrl: string | null;
   services: Array<{ service: { name: string; slug: string } }>;
   traditions: Array<{ tradition: { name: string; slug: string } }>;
   advertiser: {
-    countryCode: string;
-    whatsappNumber: string;
+    id: string;
+    reputation: number;
   };
 }
 

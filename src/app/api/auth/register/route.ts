@@ -13,7 +13,8 @@ const registerSchema = z.object({
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
   whatsappNumber: z
     .string()
-    .regex(/^\+\d{10,15}$/, 'Número de WhatsApp inválido. Debe iniciar con + y tener entre 10 y 15 dígitos'),
+    .regex(/^\+\d{10,15}$/, 'Número de WhatsApp inválido. Debe iniciar con + y tener entre 10 y 15 dígitos')
+    .optional(),
   referralCode: z.string().length(8).optional(),
 });
 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const advertiser = await register({ email, password, whatsappNumber });
+    const advertiser = await register({ email, password, ...(whatsappNumber ? { whatsappNumber } : {}) });
 
     // Process referral if code provided (fire and forget)
     if (referralCode) {

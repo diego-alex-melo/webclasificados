@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 /* eslint-disable @next/next/no-img-element */
 
 import { PROFESSIONAL_TYPES } from '@/types';
+import { countryFromPhone, countriesFromPhone } from '@/lib/utils/country-from-phone';
+import { COUNTRY_MAP } from '@/lib/utils/countries';
 
 interface ServiceOption {
   id: number;
@@ -23,6 +25,9 @@ interface ExistingAd {
   description: string;
   imageUrl: string | null;
   professionalType: string;
+  whatsappNumber: string;
+  countryCode: string;
+  websiteUrl: string | null;
   status: string;
   rejectionReason: string | null;
   services: Array<{ service: { slug: string } }>;
@@ -30,6 +35,10 @@ interface ExistingAd {
 }
 
 export default function AnuncioPage() {
+  // Which ad to edit (null = new ad form)
+  const [editingAd, setEditingAd] = useState<ExistingAd | null>(null);
+  const [existingAds, setExistingAds] = useState<ExistingAd[]>([]);
+
   // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -38,6 +47,13 @@ export default function AnuncioPage() {
   const [selectedTraditions, setSelectedTraditions] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+
+  // Country selector for +1 ambiguity
+  const [countryOptions, setCountryOptions] = useState<string[]>([]);
+  const [showCountrySelector, setShowCountrySelector] = useState(false);
 
   // Options from DB
   const [serviceOptions, setServiceOptions] = useState<ServiceOption[]>([]);
@@ -49,7 +65,6 @@ export default function AnuncioPage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [existingAd, setExistingAd] = useState<ExistingAd | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const submitRef = useRef<HTMLDivElement>(null);
 
@@ -59,8 +74,7 @@ export default function AnuncioPage() {
       if (!token) return;
 
       try {
-        // Fetch services, traditions, and existing ad in parallel
-        const [servicesRes, traditionsRes, adRes] = await Promise.all([
+        const [servicesRes, traditionsRes, adsRes] = await Promise.all([
           fetch('/api/services'),
           fetch('/api/traditions'),
           fetch('/api/ads/mine', {
@@ -78,20 +92,12 @@ export default function AnuncioPage() {
           setTraditionOptions(tJson.data ?? []);
         }
 
-        if (adRes.ok) {
-          const adJson = await adRes.json();
-          const ad: ExistingAd = adJson.data;
-          setExistingAd(ad);
-          // Pre-fill form
-          setTitle(ad.title);
-          setDescription(ad.description);
-          setProfessionalType(ad.professionalType);
-          setSelectedServices(ad.services.map((s) => s.service.slug));
-          setSelectedTraditions(ad.traditions.map((t) => t.tradition.slug));
-          setImageUrl(ad.imageUrl);
-          if (ad.imageUrl) setImagePreview(ad.imageUrl);
+        if (adsRes.ok) {
+          const adsJson = await adsRes.json();
+          const ads: ExistingAd[] = Array.isArray(adsJson.data) ? adsJson.data : [];
+          setExistingAds(ads);
         }
-      } catch (err) {
+      } catch {
         setError('Error al cargar datos');
       } finally {
         setLoading(false);
@@ -101,13 +107,71 @@ export default function AnuncioPage() {
     loadData();
   }, []);
 
+  // ── WhatsApp number change → detect country ──────────────────────────────
+
+  function handleWhatsAppChange(value: string) {
+    setWhatsappNumber(value);
+    setShowCountrySelector(false);
+
+    if (value.length >= 4) {
+      const countries = countriesFromPhone(value);
+      if (countries.length > 1) {
+        setCountryOptions(countries);
+        setShowCountrySelector(true);
+        setCountryCode('');
+      } else if (countries.length === 1) {
+        setCountryCode(countries[0]);
+        setCountryOptions([]);
+      } else {
+        setCountryCode('');
+      }
+    } else {
+      setCountryCode('');
+    }
+  }
+
+  // ── Load ad into form for editing ─────────────────────────────────────────
+
+  function loadAdIntoForm(ad: ExistingAd) {
+    setEditingAd(ad);
+    setTitle(ad.title);
+    setDescription(ad.description);
+    setProfessionalType(ad.professionalType);
+    setSelectedServices(ad.services.map((s) => s.service.slug));
+    setSelectedTraditions(ad.traditions.map((t) => t.tradition.slug));
+    setImageUrl(ad.imageUrl);
+    setImagePreview(ad.imageUrl);
+    setWhatsappNumber(ad.whatsappNumber);
+    setCountryCode(ad.countryCode);
+    setWebsiteUrl(ad.websiteUrl ?? '');
+    setShowCountrySelector(false);
+    setError(null);
+    setSuccess(null);
+  }
+
+  function resetForm() {
+    setEditingAd(null);
+    setTitle('');
+    setDescription('');
+    setProfessionalType('');
+    setSelectedServices([]);
+    setSelectedTraditions([]);
+    setImageUrl(null);
+    setImagePreview(null);
+    setWhatsappNumber('');
+    setCountryCode('');
+    setWebsiteUrl('');
+    setShowCountrySelector(false);
+    setError(null);
+    setSuccess(null);
+  }
+
   // ── Image upload handler ──────────────────────────────────────────────────
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Client-side validation
     if (file.size > 5 * 1024 * 1024) {
       setError('La imagen no puede superar 5 MB');
       return;
@@ -118,12 +182,10 @@ export default function AnuncioPage() {
       return;
     }
 
-    // Show preview immediately
     const reader = new FileReader();
     reader.onload = (ev) => setImagePreview(ev.target?.result as string);
     reader.readAsDataURL(file);
 
-    // Upload
     setUploading(true);
     setError(null);
 
@@ -159,17 +221,13 @@ export default function AnuncioPage() {
 
   function toggleService(slug: string) {
     setSelectedServices((prev) =>
-      prev.includes(slug)
-        ? prev.filter((s) => s !== slug)
-        : [...prev, slug],
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
     );
   }
 
   function toggleTradition(slug: string) {
     setSelectedTraditions((prev) =>
-      prev.includes(slug)
-        ? prev.filter((t) => t !== slug)
-        : [...prev, slug],
+      prev.includes(slug) ? prev.filter((t) => t !== slug) : [...prev, slug],
     );
   }
 
@@ -181,19 +239,28 @@ export default function AnuncioPage() {
     setError(null);
     setSuccess(null);
 
+    if (!countryCode) {
+      setError('Selecciona el pais de tu anuncio');
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
 
-      const isUpdating = existingAd && existingAd.status !== 'REJECTED';
+      const isUpdating = editingAd && editingAd.status !== 'REJECTED';
 
       const body = {
-        ...(isUpdating ? { adId: existingAd.id } : {}),
+        ...(isUpdating ? { adId: editingAd.id } : {}),
         title: title.trim(),
         description: description.trim(),
         professionalType,
         services: selectedServices,
         traditions: selectedTraditions,
         imageUrl: imageUrl ?? undefined,
+        whatsappNumber,
+        countryCode,
+        websiteUrl: websiteUrl.trim() || undefined,
       };
 
       const res = await fetch('/api/ads', {
@@ -208,7 +275,6 @@ export default function AnuncioPage() {
       const json = await res.json();
 
       if (res.status === 422) {
-        // Rejected by spam pipeline
         setError(json.error ?? 'Anuncio rechazado');
         return;
       }
@@ -219,7 +285,22 @@ export default function AnuncioPage() {
       }
 
       setSuccess(isUpdating ? 'Anuncio actualizado exitosamente.' : 'Anuncio publicado exitosamente.');
-      setExistingAd(json.data);
+
+      // Refresh ads list
+      const adsRes = await fetch('/api/ads/mine', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (adsRes.ok) {
+        const adsJson = await adsRes.json();
+        setExistingAds(Array.isArray(adsJson.data) ? adsJson.data : []);
+      }
+
+      if (isUpdating) {
+        setEditingAd(json.data);
+      } else {
+        resetForm();
+      }
+
       submitRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch {
       setError('Error de conexion. Intenta de nuevo.');
@@ -238,240 +319,352 @@ export default function AnuncioPage() {
     );
   }
 
-  const isEdit = existingAd && existingAd.status !== 'REJECTED';
-  const isRejected = existingAd?.status === 'REJECTED';
+  const isEdit = editingAd && editingAd.status !== 'REJECTED';
+  const canCreateNew = existingAds.filter((a) => a.status !== 'REJECTED').length < 3;
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-[#e8e0f0] mb-2">
-        {isEdit ? 'Editar anuncio' : 'Crear anuncio'}
-      </h1>
-
-      {isRejected && existingAd?.rejectionReason && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
-          <p className="text-red-400 text-sm font-medium mb-1">
-            Anuncio rechazado
-          </p>
-          <p className="text-red-300 text-sm">
-            {existingAd.rejectionReason}
-          </p>
-          <p className="text-[#a090b8] text-xs mt-2">
-            Corrige los problemas y vuelve a enviar.
-          </p>
-        </div>
-      )}
-
-      {success && (
-        <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-lg p-4 mb-6">
-          <p className="text-[#25D366] text-sm">{success}</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
-          <p className="text-red-400 text-sm">{error}</p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div>
-          <label className="block text-sm text-[#a090b8] mb-1.5">
-            Titulo
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={100}
-            required
-            className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
-            placeholder="Ej: Lectura de Tarot profesional en Bogota"
-          />
-          <p className="text-xs text-[#6b5a80] mt-1 text-right">
-            {title.length}/100
-          </p>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm text-[#a090b8] mb-1.5">
-            Descripcion
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={2000}
-            required
-            rows={6}
-            className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors resize-y"
-            placeholder="Describe tus servicios, experiencia y lo que ofreces..."
-          />
-          <p className="text-xs text-[#6b5a80] mt-1 text-right">
-            {description.length}/2000
-          </p>
-        </div>
-
-        {/* Image upload */}
-        <div>
-          <label className="block text-sm text-[#a090b8] mb-1.5">
-            Imagen (opcional)
-          </label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-          <div className="flex items-start gap-4">
-            {imagePreview ? (
-              <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[#2a1a4e]">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="h-full w-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setImagePreview(null);
-                    setImageUrl(null);
-                    if (fileInputRef.current) fileInputRef.current.value = '';
-                  }}
-                  className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center text-white text-xs"
+      {/* Existing ads list */}
+      {existingAds.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-[#e8e0f0] mb-3">
+            Mis anuncios ({existingAds.filter((a) => a.status !== 'REJECTED').length}/3)
+          </h2>
+          <div className="space-y-3">
+            {existingAds.map((ad) => {
+              const country = COUNTRY_MAP[ad.countryCode];
+              return (
+                <div
+                  key={ad.id}
+                  className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                    editingAd?.id === ad.id
+                      ? 'border-[#7b2ff2] bg-[#7b2ff2]/10'
+                      : 'border-[#2a1a4e] bg-[#0d0015] hover:border-[#7b2ff2]/50'
+                  }`}
                 >
-                  X
-                </button>
-              </div>
-            ) : null}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{country?.flag ?? ''}</span>
+                      <p className="text-sm text-[#e8e0f0] truncate">{ad.title}</p>
+                    </div>
+                    <p className="text-xs text-[#6b5a80] mt-0.5">
+                      {country?.name ?? ad.countryCode} &middot;{' '}
+                      <span className={
+                        ad.status === 'ACTIVE' ? 'text-[#25D366]' :
+                        ad.status === 'REJECTED' ? 'text-red-400' :
+                        'text-[#d4af37]'
+                      }>
+                        {ad.status === 'ACTIVE' ? 'Activo' :
+                         ad.status === 'REJECTED' ? 'Rechazado' :
+                         ad.status === 'PENDING' ? 'Pendiente' : ad.status}
+                      </span>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => editingAd?.id === ad.id ? resetForm() : loadAdIntoForm(ad)}
+                    className="ml-3 px-3 py-1.5 text-xs rounded-lg border border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2] transition-colors"
+                  >
+                    {editingAd?.id === ad.id ? 'Cancelar' : 'Editar'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {canCreateNew && !editingAd && (
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="px-4 py-2 bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg text-sm text-[#a090b8] hover:border-[#7b2ff2] transition-colors"
+              onClick={resetForm}
+              className="mt-3 w-full py-2.5 border border-dashed border-[#2a1a4e] rounded-lg text-sm text-[#a090b8] hover:border-[#7b2ff2] hover:text-[#e8e0f0] transition-colors"
             >
-              {uploading ? 'Subiendo...' : imagePreview ? 'Cambiar imagen' : 'Subir imagen'}
+              + Crear nuevo anuncio
             </button>
-          </div>
-          <p className="text-xs text-[#6b5a80] mt-1">
-            JPEG, PNG, WebP o GIF. Maximo 5 MB.
-          </p>
-        </div>
-
-        {/* Professional type */}
-        <div>
-          <label className="block text-sm text-[#a090b8] mb-1.5">
-            Tipo de profesional
-          </label>
-          <select
-            value={professionalType}
-            onChange={(e) => setProfessionalType(e.target.value)}
-            required
-            className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] focus:border-[#7b2ff2] focus:outline-none transition-colors appearance-none"
-          >
-            <option value="" className="bg-[#1a0e2e]">
-              Selecciona...
-            </option>
-            {PROFESSIONAL_TYPES.map((type) => (
-              <option key={type} value={type} className="bg-[#1a0e2e]">
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Services */}
-        <div>
-          <label className="block text-sm text-[#a090b8] mb-2">
-            Servicios
-          </label>
-          {serviceOptions.length === 0 ? (
-            <p className="text-xs text-[#6b5a80]">Cargando servicios...</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {serviceOptions.map((svc) => (
-                <label
-                  key={svc.slug}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors ${
-                    selectedServices.includes(svc.slug)
-                      ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
-                      : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedServices.includes(svc.slug)}
-                    onChange={() => toggleService(svc.slug)}
-                    className="sr-only"
-                  />
-                  {svc.name}
-                </label>
-              ))}
-            </div>
           )}
         </div>
+      )}
 
-        {/* Traditions */}
-        <div>
-          <label className="block text-sm text-[#a090b8] mb-2">
-            Tradiciones
-          </label>
-          {traditionOptions.length === 0 ? (
-            <p className="text-xs text-[#6b5a80]">Cargando tradiciones...</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {traditionOptions.map((trad) => (
-                <label
-                  key={trad.slug}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors ${
-                    selectedTraditions.includes(trad.slug)
-                      ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
-                      : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedTraditions.includes(trad.slug)}
-                    onChange={() => toggleTradition(trad.slug)}
-                    className="sr-only"
-                  />
-                  {trad.name}
-                </label>
-              ))}
+      {/* Show form only if editing or can create new */}
+      {(editingAd || canCreateNew || existingAds.length === 0) && (
+        <>
+          <h1 className="text-2xl font-bold text-[#e8e0f0] mb-2">
+            {isEdit ? 'Editar anuncio' : 'Crear anuncio'}
+          </h1>
+
+          {editingAd?.status === 'REJECTED' && editingAd.rejectionReason && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+              <p className="text-red-400 text-sm font-medium mb-1">Anuncio rechazado</p>
+              <p className="text-red-300 text-sm">{editingAd.rejectionReason}</p>
+              <p className="text-[#a090b8] text-xs mt-2">Corrige los problemas y vuelve a enviar.</p>
             </div>
           )}
-        </div>
-
-        {/* Submit */}
-        <div ref={submitRef}>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {submitting
-              ? 'Enviando...'
-              : isEdit
-                ? 'Guardar cambios'
-                : isRejected
-                  ? 'Reenviar anuncio'
-                  : 'Publicar anuncio'}
-          </button>
 
           {success && (
-            <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-lg p-4 mt-4">
+            <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-lg p-4 mb-6">
               <p className="text-[#25D366] text-sm">{success}</p>
             </div>
           )}
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mt-4">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
               <p className="text-red-400 text-sm">{error}</p>
             </div>
           )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* WhatsApp number */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-1.5">
+                WhatsApp (con codigo de pais)
+              </label>
+              <input
+                type="tel"
+                value={whatsappNumber}
+                onChange={(e) => handleWhatsAppChange(e.target.value)}
+                required
+                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
+                placeholder="+573001234567"
+              />
+              <p className="text-xs text-[#6b5a80] mt-1">
+                Este numero sera el contacto de este anuncio. El pais se detecta automaticamente.
+              </p>
+            </div>
+
+            {/* Country selector (only for +1) */}
+            {showCountrySelector && (
+              <div>
+                <label className="block text-sm text-[#a090b8] mb-1.5">
+                  Selecciona el pais del anuncio
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {countryOptions.map((code) => {
+                    const c = COUNTRY_MAP[code];
+                    return (
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={() => setCountryCode(code)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors ${
+                          countryCode === code
+                            ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
+                            : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
+                        }`}
+                      >
+                        <span>{c?.flag}</span>
+                        <span>{c?.name ?? code}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Detected country display */}
+            {countryCode && !showCountrySelector && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-[#1a0e2e] rounded-lg border border-[#2a1a4e]">
+                <span>{COUNTRY_MAP[countryCode]?.flag}</span>
+                <span className="text-sm text-[#e8e0f0]">
+                  {COUNTRY_MAP[countryCode]?.name ?? countryCode}
+                </span>
+              </div>
+            )}
+
+            {/* Title */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-1.5">Titulo</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                maxLength={100}
+                required
+                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
+                placeholder="Ej: Lectura de Tarot profesional en Bogota"
+              />
+              <p className="text-xs text-[#6b5a80] mt-1 text-right">{title.length}/100</p>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-1.5">Descripcion</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                maxLength={2000}
+                required
+                rows={6}
+                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors resize-y"
+                placeholder="Describe tus servicios, experiencia y lo que ofreces..."
+              />
+              <p className="text-xs text-[#6b5a80] mt-1 text-right">{description.length}/2000</p>
+            </div>
+
+            {/* Image upload */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-1.5">Imagen (opcional)</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <div className="flex items-start gap-4">
+                {imagePreview ? (
+                  <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[#2a1a4e]">
+                    <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagePreview(null);
+                        setImageUrl(null);
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
+                      className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center text-white text-xs"
+                    >
+                      X
+                    </button>
+                  </div>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="px-4 py-2 bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg text-sm text-[#a090b8] hover:border-[#7b2ff2] transition-colors"
+                >
+                  {uploading ? 'Subiendo...' : imagePreview ? 'Cambiar imagen' : 'Subir imagen'}
+                </button>
+              </div>
+              <p className="text-xs text-[#6b5a80] mt-1">JPEG, PNG, WebP o GIF. Maximo 5 MB.</p>
+            </div>
+
+            {/* Website URL */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-1.5">
+                Sitio web (opcional)
+              </label>
+              <input
+                type="url"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
+                placeholder="https://tu-sitio-web.com"
+              />
+            </div>
+
+            {/* Professional type */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-1.5">Tipo de profesional</label>
+              <select
+                value={professionalType}
+                onChange={(e) => setProfessionalType(e.target.value)}
+                required
+                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] focus:border-[#7b2ff2] focus:outline-none transition-colors appearance-none"
+              >
+                <option value="" className="bg-[#1a0e2e]">Selecciona...</option>
+                {PROFESSIONAL_TYPES.map((type) => (
+                  <option key={type} value={type} className="bg-[#1a0e2e]">{type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Services */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-2">Servicios</label>
+              {serviceOptions.length === 0 ? (
+                <p className="text-xs text-[#6b5a80]">Cargando servicios...</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {serviceOptions.map((svc) => (
+                    <label
+                      key={svc.slug}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors ${
+                        selectedServices.includes(svc.slug)
+                          ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
+                          : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedServices.includes(svc.slug)}
+                        onChange={() => toggleService(svc.slug)}
+                        className="sr-only"
+                      />
+                      {svc.name}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Traditions */}
+            <div>
+              <label className="block text-sm text-[#a090b8] mb-2">Tradiciones</label>
+              {traditionOptions.length === 0 ? (
+                <p className="text-xs text-[#6b5a80]">Cargando tradiciones...</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {traditionOptions.map((trad) => (
+                    <label
+                      key={trad.slug}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors ${
+                        selectedTraditions.includes(trad.slug)
+                          ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
+                          : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTraditions.includes(trad.slug)}
+                        onChange={() => toggleTradition(trad.slug)}
+                        className="sr-only"
+                      />
+                      {trad.name}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Submit */}
+            <div ref={submitRef}>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting
+                  ? 'Enviando...'
+                  : isEdit
+                    ? 'Guardar cambios'
+                    : editingAd?.status === 'REJECTED'
+                      ? 'Reenviar anuncio'
+                      : 'Publicar anuncio'}
+              </button>
+
+              {success && (
+                <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-lg p-4 mt-4">
+                  <p className="text-[#25D366] text-sm">{success}</p>
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mt-4">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+            </div>
+          </form>
+        </>
+      )}
+
+      {!canCreateNew && !editingAd && existingAds.length > 0 && (
+        <div className="text-center py-8">
+          <p className="text-[#a090b8] text-sm">
+            Has alcanzado el limite de 3 anuncios. Edita uno existente o espera a que expire.
+          </p>
         </div>
-      </form>
+      )}
     </div>
   );
 }

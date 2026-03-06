@@ -19,7 +19,6 @@ export default function RegistroPage() {
 function RegistroForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [whatsapp, setWhatsapp] = useState('');
   const [referral, setReferral] = useState('');
   const searchParams = useSearchParams();
   const [error, setError] = useState('');
@@ -45,7 +44,6 @@ function RegistroForm() {
         body: JSON.stringify({
           email,
           password,
-          whatsappNumber: whatsapp,
           ...(referral ? { referralCode: referral } : {}),
         }),
       });
@@ -160,24 +158,6 @@ function RegistroForm() {
               placeholder="Mínimo 8 caracteres"
               className="w-full rounded-lg border border-accent-purple/20 bg-bg-primary px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary/50 outline-none transition-colors focus:border-accent-gold"
             />
-          </div>
-
-          <div>
-            <label htmlFor="whatsapp" className="mb-1 block text-sm text-text-secondary">
-              WhatsApp (con código de país)
-            </label>
-            <input
-              id="whatsapp"
-              type="tel"
-              required
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="+573001234567"
-              className="w-full rounded-lg border border-accent-purple/20 bg-bg-primary px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary/50 outline-none transition-colors focus:border-accent-gold"
-            />
-            <p className="mt-1 text-xs text-text-secondary/60">
-              Este número será tu contacto público. Incluye el código de país.
-            </p>
           </div>
 
           <div>

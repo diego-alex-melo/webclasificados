@@ -45,8 +45,8 @@ model Advertiser {
   id               String  @id @default(uuid()) @db.Uuid
   email            String  @unique
   passwordHash     String
-  whatsappNumber   String
-  countryCode      String  @db.VarChar(2)
+  whatsappNumber   String?
+  countryCode      String? @db.VarChar(2)
   reputation       Int     @default(100)
   websiteUrl       String?
   referralCode     String  @unique
@@ -67,7 +67,6 @@ model Advertiser {
 
   @@index([email])
   @@index([referralCode])
-  @@index([whatsappNumber])
   @@map("advertisers")
 }
 
@@ -80,6 +79,9 @@ model Ad {
   imageUrl        String?
   imageHash       String?
   contentHash     String
+  whatsappNumber  String
+  countryCode     String   @db.VarChar(2)
+  websiteUrl      String?
   status          AdStatus @default(PENDING)
   professionalType String
   publishedAt     DateTime?
@@ -98,8 +100,10 @@ model Ad {
   clickEvents ClickEvent[]
   socialPosts SocialPost[]
 
+  @@unique([whatsappNumber])
   @@index([advertiserId])
   @@index([status])
+  @@index([countryCode])
   @@index([slug])
   @@index([contentHash])
   @@index([reactivationToken])

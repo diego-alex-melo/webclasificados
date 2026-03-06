@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { contentHash } from '@/lib/utils/content-hash';
 import { generateAdSlug } from '@/lib/utils/slug';
 import { runSpamPipeline } from '@/lib/services/spam-pipeline';
+import { countryFromPhone } from '@/lib/utils/country-from-phone';
 
 import type { Ad } from '@/generated/prisma';
 
@@ -17,7 +18,23 @@ interface CreateAdInput {
   professionalType: string;
   traditions: string[]; // tradition slugs
   advertiserId: string;
+  whatsappNumber: string;
+  countryCode: string;
+  websiteUrl?: string;
   ip?: string;
+}
+
+interface UpdateAdInput {
+  title: string;
+  description: string;
+  imageUrl?: string;
+  services: string[];
+  professionalType: string;
+  traditions: string[];
+  advertiserId: string;
+  whatsappNumber: string;
+  countryCode: string;
+  websiteUrl?: string;
 }
 
 interface PaginatedAds {
@@ -37,6 +54,7 @@ interface SearchFilters {
 
 const AD_EXPIRY_DAYS = 60;
 const BUMP_COOLDOWN_HOURS = 48;
+const MAX_ADS_PER_ACCOUNT = 3;
 const DEFAULT_PAGE_SIZE = 20;
 
 const activeAdIncludes = {
@@ -45,9 +63,6 @@ const activeAdIncludes = {
   advertiser: {
     select: {
       id: true,
-      whatsappNumber: true,
-      countryCode: true,
-      websiteUrl: true,
       reputation: true,
     },
   },
@@ -72,6 +87,48 @@ function paginate(page: number, pageSize: number) {
   return { skip: (safePage - 1) * safeSize, take: safeSize, page: safePage, pageSize: safeSize };
 }
 
+// ── Validate ad limits ──────────────────────────────────────────────────────
+
+async function validateAdLimits(advertiserId: string, countryCode: string, excludeAdId?: string) {
+  const where: Record<string, unknown> = {
+    advertiserId,
+    status: { in: ['ACTIVE', 'PENDING'] },
+  };
+  if (excludeAdId) {
+    where.id = { not: excludeAdId };
+  }
+
+  const existingAds = await prisma.ad.findMany({
+    where,
+    select: { id: true, countryCode: true },
+  });
+
+  if (existingAds.length >= MAX_ADS_PER_ACCOUNT) {
+    throw new AdError(`Solo puedes tener ${MAX_ADS_PER_ACCOUNT} anuncios activos`, 409);
+  }
+
+  const hasCountry = existingAds.some((a) => a.countryCode === countryCode);
+  if (hasCountry) {
+    throw new AdError('Ya tienes un anuncio en este pais', 409);
+  }
+}
+
+// ── Validate WhatsApp uniqueness ────────────────────────────────────────────
+
+async function validateWhatsAppUnique(whatsappNumber: string, excludeAdId?: string) {
+  const existing = await prisma.ad.findFirst({
+    where: {
+      whatsappNumber,
+      ...(excludeAdId ? { id: { not: excludeAdId } } : {}),
+    },
+    select: { id: true },
+  });
+
+  if (existing) {
+    throw new AdError('Este numero de WhatsApp ya esta en uso en otro anuncio', 409);
+  }
+}
+
 // ── Create ──────────────────────────────────────────────────────────────────
 
 export async function createAd(data: CreateAdInput): Promise<Ad> {
@@ -83,6 +140,9 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     professionalType,
     traditions,
     advertiserId,
+    whatsappNumber,
+    countryCode,
+    websiteUrl,
     ip,
   } = data;
 
@@ -99,35 +159,32 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     throw new AdError('Debes verificar tu email antes de publicar', 403);
   }
 
-  // 2. Check limit: max 1 ACTIVE ad per advertiser
-  const activeCount = await prisma.ad.count({
-    where: { advertiserId, status: 'ACTIVE' },
-  });
+  // 2. Validate limits: max 3 ads, max 1 per country
+  await validateAdLimits(advertiserId, countryCode);
 
-  if (activeCount >= 1) {
-    throw new AdError('Solo puedes tener 1 anuncio activo', 409);
-  }
+  // 3. Validate WhatsApp uniqueness across all ads
+  await validateWhatsAppUnique(whatsappNumber);
 
-  // 3. Generate content hash
-  const hash = contentHash(title, description, advertiser.whatsappNumber);
+  // 4. Generate content hash
+  const hash = contentHash(title, description, whatsappNumber);
 
-  // 4. Run spam pipeline
+  // 5. Run spam pipeline
   let spamResult;
   try {
     spamResult = await runSpamPipeline({
       title,
       description,
-      whatsappNumber: advertiser.whatsappNumber,
+      whatsappNumber,
       imageUrl,
       advertiserId,
       ip,
     });
   } catch (err) {
     console.error('[createAd] Spam pipeline error:', err);
-    throw new AdError('Error en el sistema de verificación. Intenta de nuevo.', 500);
+    throw new AdError('Error en el sistema de verificacion. Intenta de nuevo.', 500);
   }
 
-  // 5. Resolve service and tradition IDs
+  // 6. Resolve service and tradition IDs
   const serviceRecords = await prisma.service.findMany({
     where: { slug: { in: services } },
   });
@@ -136,9 +193,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     where: { slug: { in: traditions } },
   });
 
-  // 6. Create ad — status depends on spam result
-  // Note: PrismaNeonHttp does not support implicit transactions (nested creates),
-  // so we create the ad first, then link services/traditions separately.
+  // 7. Create ad
   const now = new Date();
   const adId = randomUUID();
   const slug = generateAdSlug(title, adId);
@@ -151,6 +206,9 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
       description,
       imageUrl: imageUrl ?? null,
       contentHash: hash,
+      whatsappNumber,
+      countryCode,
+      websiteUrl: websiteUrl ?? null,
       professionalType,
       status: spamResult.passed ? 'ACTIVE' : 'REJECTED',
       publishedAt: spamResult.passed ? now : null,
@@ -160,7 +218,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     },
   });
 
-  // 7. Link services and traditions
+  // 8. Link services and traditions
   if (serviceRecords.length > 0) {
     await Promise.all(
       serviceRecords.map((s) =>
@@ -177,29 +235,20 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     );
   }
 
-  // 8. Fetch complete ad with relations
-  const ad = await prisma.ad.findUniqueOrThrow({
+  // 9. Fetch complete ad with relations
+  return prisma.ad.findUniqueOrThrow({
     where: { id: adId },
     include: activeAdIncludes,
   });
-
-  return ad;
 }
 
 // ── Update ──────────────────────────────────────────────────────────────────
 
-interface UpdateAdInput {
-  title: string;
-  description: string;
-  imageUrl?: string;
-  services: string[];
-  professionalType: string;
-  traditions: string[];
-  advertiserId: string;
-}
-
 export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
-  const { title, description, imageUrl, services, professionalType, traditions, advertiserId } = data;
+  const {
+    title, description, imageUrl, services, professionalType,
+    traditions, advertiserId, whatsappNumber, countryCode, websiteUrl,
+  } = data;
 
   // 1. Verify ad exists and belongs to this advertiser
   const existing = await prisma.ad.findFirst({
@@ -210,7 +259,17 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     throw new AdError('Anuncio no encontrado o no te pertenece', 404);
   }
 
-  // 2. Resolve service and tradition IDs
+  // 2. If country changed, validate limits
+  if (countryCode !== existing.countryCode) {
+    await validateAdLimits(advertiserId, countryCode, adId);
+  }
+
+  // 3. If WhatsApp changed, validate uniqueness
+  if (whatsappNumber !== existing.whatsappNumber) {
+    await validateWhatsAppUnique(whatsappNumber, adId);
+  }
+
+  // 4. Resolve service and tradition IDs
   const serviceRecords = await prisma.service.findMany({
     where: { slug: { in: services } },
   });
@@ -219,13 +278,8 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     where: { slug: { in: traditions } },
   });
 
-  // 3. Update ad fields
-  const advertiser = await prisma.advertiser.findUnique({
-    where: { id: advertiserId },
-    select: { whatsappNumber: true },
-  });
-
-  const hash = contentHash(title, description, advertiser!.whatsappNumber);
+  // 5. Update ad fields
+  const hash = contentHash(title, description, whatsappNumber);
 
   await prisma.ad.update({
     where: { id: adId },
@@ -234,11 +288,14 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
       description,
       imageUrl: imageUrl ?? null,
       contentHash: hash,
+      whatsappNumber,
+      countryCode,
+      websiteUrl: websiteUrl ?? null,
       professionalType,
     },
   });
 
-  // 4. Replace services (delete old, create new) — no transactions in NeonHttp
+  // 6. Replace services
   await prisma.adService.deleteMany({ where: { adId } });
   if (serviceRecords.length > 0) {
     await Promise.all(
@@ -248,7 +305,7 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     );
   }
 
-  // 5. Replace traditions
+  // 7. Replace traditions
   await prisma.adTradition.deleteMany({ where: { adId } });
   if (traditionRecords.length > 0) {
     await Promise.all(
@@ -258,7 +315,7 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     );
   }
 
-  // 6. Return updated ad with relations
+  // 8. Return updated ad with relations
   return prisma.ad.findUniqueOrThrow({
     where: { id: adId },
     include: activeAdIncludes,
@@ -291,7 +348,7 @@ export async function getAdsByCountry(
 
   const where = {
     status: 'ACTIVE' as const,
-    ...(countryCode ? { advertiser: { countryCode } } : {}),
+    ...(countryCode ? { countryCode } : {}),
   };
 
   const [ads, total] = await Promise.all([
@@ -326,7 +383,7 @@ export async function getAdsByService(
 
   const where = {
     status: 'ACTIVE' as const,
-    advertiser: { countryCode },
+    countryCode,
     services: { some: { service: { slug: serviceSlug } } },
   };
 
@@ -362,7 +419,7 @@ export async function getAdsByTradition(
 
   const where = {
     status: 'ACTIVE' as const,
-    advertiser: { countryCode },
+    countryCode,
     traditions: { some: { tradition: { slug: traditionSlug } } },
   };
 
@@ -398,7 +455,7 @@ export async function getAdsByProfessional(
 
   const where = {
     status: 'ACTIVE' as const,
-    advertiser: { countryCode },
+    countryCode,
     professionalType,
   };
 
@@ -441,7 +498,7 @@ export async function searchAds(
   };
 
   if (filters.countryCode) {
-    where.advertiser = { countryCode: filters.countryCode };
+    where.countryCode = filters.countryCode;
   }
   if (filters.serviceSlug) {
     where.services = { some: { service: { slug: filters.serviceSlug } } };
@@ -475,14 +532,13 @@ export async function searchAds(
 
 // ── Bump ────────────────────────────────────────────────────────────────────
 
-export async function bumpAd(advertiserId: string): Promise<Ad> {
+export async function bumpAd(adId: string, advertiserId: string): Promise<Ad> {
   const ad = await prisma.ad.findFirst({
-    where: { advertiserId, status: 'ACTIVE' },
-    orderBy: { createdAt: 'desc' },
+    where: { id: adId, advertiserId, status: 'ACTIVE' },
   });
 
   if (!ad) {
-    throw new AdError('No tienes un anuncio activo para republicar', 404);
+    throw new AdError('Anuncio no encontrado o no te pertenece', 404);
   }
 
   // Check 48h cooldown
@@ -503,12 +559,10 @@ export async function bumpAd(advertiserId: string): Promise<Ad> {
     data: { lastBumpedAt: new Date() },
   });
 
-  const updated = await prisma.ad.findUniqueOrThrow({
+  return prisma.ad.findUniqueOrThrow({
     where: { id: ad.id },
     include: activeAdIncludes,
   });
-
-  return updated;
 }
 
 // ── Reactivate ──────────────────────────────────────────────────────────────
@@ -539,8 +593,20 @@ export async function reactivateAd(adId: string): Promise<Ad> {
   });
 }
 
-// ── Advertiser's ad ─────────────────────────────────────────────────────────
+// ── Advertiser's ads ────────────────────────────────────────────────────────
 
+export async function getAdvertiserAds(advertiserId: string) {
+  return prisma.ad.findMany({
+    where: {
+      advertiserId,
+      status: { in: ['ACTIVE', 'PENDING', 'REJECTED'] },
+    },
+    include: activeAdIncludes,
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+// Keep single-ad getter for backward compat (e.g. bump route)
 export async function getAdvertiserAd(advertiserId: string) {
   return prisma.ad.findFirst({
     where: {

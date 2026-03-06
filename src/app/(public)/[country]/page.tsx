@@ -38,7 +38,7 @@ export default async function CountryPage({ params }: PageProps) {
       const count = await prisma.ad.count({
         where: {
           status: 'ACTIVE',
-          advertiser: { countryCode: code },
+          countryCode: code,
           services: { some: { service: { slug: cat.slug } } },
         },
       });
@@ -50,7 +50,7 @@ export default async function CountryPage({ params }: PageProps) {
   const recentAds = await prisma.ad.findMany({
     where: {
       status: 'ACTIVE',
-      advertiser: { countryCode: code },
+      countryCode: code,
     },
     include: {
       services: { include: { service: true } },
@@ -58,9 +58,6 @@ export default async function CountryPage({ params }: PageProps) {
       advertiser: {
         select: {
           id: true,
-          whatsappNumber: true,
-          countryCode: true,
-          websiteUrl: true,
           reputation: true,
         },
       },

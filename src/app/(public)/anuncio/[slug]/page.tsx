@@ -28,9 +28,6 @@ async function getAd(slug: string) {
       advertiser: {
         select: {
           id: true,
-          whatsappNumber: true,
-          countryCode: true,
-          websiteUrl: true,
           reputation: true,
         },
       },
@@ -49,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ad = await getAd(slug);
   if (!ad) return { title: 'Anuncio no encontrado' };
 
-  const countryName = getCountryName(ad.advertiser.countryCode);
+  const countryName = getCountryName(ad.countryCode);
   const description = ad.description.slice(0, 160);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
   const url = `${baseUrl}/anuncio/${ad.slug}`;
@@ -72,9 +69,9 @@ export default async function AdDetailPage({ params }: PageProps) {
   const ad = await getAd(slug);
   if (!ad) notFound();
 
-  const countryName = getCountryName(ad.advertiser.countryCode);
-  const countryFlag = getCountryFlag(ad.advertiser.countryCode);
-  const countrySlug = ad.advertiser.countryCode.toLowerCase();
+  const countryName = getCountryName(ad.countryCode);
+  const countryFlag = getCountryFlag(ad.countryCode);
+  const countrySlug = ad.countryCode.toLowerCase();
   const serviceSlugs = ad.services.map((s) => s.service.slug);
   const firstService = ad.services[0]?.service;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
@@ -168,7 +165,7 @@ export default async function AdDetailPage({ params }: PageProps) {
               ¿Te interesa este servicio?
             </p>
             <WhatsAppButton adId={ad.id} clickCount={ad._count.clickEvents} />
-            {ad.advertiser.websiteUrl && (
+            {ad.websiteUrl && (
               <a
                 href={`/click/web/${ad.id}`}
                 className="mt-3 block w-full rounded-full border border-accent-purple/30 py-3 text-center text-sm font-medium text-accent-purple-light transition-all hover:border-accent-purple/50 hover:bg-accent-purple/5"
@@ -210,7 +207,7 @@ export default async function AdDetailPage({ params }: PageProps) {
       <RelatedAds
         currentAdId={ad.id}
         serviceSlugs={serviceSlugs}
-        countryCode={ad.advertiser.countryCode}
+        countryCode={ad.countryCode}
       />
     </div>
   );

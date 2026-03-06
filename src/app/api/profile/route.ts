@@ -4,29 +4,15 @@ import { z } from 'zod';
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import { serverError } from '@/lib/services/error-logger';
 import { prisma } from '@/lib/db/prisma';
-import { COUNTRY_CODES } from '@/types';
 import type { ApiResponse } from '@/types';
 
 const updateProfileSchema = z.object({
-  whatsappNumber: z
-    .string()
-    .min(10, 'Número de WhatsApp inválido')
-    .max(20, 'Número de WhatsApp inválido')
-    .regex(/^\+\d{8,}$/, 'El número debe incluir código de país (ej: +573001234567)'),
   websiteUrl: z
     .string()
     .url('URL inválida')
     .optional()
     .or(z.literal('')),
 });
-
-function detectCountryCode(phone: string): string {
-  const sorted = Object.keys(COUNTRY_CODES).sort((a, b) => b.length - a.length);
-  for (const prefix of sorted) {
-    if (phone.startsWith(prefix)) return COUNTRY_CODES[prefix]!;
-  }
-  return 'CO';
-}
 
 // ── GET /api/profile — Get current profile ──────────────────────────────────
 
@@ -43,8 +29,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     return NextResponse.json({
       data: {
         email: advertiser.email,
-        whatsappNumber: advertiser.whatsappNumber,
-        countryCode: advertiser.countryCode,
+        whatsappNumber: advertiser.whatsappNumber ?? null,
         websiteUrl: advertiser.websiteUrl,
         referralCode: advertiser.referralCode,
       },
@@ -77,34 +62,16 @@ export async function PUT(request: NextRequest): Promise<NextResponse<ApiRespons
       return NextResponse.json({ error: firstError }, { status: 400 });
     }
 
-    const { whatsappNumber, websiteUrl } = parsed.data;
-
-    // Check if new number is already used by another account
-    if (whatsappNumber !== advertiser.whatsappNumber) {
-      const existing = await prisma.advertiser.findFirst({
-        where: { whatsappNumber, id: { not: advertiser.id } },
-      });
-      if (existing) {
-        return NextResponse.json(
-          { error: 'Este número de WhatsApp ya está registrado en otra cuenta' },
-          { status: 409 },
-        );
-      }
-    }
-
-    const countryCode = detectCountryCode(whatsappNumber);
+    const { websiteUrl } = parsed.data;
 
     const updated = await prisma.advertiser.update({
       where: { id: advertiser.id },
       data: {
-        whatsappNumber,
-        countryCode,
         websiteUrl: websiteUrl || null,
       },
       select: {
         email: true,
         whatsappNumber: true,
-        countryCode: true,
         websiteUrl: true,
         referralCode: true,
       },

@@ -45,7 +45,7 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
 
   const where: Record<string, unknown> = {
     status: 'ACTIVE',
-    advertiser: { countryCode: code },
+    countryCode: code,
     services: { some: { service: { slug: service } } },
   };
 
@@ -65,9 +65,6 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
         advertiser: {
           select: {
             id: true,
-            whatsappNumber: true,
-            countryCode: true,
-            websiteUrl: true,
             reputation: true,
           },
         },
@@ -82,7 +79,7 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
       .findMany({
         where: {
           status: 'ACTIVE',
-          advertiser: { countryCode: code },
+          countryCode: code,
           services: { some: { service: { slug: service } } },
         },
         select: { professionalType: true },

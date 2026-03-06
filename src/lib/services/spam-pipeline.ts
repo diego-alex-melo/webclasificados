@@ -37,7 +37,7 @@ function getRedis(): Redis {
 
 // ── Step 0: Ad limit per account ─────────────────────────────────────────────
 
-const MAX_ACTIVE_ADS = 1;
+const MAX_ACTIVE_ADS = 3;
 
 async function checkAdLimit(advertiserId: string): Promise<SpamCheckResult> {
   const step = 'ad_limit';
@@ -53,7 +53,7 @@ async function checkAdLimit(advertiserId: string): Promise<SpamCheckResult> {
     return {
       passed: false,
       step,
-      reason: `Solo puedes tener ${MAX_ACTIVE_ADS} anuncio activo. Elimina o espera a que expire el actual.`,
+      reason: `Solo puedes tener ${MAX_ACTIVE_ADS} anuncios activos. Elimina o espera a que expire uno.`,
     };
   }
 
@@ -146,7 +146,7 @@ async function checkTextSimilarity(
 
   const existingAds = await prisma.ad.findMany({
     where: {
-      advertiser: { whatsappNumber },
+      whatsappNumber,
       status: { in: ['ACTIVE', 'PENDING'] },
     },
     select: { title: true, description: true },

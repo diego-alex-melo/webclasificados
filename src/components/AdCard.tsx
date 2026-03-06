@@ -13,12 +13,14 @@ interface AdCardAd {
   description: string;
   imageUrl: string | null;
   professionalType: string;
+  countryCode: string;
+  websiteUrl: string | null;
   publishedAt: string | Date | null;
   services: Array<{ service: { name: string; slug: string } }>;
   traditions: Array<{ tradition: { name: string; slug: string } }>;
   advertiser: {
-    countryCode: string;
-    whatsappNumber: string;
+    id: string;
+    reputation: number;
   };
 }
 
@@ -27,8 +29,8 @@ interface AdCardProps {
 }
 
 export default function AdCard({ ad }: AdCardProps) {
-  const flag = getCountryFlag(ad.advertiser.countryCode);
-  const countrySlug = ad.advertiser.countryCode.toLowerCase();
+  const flag = getCountryFlag(ad.countryCode);
+  const countrySlug = ad.countryCode.toLowerCase();
 
   return (
     <article className="card-gradient group relative flex flex-col overflow-hidden rounded-xl transition-all">
@@ -71,7 +73,7 @@ export default function AdCard({ ad }: AdCardProps) {
           <span className="rounded-full bg-accent-purple/15 px-2.5 py-0.5 text-xs font-medium text-accent-purple-light">
             {ad.professionalType}
           </span>
-          <span className="text-sm" title={ad.advertiser.countryCode}>
+          <span className="text-sm" title={ad.countryCode}>
             {flag}
           </span>
         </div>
