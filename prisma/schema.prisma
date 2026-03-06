@@ -65,6 +65,7 @@ model Advertiser {
   referralCode     String  @unique
   referredById     String? @db.Uuid
   pushSubscription Json?
+  badgeVerified    Boolean @default(false)
   emailVerified          Boolean   @default(false)
   emailVerifyToken       String?
   passwordResetToken     String?
@@ -100,6 +101,8 @@ model Ad {
   publishedAt     DateTime?
   expiresAt       DateTime?
   lastBumpedAt    DateTime?
+  renewedAt       DateTime?
+  bumpCount       Int       @default(0)
   rejectionReason    String?
   reactivationToken  String?   @map("reactivation_token")
 

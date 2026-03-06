@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import MetricsChart from '@/components/MetricsChart';
 import BumpButton from '@/components/BumpButton';
+import RenewButton from '@/components/RenewButton';
 import { COUNTRY_MAP } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
 
@@ -14,6 +15,7 @@ interface AdData {
   status: string;
   lastBumpedAt: string | null;
   publishedAt: string | null;
+  expiresAt: string | null;
   countryCode: string;
   rejectionReason: string | null;
   advertiser: {
@@ -258,6 +260,17 @@ export default function DashboardPage() {
           <BumpButton adId={ad.id} lastBumpedAt={ad.lastBumpedAt} />
         </section>
       </div>
+
+      {/* Renew */}
+      {ad.expiresAt && (
+        <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6">
+          <h2 className="text-sm font-medium text-[#a090b8] mb-3">Renovar anuncio</h2>
+          <p className="text-xs text-[#6b5a80] mb-4">
+            Renueva tu anuncio por 60 dias mas. Disponible en los ultimos 7 dias antes de expirar.
+          </p>
+          <RenewButton adId={ad.id} expiresAt={ad.expiresAt} />
+        </section>
+      )}
 
       {/* Rejected ads */}
       {rejectedAds.length > 0 && <RejectedAdsSection ads={rejectedAds} />}

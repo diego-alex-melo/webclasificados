@@ -4,22 +4,21 @@ const BASE_REPUTATION = 100;
 const MIN_REPUTATION = 0;
 const MAX_REPUTATION = 200;
 
-const BONUS_CLICKS_THRESHOLD = 10;
-const BONUS_CLICKS = 20;
-const BONUS_AGE_30_DAYS = 10;
-const BONUS_AGE_90_DAYS = 20;
-const BONUS_WEBSITE = 10;
+const BONUS_BADGE_VERIFIED = 30;
+const BONUS_REFERRAL = 10;
+const BONUS_RENEWAL = 10;
+const BONUS_FIRST_BUMP = 5;
 const PENALTY_REJECTION = -30;
 
 /**
  * Calculate the reputation score for an advertiser based on multiple factors.
  *
- * Factors:
+ * Points reward actions that are HARD to achieve or BENEFIT our SEO/visibility:
  * - Base: 100
- * - Active ad with >10 WhatsApp clicks: +20
- * - Account age >30 days: +10
- * - Account age >90 days: +20 (stacks with 30-day bonus)
- * - Has website URL: +10
+ * - Badge/seal verified on advertiser's website: +30
+ * - Referred a friend (who registered): +10 per referral
+ * - Renewed ad before expiry: +10 per renewal
+ * - First bump (republish): +5
  * - Rejected ads: -30 per rejection
  *
  * Range: [0, 200]
@@ -32,11 +31,12 @@ export async function calculateReputation(advertiserId: string): Promise<number>
         select: {
           id: true,
           status: true,
-          clickEvents: {
-            where: { type: 'WHATSAPP' },
-            select: { id: true },
-          },
+          renewedAt: true,
+          bumpCount: true,
         },
+      },
+      _count: {
+        select: { referrals: true },
       },
     },
   });
@@ -47,31 +47,25 @@ export async function calculateReputation(advertiserId: string): Promise<number>
 
   let score = BASE_REPUTATION;
 
-  // Active ad with >10 WhatsApp clicks
-  const hasPopularAd = advertiser.ads.some(
-    (ad) => ad.status === 'ACTIVE' && ad.clickEvents.length > BONUS_CLICKS_THRESHOLD,
-  );
-  if (hasPopularAd) {
-    score += BONUS_CLICKS;
+  // Badge verified on advertiser's website (+30)
+  if (advertiser.badgeVerified) {
+    score += BONUS_BADGE_VERIFIED;
   }
 
-  // Account age bonuses
-  const now = new Date();
-  const accountAgeDays = (now.getTime() - advertiser.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+  // Referrals (+10 per referred friend)
+  score += advertiser._count.referrals * BONUS_REFERRAL;
 
-  if (accountAgeDays > 90) {
-    score += BONUS_AGE_90_DAYS;
-  }
-  if (accountAgeDays > 30) {
-    score += BONUS_AGE_30_DAYS;
-  }
+  // Renewals (+10 per ad renewed before expiry)
+  const renewedAds = advertiser.ads.filter((ad) => ad.renewedAt !== null).length;
+  score += renewedAds * BONUS_RENEWAL;
 
-  // Has website URL
-  if (advertiser.websiteUrl) {
-    score += BONUS_WEBSITE;
+  // First bump ever (+5, one-time)
+  const hasBumped = advertiser.ads.some((ad) => ad.bumpCount > 0);
+  if (hasBumped) {
+    score += BONUS_FIRST_BUMP;
   }
 
-  // Rejected ads penalty
+  // Rejected ads penalty (-30 per rejection)
   const rejectedCount = advertiser.ads.filter((ad) => ad.status === 'REJECTED').length;
   score += rejectedCount * PENALTY_REJECTION;
 

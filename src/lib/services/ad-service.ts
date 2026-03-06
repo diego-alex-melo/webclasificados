@@ -54,6 +54,7 @@ interface SearchFilters {
 }
 
 const AD_EXPIRY_DAYS = 60;
+const RENEWAL_WINDOW_DAYS = 7;
 const BUMP_COOLDOWN_HOURS = 48;
 const MAX_ADS_PER_ACCOUNT = 3;
 const DEFAULT_PAGE_SIZE = 20;
@@ -611,7 +612,54 @@ export async function bumpAd(adId: string, advertiserId: string): Promise<Ad> {
 
   await prisma.ad.update({
     where: { id: ad.id },
-    data: { lastBumpedAt: new Date() },
+    data: { lastBumpedAt: new Date(), bumpCount: { increment: 1 } },
+  });
+
+  return prisma.ad.findUniqueOrThrow({
+    where: { id: ad.id },
+    include: activeAdIncludes,
+  });
+}
+
+// ── Renew ───────────────────────────────────────────────────────────────────
+
+/**
+ * Renew an active ad within the last 7 days before expiry.
+ * Resets the 60-day timer and marks the ad as renewed for reputation bonus.
+ */
+export async function renewAd(adId: string, advertiserId: string): Promise<Ad> {
+  const ad = await prisma.ad.findFirst({
+    where: { id: adId, advertiserId, status: 'ACTIVE' },
+  });
+
+  if (!ad) {
+    throw new AdError('Anuncio no encontrado o no te pertenece', 404);
+  }
+
+  if (!ad.expiresAt) {
+    throw new AdError('El anuncio no tiene fecha de expiración', 400);
+  }
+
+  const now = new Date();
+  const daysUntilExpiry = (ad.expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+
+  if (daysUntilExpiry > RENEWAL_WINDOW_DAYS) {
+    throw new AdError(
+      `Solo puedes renovar en los últimos ${RENEWAL_WINDOW_DAYS} días antes de expirar. Faltan ${Math.ceil(daysUntilExpiry)} días.`,
+      400,
+    );
+  }
+
+  if (daysUntilExpiry < 0) {
+    throw new AdError('El anuncio ya expiró. Usa el enlace de reactivación del email.', 400);
+  }
+
+  await prisma.ad.update({
+    where: { id: ad.id },
+    data: {
+      expiresAt: expiresAt(),
+      renewedAt: new Date(),
+    },
   });
 
   return prisma.ad.findUniqueOrThrow({

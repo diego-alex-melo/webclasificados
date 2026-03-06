@@ -67,8 +67,12 @@ export default function GuiaPage() {
           <InfoRow label="Anuncios activos" value="Maximo 3 por cuenta, cada uno con un numero de WhatsApp diferente" />
           <InfoRow label="Duracion" value="60 dias desde la publicacion" />
           <InfoRow
+            label="Renovacion"
+            value="En los ultimos 7 dias antes de expirar, puedes renovar tu anuncio desde el panel. Esto reinicia el contador de 60 dias y te da puntos de reputacion."
+          />
+          <InfoRow
             label="Expiracion"
-            value="Recibiras un recordatorio por email antes de que expire. Una vez expirado, puedes reactivarlo gratis desde el enlace en el email."
+            value="Si no renuevas a tiempo, recibiras un email con un enlace para reactivar tu anuncio gratis."
           />
           <InfoRow
             label="Destacar (bump)"
@@ -102,10 +106,10 @@ export default function GuiaPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              <ReputationRow action="Anuncio con mas de 10 clics en WhatsApp" points="+20" positive />
-              <ReputationRow action="Cuenta con mas de 30 dias" points="+10" positive />
-              <ReputationRow action="Cuenta con mas de 90 dias" points="+20" positive />
-              <ReputationRow action="Tener URL de sitio web en tu anuncio" points="+10" positive />
+              <ReputationRow action="Tener nuestro sello verificado en tu sitio web" points="+30" positive />
+              <ReputationRow action="Referir un amigo que se registre" points="+10" positive />
+              <ReputationRow action="Renovar tu anuncio antes de que expire" points="+10" positive />
+              <ReputationRow action="Republicar (bump) tu anuncio por primera vez" points="+5" positive />
             </tbody>
           </table>
         </div>
@@ -140,7 +144,11 @@ export default function GuiaPage() {
                 <td className="px-4 py-2.5 text-red-400">Cuenta bloqueada — no puedes publicar</td>
               </tr>
               <tr>
-                <td className="px-4 py-2.5 text-text-primary">100+</td>
+                <td className="px-4 py-2.5 text-text-primary">80+</td>
+                <td className="px-4 py-2.5 text-text-secondary">Tu enlace web aparece visible en tu anuncio</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2.5 text-text-primary">100</td>
                 <td className="px-4 py-2.5 text-text-secondary">Publicacion normal (cuenta nueva)</td>
               </tr>
               <tr>
