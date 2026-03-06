@@ -10,6 +10,8 @@ export default function WhatsAppButton({ adId, clickCount, small = false }: What
   return (
     <a
       href={`/click/whatsapp/${adId}`}
+      target="_blank"
+      rel="noopener"
       className={`glow-green inline-flex items-center gap-2 rounded-full bg-whatsapp font-medium text-white transition-all hover:brightness-110 ${
         small ? 'px-3 py-1.5 text-xs' : 'px-6 py-3 text-base'
       }`}
