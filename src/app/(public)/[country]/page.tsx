@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/db/prisma';
-import { COUNTRY_MAP, getCountryName, getCountryFlag, countryCodeFromSlug } from '@/lib/utils/countries';
+import { COUNTRY_MAP, getCountryName, countryCodeFromSlug } from '@/lib/utils/countries';
+import CountryFlag from '@/components/CountryFlag';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
@@ -30,7 +31,6 @@ export default async function CountryPage({ params }: PageProps) {
   if (!info) notFound();
 
   const countryName = info.name;
-  const flag = info.flag;
 
   // Get ad counts per service for this country
   const serviceCounts = await Promise.all(
@@ -71,12 +71,12 @@ export default async function CountryPage({ params }: PageProps) {
       <Breadcrumbs
         items={[
           { label: 'Inicio', href: '/' },
-          { label: `${flag} ${countryName}` },
+          { label: countryName },
         ]}
       />
 
       <h1 className="mb-2 text-3xl font-bold">
-        Servicios Esotéricos en {countryName} {flag}
+        Servicios Esotéricos en {countryName} <CountryFlag code={code} size={24} />
       </h1>
       <p className="mb-8 text-text-secondary">
         Encuentra profesionales esotéricos verificados en {countryName}.

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import FavoriteButton from '@/components/FavoriteButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { getCountryFlag } from '@/lib/utils/countries';
+import CountryFlag from '@/components/CountryFlag';
 import { relativeTime } from '@/lib/utils/time';
 
 interface AdCardAd {
@@ -29,7 +29,6 @@ interface AdCardProps {
 }
 
 export default function AdCard({ ad }: AdCardProps) {
-  const flag = getCountryFlag(ad.countryCode);
   const countrySlug = ad.countryCode.toLowerCase();
 
   return (
@@ -74,7 +73,7 @@ export default function AdCard({ ad }: AdCardProps) {
             {ad.professionalType}
           </span>
           <span className="text-sm" title={ad.countryCode}>
-            {flag}
+            <CountryFlag code={ad.countryCode} size={16} />
           </span>
         </div>
 

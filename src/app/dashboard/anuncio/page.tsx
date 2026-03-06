@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { PROFESSIONAL_TYPES } from '@/types';
 import { countryFromPhone, countriesFromPhone } from '@/lib/utils/country-from-phone';
 import { COUNTRY_MAP } from '@/lib/utils/countries';
+import CountryFlag from '@/components/CountryFlag';
 
 interface ServiceOption {
   id: number;
@@ -344,7 +345,7 @@ export default function AnuncioPage() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">{country?.flag ?? ''}</span>
+                      <CountryFlag code={ad.countryCode} size={16} />
                       <p className="text-sm text-[#e8e0f0] truncate">{ad.title}</p>
                     </div>
                     <p className="text-xs text-[#6b5a80] mt-0.5">
@@ -450,7 +451,7 @@ export default function AnuncioPage() {
                             : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
                         }`}
                       >
-                        <span>{c?.flag}</span>
+                        <CountryFlag code={code} size={16} />
                         <span>{c?.name ?? code}</span>
                       </button>
                     );
@@ -462,7 +463,7 @@ export default function AnuncioPage() {
             {/* Detected country display */}
             {countryCode && !showCountrySelector && (
               <div className="flex items-center gap-2 px-3 py-2 bg-[#1a0e2e] rounded-lg border border-[#2a1a4e]">
-                <span>{COUNTRY_MAP[countryCode]?.flag}</span>
+                <CountryFlag code={countryCode} size={16} />
                 <span className="text-sm text-[#e8e0f0]">
                   {COUNTRY_MAP[countryCode]?.name ?? countryCode}
                 </span>

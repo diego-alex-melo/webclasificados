@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/db/prisma';
-import { getCountryName, getCountryFlag } from '@/lib/utils/countries';
+import { getCountryName } from '@/lib/utils/countries';
+import CountryFlag from '@/components/CountryFlag';
 import { relativeTime } from '@/lib/utils/time';
 import {
   generateAdJsonLd,
@@ -71,7 +72,6 @@ export default async function AdDetailPage({ params }: PageProps) {
   if (!ad) notFound();
 
   const countryName = getCountryName(ad.countryCode);
-  const countryFlag = getCountryFlag(ad.countryCode);
   const countrySlug = ad.countryCode.toLowerCase();
   const serviceSlugs = ad.services.map((s) => s.service.slug);
   const firstService = ad.services[0]?.service;
@@ -79,7 +79,7 @@ export default async function AdDetailPage({ params }: PageProps) {
 
   const breadcrumbs = [
     { label: 'Inicio', href: '/' },
-    { label: `${countryFlag} ${countryName}`, href: `/${countrySlug}` },
+    { label: countryName, href: `/${countrySlug}` },
     ...(firstService
       ? [{ label: firstService.name, href: `/${countrySlug}/${firstService.slug}` }]
       : []),
@@ -115,8 +115,8 @@ export default async function AdDetailPage({ params }: PageProps) {
             <span className="rounded-full bg-accent-purple/15 px-2.5 py-0.5 text-xs font-medium text-accent-purple-light">
               {ad.professionalType}
             </span>
-            <span>
-              {countryFlag} {countryName}
+            <span className="inline-flex items-center gap-1">
+              <CountryFlag code={ad.countryCode} size={18} /> {countryName}
             </span>
             {ad.publishedAt && <time>{relativeTime(ad.publishedAt)}</time>}
           </div>

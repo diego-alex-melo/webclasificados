@@ -6,6 +6,7 @@ import Link from 'next/link';
 import MetricsChart from '@/components/MetricsChart';
 import BumpButton from '@/components/BumpButton';
 import { COUNTRY_MAP } from '@/lib/utils/countries';
+import CountryFlag from '@/components/CountryFlag';
 
 interface AdData {
   id: string;
@@ -161,7 +162,7 @@ export default function DashboardPage() {
                     : 'border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
                 }`}
               >
-                <span>{country?.flag}</span>
+                <CountryFlag code={a.countryCode} size={16} />
                 <span className="truncate max-w-[150px]">{a.title}</span>
               </button>
             );
@@ -173,7 +174,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-[#e8e0f0]">Metricas</h1>
         <p className="text-[#a090b8] text-sm mt-1">
-          {COUNTRY_MAP[ad.countryCode]?.flag} {ad.title}
+          <CountryFlag code={ad.countryCode} size={16} /> {ad.title}
         </p>
       </div>
 

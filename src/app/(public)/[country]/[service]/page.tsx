@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db/prisma';
-import { COUNTRY_MAP, getCountryFlag, countryCodeFromSlug } from '@/lib/utils/countries';
+import { COUNTRY_MAP, countryCodeFromSlug } from '@/lib/utils/countries';
+import CountryFlag from '@/components/CountryFlag';
 import { getServiceBySlug } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
@@ -35,7 +36,6 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
 
   if (!info || !svc) notFound();
 
-  const flag = getCountryFlag(code);
   const page = Math.max(1, Number(sp.page) || 1);
   const pageSize = 12;
 
@@ -99,7 +99,7 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
       <Breadcrumbs
         items={[
           { label: 'Inicio', href: '/' },
-          { label: `${flag} ${info.name}`, href: `/${country}` },
+          { label: info.name, href: `/${country}` },
           { label: svc.name },
         ]}
       />
