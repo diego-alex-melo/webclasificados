@@ -47,14 +47,14 @@ export default function AdCard({ ad }: AdCardProps) {
             <span className="text-4xl opacity-60">
               {ad.services[0]?.service.slug === 'amor-y-relaciones'
                 ? '\u{1F52E}'
-                : ad.services[0]?.service.slug === 'proteccion-y-limpieza'
-                  ? '\u{1F9FF}'
-                  : ad.services[0]?.service.slug === 'prosperidad-y-dinero'
-                    ? '\u{2728}'
-                    : ad.services[0]?.service.slug === 'salud-y-bienestar'
-                      ? '\u{1F33F}'
-                      : ad.services[0]?.service.slug === 'lectura-y-adivinacion'
-                        ? '\u{1F0CF}'
+                : ad.services[0]?.service.slug === 'consultas-y-lecturas'
+                  ? '\u{1F0CF}'
+                  : ad.services[0]?.service.slug === 'limpiezas-y-sanacion'
+                    ? '\u{1F33F}'
+                    : ad.services[0]?.service.slug === 'proteccion'
+                      ? '\u{1F9FF}'
+                      : ad.services[0]?.service.slug === 'prosperidad'
+                        ? '\u{2728}'
                         : '\u{1F319}'}
             </span>
           </div>

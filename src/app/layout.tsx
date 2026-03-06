@@ -126,28 +126,28 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=proteccion-y-limpieza" prefetch={false} className="hover:text-accent-gold">
-                  Protección y Limpieza
+                <Link href="/buscar?service=consultas-y-lecturas" prefetch={false} className="hover:text-accent-gold">
+                  Consultas y Lecturas
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=prosperidad-y-dinero" prefetch={false} className="hover:text-accent-gold">
-                  Prosperidad y Dinero
+                <Link href="/buscar?service=limpiezas-y-sanacion" prefetch={false} className="hover:text-accent-gold">
+                  Limpiezas y Sanación
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=salud-y-bienestar" prefetch={false} className="hover:text-accent-gold">
-                  Salud y Bienestar
+                <Link href="/buscar?service=proteccion" prefetch={false} className="hover:text-accent-gold">
+                  Protección
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=lectura-y-adivinacion" prefetch={false} className="hover:text-accent-gold">
-                  Lectura y Adivinación
+                <Link href="/buscar?service=prosperidad" prefetch={false} className="hover:text-accent-gold">
+                  Prosperidad
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=trabajos-especiales" prefetch={false} className="hover:text-accent-gold">
-                  Trabajos Especiales
+                <Link href="/buscar?service=trabajos-espirituales" prefetch={false} className="hover:text-accent-gold">
+                  Trabajos Espirituales
                 </Link>
               </li>
             </ul>
