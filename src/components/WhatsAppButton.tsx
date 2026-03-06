@@ -20,8 +20,8 @@ export default function WhatsAppButton({ adId, clickCount, small = false }: What
       </svg>
       {small ? 'WhatsApp' : 'Contactar por WhatsApp'}
       {typeof clickCount === 'number' && clickCount > 0 && (
-        <span className={`rounded-full bg-white/20 ${small ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-0.5 text-xs'}`}>
-          {clickCount} contactos
+        <span className={`rounded-full bg-white/20 font-semibold ${small ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-0.5 text-xs'}`}>
+          {clickCount}
         </span>
       )}
     </a>
