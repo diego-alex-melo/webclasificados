@@ -498,11 +498,17 @@ export async function bumpAd(advertiserId: string): Promise<Ad> {
     }
   }
 
-  return prisma.ad.update({
+  await prisma.ad.update({
     where: { id: ad.id },
     data: { lastBumpedAt: new Date() },
+  });
+
+  const updated = await prisma.ad.findUniqueOrThrow({
+    where: { id: ad.id },
     include: activeAdIncludes,
   });
+
+  return updated;
 }
 
 // ── Reactivate ──────────────────────────────────────────────────────────────
@@ -518,13 +524,17 @@ export async function reactivateAd(adId: string): Promise<Ad> {
     throw new AdError('Solo se pueden reactivar anuncios expirados', 400);
   }
 
-  return prisma.ad.update({
+  await prisma.ad.update({
     where: { id: adId },
     data: {
       status: 'ACTIVE',
       expiresAt: expiresAt(),
       publishedAt: new Date(),
     },
+  });
+
+  return prisma.ad.findUniqueOrThrow({
+    where: { id: adId },
     include: activeAdIncludes,
   });
 }
