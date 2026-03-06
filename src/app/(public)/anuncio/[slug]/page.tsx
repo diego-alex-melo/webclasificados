@@ -172,10 +172,10 @@ export default async function AdDetailPage({ params }: PageProps) {
               <a
                 href={`/click/web/${ad.id}`}
                 target="_blank"
-                className="mt-3 block w-full rounded-full border border-accent-purple/30 py-3 text-center text-sm font-medium text-accent-purple-light transition-all hover:border-accent-purple/50 hover:bg-accent-purple/5"
+                className="mt-3 block w-full rounded-full bg-[#2563eb] py-3 text-center text-sm font-medium text-white transition-all hover:bg-[#1d4ed8] active:scale-[0.98]"
                 rel={`${ad.advertiser.reputation >= 150 ? 'ugc' : 'ugc nofollow'} noopener`}
               >
-                Visitar sitio web
+                Sitio web
               </a>
             )}
           </div>
