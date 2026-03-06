@@ -37,7 +37,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
     ];
   }
   if (countryFilter) {
-    where.advertiser = { countryCode: countryFilter.toUpperCase() };
+    where.countryCode = countryFilter.toUpperCase();
   }
   if (serviceFilter) {
     where.services = { some: { service: { slug: serviceFilter } } };
