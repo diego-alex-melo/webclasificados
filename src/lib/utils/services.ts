@@ -4,40 +4,34 @@
  */
 export const SERVICE_CATEGORIES = [
   {
-    slug: 'amor-y-relaciones',
-    name: 'Amor y Relaciones',
+    slug: 'amarres-y-alejamientos',
+    name: 'Amarres y Alejamientos',
     emoji: '\u{1F52E}',
-    description: 'Amarres, endulzamientos, recuperar pareja, limpiezas de amor',
+    description: 'Amarres de amor, endulzamientos, retornos de pareja, alejamientos',
   },
   {
-    slug: 'consultas-y-lecturas',
-    name: 'Consultas y Lecturas',
-    emoji: '\u{1F0CF}',
-    description: 'Tarot, lectura de cartas, adivinación, consultas espirituales',
+    slug: 'prosperidad-y-dinero',
+    name: 'Prosperidad y Dinero',
+    emoji: '\u{2728}',
+    description: 'Rituales de abundancia, apertura de caminos, suerte en negocios',
   },
   {
     slug: 'limpiezas-y-sanacion',
     name: 'Limpiezas y Sanación',
     emoji: '\u{1F33F}',
-    description: 'Limpiezas espirituales, sanación energética, baños de descarga',
+    description: 'Limpiezas espirituales, sanación energética, protección, baños de descarga',
   },
   {
-    slug: 'proteccion',
-    name: 'Protección',
-    emoji: '\u{1F9FF}',
-    description: 'Protección contra envidias, trabajos de defensa, resguardos espirituales',
+    slug: 'tarot-y-lecturas',
+    name: 'Tarot y Lecturas',
+    emoji: '\u{1F0CF}',
+    description: 'Tarot, lectura de cartas, adivinación, consultas espirituales',
   },
   {
-    slug: 'prosperidad',
-    name: 'Prosperidad',
-    emoji: '\u{2728}',
-    description: 'Rituales de abundancia, apertura de caminos, suerte en negocios',
-  },
-  {
-    slug: 'trabajos-espirituales',
-    name: 'Trabajos Espirituales',
-    emoji: '\u{1F319}',
-    description: 'Trabajos a medida, consultas personalizadas, casos difíciles',
+    slug: 'tiendas-esotericas',
+    name: 'Tiendas Esotéricas',
+    emoji: '\u{1F56F}',
+    description: 'Velas, hierbas, amuletos, inciensos, cristales y productos esotéricos',
   },
 ] as const;
 

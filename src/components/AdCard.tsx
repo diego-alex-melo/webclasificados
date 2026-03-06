@@ -45,16 +45,16 @@ export default function AdCard({ ad }: AdCardProps) {
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-purple/20 to-bg-card">
             <span className="text-4xl opacity-60">
-              {ad.services[0]?.service.slug === 'amor-y-relaciones'
+              {ad.services[0]?.service.slug === 'amarres-y-alejamientos'
                 ? '\u{1F52E}'
-                : ad.services[0]?.service.slug === 'consultas-y-lecturas'
-                  ? '\u{1F0CF}'
+                : ad.services[0]?.service.slug === 'prosperidad-y-dinero'
+                  ? '\u{2728}'
                   : ad.services[0]?.service.slug === 'limpiezas-y-sanacion'
                     ? '\u{1F33F}'
-                    : ad.services[0]?.service.slug === 'proteccion'
-                      ? '\u{1F9FF}'
-                      : ad.services[0]?.service.slug === 'prosperidad'
-                        ? '\u{2728}'
+                    : ad.services[0]?.service.slug === 'tarot-y-lecturas'
+                      ? '\u{1F0CF}'
+                      : ad.services[0]?.service.slug === 'tiendas-esotericas'
+                        ? '\u{1F56F}'
                         : '\u{1F319}'}
             </span>
           </div>

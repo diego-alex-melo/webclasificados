@@ -9,12 +9,11 @@ const sql = neon(process.env.DATABASE_URL!);
 
 async function main() {
   const services = [
-    { name: 'Amor y Relaciones', slug: 'amor-y-relaciones' },
-    { name: 'Consultas y Lecturas', slug: 'consultas-y-lecturas' },
+    { name: 'Amarres y Alejamientos', slug: 'amarres-y-alejamientos' },
+    { name: 'Prosperidad y Dinero', slug: 'prosperidad-y-dinero' },
     { name: 'Limpiezas y Sanación', slug: 'limpiezas-y-sanacion' },
-    { name: 'Protección', slug: 'proteccion' },
-    { name: 'Prosperidad', slug: 'prosperidad' },
-    { name: 'Trabajos Espirituales', slug: 'trabajos-espirituales' },
+    { name: 'Tarot y Lecturas', slug: 'tarot-y-lecturas' },
+    { name: 'Tiendas Esotéricas', slug: 'tiendas-esotericas' },
   ];
 
   for (const s of services) {
@@ -98,7 +97,7 @@ async function main() {
         professionalType: 'BRUJO',
         slugSuffix: 'mx',
       },
-      serviceSlugs: ['amor-y-relaciones', 'limpiezas-y-sanacion', 'proteccion'],
+      serviceSlugs: ['amarres-y-alejamientos', 'limpiezas-y-sanacion'],
       traditionSlugs: ['brujeria', 'santeria'],
     },
     {
@@ -116,7 +115,7 @@ async function main() {
         professionalType: 'BRUJO',
         slugSuffix: 'cl',
       },
-      serviceSlugs: ['amor-y-relaciones', 'consultas-y-lecturas'],
+      serviceSlugs: ['amarres-y-alejamientos', 'tarot-y-lecturas'],
       traditionSlugs: ['brujeria'],
     },
     {
@@ -134,7 +133,7 @@ async function main() {
         professionalType: 'CHAMAN',
         slugSuffix: 'sv',
       },
-      serviceSlugs: ['amor-y-relaciones', 'limpiezas-y-sanacion', 'consultas-y-lecturas', 'proteccion'],
+      serviceSlugs: ['amarres-y-alejamientos', 'limpiezas-y-sanacion', 'tarot-y-lecturas'],
       traditionSlugs: ['brujeria', 'chamanismo'],
     },
   ];

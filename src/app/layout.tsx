@@ -121,13 +121,13 @@ function Footer() {
             <p className="mb-2 text-sm font-semibold text-text-primary">Categorías</p>
             <ul className="space-y-1 text-sm text-text-secondary">
               <li>
-                <Link href="/buscar?service=amor-y-relaciones" prefetch={false} className="hover:text-accent-gold">
-                  Amor y Relaciones
+                <Link href="/buscar?service=amarres-y-alejamientos" prefetch={false} className="hover:text-accent-gold">
+                  Amarres y Alejamientos
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=consultas-y-lecturas" prefetch={false} className="hover:text-accent-gold">
-                  Consultas y Lecturas
+                <Link href="/buscar?service=prosperidad-y-dinero" prefetch={false} className="hover:text-accent-gold">
+                  Prosperidad y Dinero
                 </Link>
               </li>
               <li>
@@ -136,18 +136,13 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=proteccion" prefetch={false} className="hover:text-accent-gold">
-                  Protección
+                <Link href="/buscar?service=tarot-y-lecturas" prefetch={false} className="hover:text-accent-gold">
+                  Tarot y Lecturas
                 </Link>
               </li>
               <li>
-                <Link href="/buscar?service=prosperidad" prefetch={false} className="hover:text-accent-gold">
-                  Prosperidad
-                </Link>
-              </li>
-              <li>
-                <Link href="/buscar?service=trabajos-espirituales" prefetch={false} className="hover:text-accent-gold">
-                  Trabajos Espirituales
+                <Link href="/buscar?service=tiendas-esotericas" prefetch={false} className="hover:text-accent-gold">
+                  Tiendas Esotéricas
                 </Link>
               </li>
             </ul>
