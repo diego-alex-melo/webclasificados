@@ -15,6 +15,7 @@ interface AdData {
   lastBumpedAt: string | null;
   publishedAt: string | null;
   countryCode: string;
+  rejectionReason: string | null;
   advertiser: {
     reputation: number;
   };
@@ -57,8 +58,7 @@ export default function DashboardPage() {
 
         const adJson = await adRes.json();
         const allAds: AdData[] = Array.isArray(adJson.data) ? adJson.data : [];
-        const activeAds = allAds.filter((a) => a.status === 'ACTIVE' || a.status === 'PENDING');
-        setAds(activeAds);
+        setAds(allAds);
 
         // Auto-select first active ad
         if (activeAds.length > 0) {
@@ -128,7 +128,10 @@ export default function DashboardPage() {
     );
   }
 
-  if (ads.length === 0) {
+  const activeAds = ads.filter((a) => a.status === 'ACTIVE' || a.status === 'PENDING');
+  const rejectedAds = ads.filter((a) => a.status === 'REJECTED');
+
+  if (activeAds.length === 0 && rejectedAds.length === 0) {
     return (
       <div className="py-16 text-center">
         <h1 className="text-2xl font-bold text-[#e8e0f0] mb-4">Bienvenido a tu panel</h1>
@@ -143,14 +146,33 @@ export default function DashboardPage() {
     );
   }
 
-  const ad = selectedAd ?? ads[0];
+  // If no active ads but has rejected, show only rejected section
+  if (activeAds.length === 0 && rejectedAds.length > 0) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold text-[#e8e0f0] mb-4">Bienvenido a tu panel</h1>
+          <p className="text-[#a090b8] mb-6">No tienes anuncios activos.</p>
+          <Link
+            href="/dashboard/anuncio"
+            className="inline-block px-6 py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] transition-colors"
+          >
+            Crear nuevo anuncio
+          </Link>
+        </div>
+        <RejectedAdsSection ads={rejectedAds} />
+      </div>
+    );
+  }
+
+  const ad = selectedAd ?? activeAds[0];
 
   return (
     <div className="space-y-8">
-      {/* Ad selector (only if multiple ads) */}
-      {ads.length > 1 && (
+      {/* Ad selector (only if multiple active ads) */}
+      {activeAds.length > 1 && (
         <div className="flex flex-wrap gap-2">
-          {ads.map((a) => {
+          {activeAds.map((a) => {
             const country = COUNTRY_MAP[a.countryCode];
             return (
               <button
@@ -235,7 +257,42 @@ export default function DashboardPage() {
           <BumpButton adId={ad.id} lastBumpedAt={ad.lastBumpedAt} />
         </section>
       </div>
+
+      {/* Rejected ads */}
+      {rejectedAds.length > 0 && <RejectedAdsSection ads={rejectedAds} />}
     </div>
+  );
+}
+
+// ── Rejected Ads Section ────────────────────────────────────────────────────
+
+function RejectedAdsSection({ ads }: { ads: AdData[] }) {
+  return (
+    <section className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 lg:p-6">
+      <h2 className="text-sm font-medium text-red-400 mb-3">
+        Anuncios rechazados ({ads.length})
+      </h2>
+      <div className="space-y-3">
+        {ads.map((ad) => (
+          <div key={ad.id} className="bg-[#0d0015] border border-red-500/15 rounded-lg p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-[#e8e0f0] truncate">{ad.title}</p>
+                {ad.rejectionReason && (
+                  <p className="text-xs text-red-300 mt-1">Motivo: {ad.rejectionReason}</p>
+                )}
+              </div>
+              <Link
+                href="/dashboard/anuncio"
+                className="shrink-0 px-4 py-1.5 bg-red-500/15 border border-red-500/30 rounded-lg text-sm text-red-300 hover:bg-red-500/25 transition-colors"
+              >
+                Editar y corregir
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

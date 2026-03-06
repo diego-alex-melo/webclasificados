@@ -7,6 +7,7 @@ import AdCard from '@/components/AdCard';
 import Pagination from '@/components/Pagination';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import CountryFlag from '@/components/CountryFlag';
+import MobileFilters from '@/components/MobileFilters';
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -87,6 +88,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
   if (traditionFilter) paginationParams.tradition = traditionFilter;
   if (professionalFilter) paginationParams.professional = professionalFilter;
 
+  const hasActiveFilters = !!(countryFilter || serviceFilter || traditionFilter || professionalFilter);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <Breadcrumbs items={[{ label: 'Inicio', href: '/' }, { label: 'Buscar' }]} />
@@ -96,7 +99,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
       </div>
 
       {/* Active filters chips */}
-      {(countryFilter || serviceFilter || traditionFilter || professionalFilter) && (
+      {hasActiveFilters && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-xs text-text-secondary">Filtros:</span>
           {countryFilter && (
@@ -132,10 +135,24 @@ export default async function SearchPage({ searchParams }: PageProps) {
         </div>
       )}
 
+      {/* Mobile filters (collapsible) */}
+      <div className="lg:hidden mb-6">
+        <MobileFilters
+          countries={Object.entries(COUNTRY_MAP).map(([code, { name }]) => ({ code, name }))}
+          services={SERVICE_CATEGORIES}
+          traditions={traditions}
+          paginationParams={paginationParams}
+          countryFilter={countryFilter}
+          serviceFilter={serviceFilter}
+          traditionFilter={traditionFilter}
+          hasActiveFilters={hasActiveFilters}
+        />
+      </div>
+
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-        {/* Filters Sidebar */}
-        <aside className="space-y-6">
-          <FilterSection title="País">
+        {/* Filters Sidebar — desktop only */}
+        <aside className="hidden lg:block space-y-6 rounded-xl bg-bg-secondary/30 p-4">
+          <FilterSection title="Pa&iacute;s">
             {Object.entries(COUNTRY_MAP).map(([code, { name }]) => (
               <FilterLink
                 key={code}
@@ -162,7 +179,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
           </FilterSection>
 
           {traditions.length > 0 && (
-            <FilterSection title="Tradición">
+            <FilterSection title="Tradici&oacute;n">
               {traditions.map((t) => (
                 <FilterLink
                   key={t.slug}
@@ -210,11 +227,11 @@ export default async function SearchPage({ searchParams }: PageProps) {
               <p className="mb-2 text-4xl">&#x1F50E;</p>
               <p className="mb-2 text-lg font-semibold">Sin resultados</p>
               <p className="text-sm text-text-secondary">
-                Intenta con otros términos de búsqueda o ajusta los filtros.
+                Intenta con otros t&eacute;rminos de b&uacute;squeda o ajusta los filtros.
               </p>
               {query && (
                 <p className="mt-4 text-sm text-text-secondary">
-                  Sugerencias: prueba con palabras más generales como &ldquo;tarot&rdquo;,
+                  Sugerencias: prueba con palabras m&aacute;s generales como &ldquo;tarot&rdquo;,
                   &ldquo;amarre&rdquo;, &ldquo;limpieza&rdquo;
                 </p>
               )}

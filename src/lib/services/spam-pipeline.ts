@@ -113,6 +113,7 @@ async function checkExactDuplicate(
   title: string,
   description: string,
   whatsappNumber: string,
+  advertiserId: string,
 ): Promise<SpamCheckResult> {
   const step = 'exact_duplicate';
   const hash = contentHash(title, description, whatsappNumber);
@@ -120,6 +121,7 @@ async function checkExactDuplicate(
   const existing = await prisma.ad.findFirst({
     where: {
       contentHash: hash,
+      advertiserId,
       status: { in: ['ACTIVE', 'PENDING'] },
     },
   });
@@ -329,8 +331,8 @@ export async function runSpamPipeline(input: SpamCheckInput): Promise<SpamCheckR
   const textResult = checkTextValidation(title, description);
   if (!textResult.passed) return textResult;
 
-  // Step 3: Exact duplicate
-  const dupResult = await checkExactDuplicate(title, description, whatsappNumber);
+  // Step 3: Exact duplicate (same advertiser only)
+  const dupResult = await checkExactDuplicate(title, description, whatsappNumber, advertiserId);
   if (!dupResult.passed) return dupResult;
 
   // Step 4: Text similarity

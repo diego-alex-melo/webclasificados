@@ -113,7 +113,7 @@ model Ad {
   clickEvents ClickEvent[]
   socialPosts SocialPost[]
 
-  @@unique([whatsappNumber])
+  @@index([whatsappNumber])
   @@index([advertiserId])
   @@index([status])
   @@index([countryCode])

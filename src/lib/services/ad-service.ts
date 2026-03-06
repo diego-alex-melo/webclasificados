@@ -121,19 +121,49 @@ async function validateAdLimits(advertiserId: string, countryCode: string, exclu
   }
 }
 
-// ── Validate WhatsApp uniqueness ────────────────────────────────────────────
+// ── Validate WhatsApp uniqueness (only ACTIVE/PENDING from other advertisers) ─
 
-async function validateWhatsAppUnique(whatsappNumber: string, excludeAdId?: string) {
+async function validateWhatsAppUnique(
+  whatsappNumber: string,
+  advertiserId: string,
+  excludeAdId?: string,
+) {
   const existing = await prisma.ad.findFirst({
     where: {
       whatsappNumber,
+      status: { in: ['ACTIVE', 'PENDING'] },
+      advertiserId: { not: advertiserId },
       ...(excludeAdId ? { id: { not: excludeAdId } } : {}),
     },
     select: { id: true },
   });
 
   if (existing) {
-    throw new AdError('Este numero de WhatsApp ya esta en uso en otro anuncio', 409);
+    throw new AdError('Este numero de WhatsApp ya esta en uso por otro anunciante', 409);
+  }
+}
+
+// ── Validate Website uniqueness (only ACTIVE/PENDING from other advertisers) ─
+
+async function validateWebsiteUnique(
+  websiteUrl: string | undefined | null,
+  advertiserId: string,
+  excludeAdId?: string,
+) {
+  if (!websiteUrl) return;
+
+  const existing = await prisma.ad.findFirst({
+    where: {
+      websiteUrl,
+      status: { in: ['ACTIVE', 'PENDING'] },
+      advertiserId: { not: advertiserId },
+      ...(excludeAdId ? { id: { not: excludeAdId } } : {}),
+    },
+    select: { id: true },
+  });
+
+  if (existing) {
+    throw new AdError('Este sitio web ya esta en uso por otro anunciante', 409);
   }
 }
 
@@ -170,8 +200,9 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
   // 2. Validate limits: max 3 ads, max 1 per country
   await validateAdLimits(advertiserId, countryCode);
 
-  // 3. Validate WhatsApp uniqueness across all ads
-  await validateWhatsAppUnique(whatsappNumber);
+  // 3. Validate WhatsApp and website uniqueness (ACTIVE/PENDING from other advertisers)
+  await validateWhatsAppUnique(whatsappNumber, advertiserId);
+  await validateWebsiteUnique(websiteUrl, advertiserId);
 
   // 4. Generate content hash
   const hash = contentHash(title, description, whatsappNumber);
@@ -258,9 +289,9 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     traditions, advertiserId, whatsappNumber, countryCode, websiteUrl,
   } = data;
 
-  // 1. Verify ad exists and belongs to this advertiser
+  // 1. Verify ad exists and belongs to this advertiser (include REJECTED for correction)
   const existing = await prisma.ad.findFirst({
-    where: { id: adId, advertiserId, status: { in: ['ACTIVE', 'PENDING'] } },
+    where: { id: adId, advertiserId, status: { in: ['ACTIVE', 'PENDING', 'REJECTED'] } },
   });
 
   if (!existing) {
@@ -272,9 +303,12 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     await validateAdLimits(advertiserId, countryCode, adId);
   }
 
-  // 3. If WhatsApp changed, validate uniqueness
+  // 3. Validate WhatsApp and website uniqueness
   if (whatsappNumber !== existing.whatsappNumber) {
-    await validateWhatsAppUnique(whatsappNumber, adId);
+    await validateWhatsAppUnique(whatsappNumber, advertiserId, adId);
+  }
+  if (websiteUrl !== (existing.websiteUrl ?? undefined)) {
+    await validateWebsiteUnique(websiteUrl, advertiserId, adId);
   }
 
   // 4. Resolve service and tradition IDs
@@ -286,8 +320,26 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
     where: { slug: { in: traditions } },
   });
 
+  // 4b. If correcting a REJECTED ad, re-run spam pipeline
+  const wasRejected = existing.status === 'REJECTED';
+  let newStatus = existing.status;
+  let rejectionReason: string | null = existing.rejectionReason;
+
+  if (wasRejected) {
+    const spamResult = await runSpamPipeline({
+      title,
+      description,
+      whatsappNumber,
+      imageUrl,
+      advertiserId,
+    });
+    newStatus = spamResult.passed ? 'ACTIVE' : 'REJECTED';
+    rejectionReason = spamResult.passed ? null : (spamResult.reason ?? null);
+  }
+
   // 5. Update ad fields
   const hash = contentHash(title, description, whatsappNumber);
+  const now = new Date();
 
   await prisma.ad.update({
     where: { id: adId },
@@ -300,6 +352,14 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
       countryCode,
       websiteUrl: websiteUrl ?? null,
       professionalType,
+      ...(wasRejected
+        ? {
+            status: newStatus,
+            rejectionReason,
+            publishedAt: newStatus === 'ACTIVE' ? now : null,
+            expiresAt: newStatus === 'ACTIVE' ? expiresAt() : null,
+          }
+        : {}),
     },
   });
 
@@ -585,6 +645,15 @@ export async function reactivateAd(adId: string): Promise<Ad> {
   if (ad.status !== 'EXPIRED') {
     throw new AdError('Solo se pueden reactivar anuncios expirados', 400);
   }
+
+  // Validate ad limits (max 3 ads, 1 per country)
+  await validateAdLimits(ad.advertiserId, ad.countryCode, ad.id);
+
+  // Validate WhatsApp not taken by another advertiser
+  await validateWhatsAppUnique(ad.whatsappNumber, ad.advertiserId, ad.id);
+
+  // Validate website not taken by another advertiser
+  await validateWebsiteUnique(ad.websiteUrl, ad.advertiserId, ad.id);
 
   await prisma.ad.update({
     where: { id: adId },

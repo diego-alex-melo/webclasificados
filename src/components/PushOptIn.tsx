@@ -44,7 +44,7 @@ export default function PushOptIn() {
 
   return (
     <div className="animate-slide-down border-b border-accent-gold/20 bg-bg-secondary/80 px-4 py-3 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+      <div className="mx-auto flex max-w-6xl flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <p className="text-sm text-text-secondary">
           <span className="mr-1.5 text-accent-gold">&#128276;</span>
           Recibe notificaciones cuando te contacten por WhatsApp
@@ -55,13 +55,13 @@ export default function PushOptIn() {
             disabled={isLoading}
             className="rounded-full bg-accent-gold/15 px-4 py-1.5 text-sm font-medium text-accent-gold transition-colors hover:bg-accent-gold/25 disabled:opacity-50"
           >
-            {isLoading ? 'Activando...' : 'Activar notificaciones'}
+            {isLoading ? 'Activando...' : 'Activar'}
           </button>
           <button
             onClick={handleDismiss}
             className="rounded-full px-3 py-1.5 text-sm text-text-secondary transition-colors hover:text-text-primary"
           >
-            No, gracias
+            No
           </button>
         </div>
       </div>

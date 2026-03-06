@@ -68,8 +68,8 @@ function Header() {
         <Link href="/" className="text-gradient-gold text-xl font-bold tracking-tight">
           BrujosClassifieds
         </Link>
-        <ul className="flex items-center gap-6 text-sm">
-          <li>
+        <ul className="flex items-center gap-2 sm:gap-6 text-sm">
+          <li className="hidden sm:block">
             <Link href="/" className="text-text-secondary transition-colors hover:text-accent-gold">
               Inicio
             </Link>
@@ -79,7 +79,8 @@ function Header() {
               href="/buscar"
               className="text-text-secondary transition-colors hover:text-accent-gold"
             >
-              Buscar
+              <span className="hidden sm:inline">Buscar</span>
+              <svg className="sm:hidden w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </Link>
           </li>
           <li>
@@ -87,13 +88,14 @@ function Header() {
               href="/favoritos"
               className="text-text-secondary transition-colors hover:text-accent-gold"
             >
-              Favoritos
+              <span className="hidden sm:inline">Favoritos</span>
+              <svg className="sm:hidden w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </Link>
           </li>
           <li>
             <Link
               href="/dashboard"
-              className="glow-gold inline-flex items-center gap-1.5 rounded-full bg-accent-gold/10 px-4 py-1.5 text-accent-gold transition-all hover:bg-accent-gold/20"
+              className="glow-gold inline-flex items-center gap-1.5 rounded-full bg-accent-gold/10 px-3 sm:px-4 py-1.5 text-accent-gold transition-all hover:bg-accent-gold/20"
             >
               Publicar
             </Link>
@@ -108,7 +110,7 @@ function Footer() {
   return (
     <footer className="border-t border-accent-purple/10 bg-bg-secondary/50 px-4 py-10">
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-8 sm:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <p className="text-gradient-gold mb-2 font-bold">BrujosClassifieds</p>
             <p className="text-sm text-text-secondary">

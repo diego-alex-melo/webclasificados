@@ -159,6 +159,17 @@ export async function PUT(request: NextRequest): Promise<NextResponse<ApiRespons
       advertiserId: advertiser.id,
     });
 
+    // If a corrected ad was re-rejected, return 422
+    if (ad.status === 'REJECTED') {
+      return NextResponse.json(
+        {
+          data: ad,
+          error: ad.rejectionReason ?? 'Anuncio rechazado por el sistema anti-spam',
+        },
+        { status: 422 },
+      );
+    }
+
     return NextResponse.json({ data: ad });
   } catch (err) {
     if (err instanceof AuthError) {

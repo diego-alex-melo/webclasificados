@@ -48,7 +48,8 @@ export default async function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="mx-auto max-w-6xl px-4 pb-16">
+      <section className="bg-bg-secondary/40 py-16">
+        <div className="mx-auto max-w-6xl px-4">
         <h2 className="mb-6 text-center text-2xl font-bold">Servicios</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICE_CATEGORIES.map((cat) => (
@@ -66,11 +67,13 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Recent Ads */}
       {recentAds.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-16">
+        <section className="py-16">
+          <div className="mx-auto max-w-6xl px-4">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Anuncios recientes</h2>
             <Link
@@ -91,11 +94,12 @@ export default async function HomePage() {
               />
             ))}
           </div>
+          </div>
         </section>
       )}
 
       {/* CTA */}
-      <section className="px-4 pb-20">
+      <section className="bg-bg-secondary/40 py-16 px-4">
         <div className="mx-auto max-w-2xl rounded-2xl bg-gradient-to-br from-accent-purple/20 to-bg-card p-8 text-center sm:p-12">
           <h2 className="mb-3 text-2xl font-bold">
             ¿Eres profesional esotérico?

@@ -249,7 +249,7 @@ export default function AnuncioPage() {
     try {
       const token = localStorage.getItem('token');
 
-      const isUpdating = editingAd && editingAd.status !== 'REJECTED';
+      const isUpdating = !!editingAd;
 
       const body = {
         ...(isUpdating ? { adId: editingAd.id } : {}),
@@ -320,7 +320,7 @@ export default function AnuncioPage() {
     );
   }
 
-  const isEdit = editingAd && editingAd.status !== 'REJECTED';
+  const isEdit = !!editingAd;
   const canCreateNew = existingAds.filter((a) => a.status !== 'REJECTED').length < 3;
 
   return (
@@ -636,10 +636,10 @@ export default function AnuncioPage() {
               >
                 {submitting
                   ? 'Enviando...'
-                  : isEdit
-                    ? 'Guardar cambios'
-                    : editingAd?.status === 'REJECTED'
-                      ? 'Reenviar anuncio'
+                  : editingAd?.status === 'REJECTED'
+                    ? 'Corregir y reenviar'
+                    : isEdit
+                      ? 'Guardar cambios'
                       : 'Publicar anuncio'}
               </button>
 
