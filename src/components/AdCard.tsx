@@ -12,7 +12,6 @@ interface AdCardAd {
   slug: string;
   description: string;
   imageUrl: string | null;
-  professionalType: string;
   countryCode: string;
   websiteUrl: string | null;
   publishedAt: string | Date | null;
@@ -67,11 +66,13 @@ export default function AdCard({ ad }: AdCardProps) {
 
       {/* Content */}
       <div className="flex flex-1 flex-col gap-2 p-4">
-        {/* Professional type badge + country */}
+        {/* Tradition badges + country */}
         <div className="flex items-center justify-between">
-          <span className="rounded-full bg-accent-purple/15 px-2.5 py-0.5 text-xs font-medium text-accent-purple-light">
-            {ad.professionalType}
-          </span>
+          {ad.traditions.length > 0 && (
+            <span className="rounded-full bg-accent-purple/15 px-2.5 py-0.5 text-xs font-medium text-accent-purple-light">
+              {ad.traditions[0].tradition.name}
+            </span>
+          )}
           <span className="text-sm" title={ad.countryCode}>
             <CountryFlag code={ad.countryCode} size={16} />
           </span>

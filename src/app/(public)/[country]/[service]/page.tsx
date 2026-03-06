@@ -41,7 +41,6 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
 
   // Optional filters from query params
   const traditionFilter = typeof sp.tradition === 'string' ? sp.tradition : '';
-  const professionalFilter = typeof sp.professional === 'string' ? sp.professional : '';
 
   const where: Record<string, unknown> = {
     status: 'ACTIVE',
@@ -52,11 +51,8 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
   if (traditionFilter) {
     where.traditions = { some: { tradition: { slug: traditionFilter } } };
   }
-  if (professionalFilter) {
-    where.professionalType = professionalFilter;
-  }
 
-  const [ads, total, traditions, professionalTypes] = await Promise.all([
+  const [ads, total, traditions] = await Promise.all([
     prisma.ad.findMany({
       where,
       include: {
@@ -75,24 +71,12 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
     }),
     prisma.ad.count({ where }),
     prisma.tradition.findMany({ orderBy: { name: 'asc' } }),
-    prisma.ad
-      .findMany({
-        where: {
-          status: 'ACTIVE',
-          countryCode: code,
-          services: { some: { service: { slug: service } } },
-        },
-        select: { professionalType: true },
-        distinct: ['professionalType'],
-      })
-      .then((results) => results.map((r) => r.professionalType)),
   ]);
 
   const totalPages = Math.ceil(total / pageSize);
 
   const paginationParams: Record<string, string> = {};
   if (traditionFilter) paginationParams.tradition = traditionFilter;
-  if (professionalFilter) paginationParams.professional = professionalFilter;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -114,7 +98,7 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
         <aside className="space-y-6">
           {traditions.length > 0 && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-text-primary">Tradición</h3>
+              <h3 className="mb-2 text-sm font-semibold text-text-primary">Especialidad</h3>
               <div className="flex flex-col gap-1">
                 {traditions.map((t) => {
                   const active = traditionFilter === t.slug;
@@ -139,32 +123,6 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
             </div>
           )}
 
-          {professionalTypes.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-sm font-semibold text-text-primary">Tipo de Profesional</h3>
-              <div className="flex flex-col gap-1">
-                {professionalTypes.map((pt) => {
-                  const active = professionalFilter === pt;
-                  const href = active
-                    ? `/${country}/${service}`
-                    : `/${country}/${service}?professional=${encodeURIComponent(pt)}`;
-                  return (
-                    <a
-                      key={pt}
-                      href={href}
-                      className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
-                        active
-                          ? 'bg-accent-purple/20 text-accent-purple-light'
-                          : 'text-text-secondary hover:bg-bg-card hover:text-text-primary'
-                      }`}
-                    >
-                      {pt}
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </aside>
 
         {/* Results */}

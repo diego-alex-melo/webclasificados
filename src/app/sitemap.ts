@@ -94,7 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // ── Programmatic SEO city pages ─────────────────────────────────────────
-  const professionalSlugs = Object.values(PROFESSIONAL_SLUGS);
+  const professionalSlugs = Object.keys(PROFESSIONAL_SLUGS);
   const cityPages: MetadataRoute.Sitemap = Object.values(CITIES)
     .flat()
     .flatMap((city) =>

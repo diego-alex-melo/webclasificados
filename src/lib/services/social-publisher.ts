@@ -10,7 +10,6 @@ interface AdWithRelations {
   description: string;
   slug: string;
   imageUrl: string | null;
-  professionalType: string;
   countryCode: string;
   services: Array<{ service: { name: string; slug: string } }>;
 }
@@ -41,13 +40,6 @@ export function generateHashtags(ad: AdWithRelations): string[] {
 
   tags.add('#esoterico');
   tags.add('#BrujosClassifieds');
-
-  // Professional type tag
-  const typeTag = ad.professionalType
-    .toLowerCase()
-    .replace(/[^a-záéíóúñü]/g, '')
-    .replace(/\//g, '');
-  if (typeTag) tags.add(`#${typeTag}`);
 
   // Service tags
   for (const s of ad.services) {
@@ -107,7 +99,7 @@ function generateCaption(ad: AdWithRelations): string {
   const adUrl = `${APP_URL}/anuncio/${ad.slug}`;
   const hashtags = generateHashtags(ad).join(' ');
 
-  return `${ad.title} — ${ad.professionalType} en ${country}. Más info: ${adUrl} ${hashtags}`;
+  return `${ad.title} — en ${country}. Más info: ${adUrl} ${hashtags}`;
 }
 
 // ── Platform Publishers ─────────────────────────────────────────────────────

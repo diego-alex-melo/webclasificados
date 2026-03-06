@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     ...generateOgTags(
-      `${ad.title} — ${ad.professionalType} en ${countryName}`,
+      `${ad.title} — ${countryName}`,
       description,
       ad.imageUrl ?? undefined,
       url,
@@ -112,9 +112,6 @@ export default async function AdDetailPage({ params }: PageProps) {
 
           {/* Meta row */}
           <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-text-secondary">
-            <span className="rounded-full bg-accent-purple/15 px-2.5 py-0.5 text-xs font-medium text-accent-purple-light">
-              {ad.professionalType}
-            </span>
             <span className="inline-flex items-center gap-1">
               <CountryFlag code={ad.countryCode} size={18} /> {countryName}
             </span>

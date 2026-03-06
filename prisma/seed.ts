@@ -22,16 +22,19 @@ async function main() {
   console.log(`Seeded ${services.length} services`);
 
   const traditions = [
-    { name: 'Santería', slug: 'santeria' },
-    { name: 'Tarot', slug: 'tarot' },
-    { name: 'Chamanismo', slug: 'chamanismo' },
-    { name: 'Brujería', slug: 'brujeria' },
+    { name: 'Angelología', slug: 'angelologia' },
     { name: 'Astrología', slug: 'astrologia' },
+    { name: 'Brujería', slug: 'brujeria' },
+    { name: 'Cartomancia', slug: 'cartomancia' },
+    { name: 'Chamanismo', slug: 'chamanismo' },
+    { name: 'Curanderismo', slug: 'curanderismo' },
+    { name: 'Espiritismo', slug: 'espiritismo' },
+    { name: 'Herbolaria', slug: 'herbolaria' },
+    { name: 'Magia Blanca', slug: 'magia-blanca' },
     { name: 'Numerología', slug: 'numerologia' },
-    { name: 'Reiki', slug: 'reiki' },
-    { name: 'Velas', slug: 'velas' },
-    { name: 'Cristales', slug: 'cristales' },
-    { name: 'Médiumship', slug: 'mediumship' },
+    { name: 'Santería', slug: 'santeria' },
+    { name: 'Videncia', slug: 'videncia' },
+    { name: 'Vudú', slug: 'vudu' },
   ];
 
   for (const t of traditions) {

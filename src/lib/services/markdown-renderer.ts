@@ -8,7 +8,6 @@ export interface MarkdownAd {
   slug: string;
   title: string;
   description: string;
-  professionalType: string;
   countryCode: string;
   websiteUrl: string | null;
   expiresAt: Date | null;
@@ -32,7 +31,6 @@ interface SearchFilters {
   countryCode?: string;
   serviceSlug?: string;
   traditionSlug?: string;
-  professionalType?: string;
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -61,7 +59,6 @@ export function renderAdMarkdown(ad: MarkdownAd): string {
   const lines: string[] = [
     `# ${ad.title}`,
     '',
-    `**Profesional:** ${ad.professionalType}`,
   ];
 
   if (services) {
@@ -109,14 +106,15 @@ export function renderCategoryMarkdown(
     return lines.join('\n');
   }
 
-  lines.push('| Anuncio | Profesional | Contacto |');
-  lines.push('|---------|-------------|----------|');
+  lines.push('| Anuncio | Tradición | Contacto |');
+  lines.push('|---------|-----------|----------|');
 
   for (const ad of ads) {
     const adUrl = `${APP_URL}/anuncio/${ad.slug}`;
     const clickUrl = `${APP_URL}/click/whatsapp/${ad.id}`;
+    const traditionName = ad.traditions[0]?.tradition.name ?? '';
     lines.push(
-      `| [${truncate(ad.title, 60)}](${adUrl}) | ${ad.professionalType} | [WhatsApp](${clickUrl}) |`,
+      `| [${truncate(ad.title, 60)}](${adUrl}) | ${traditionName} | [WhatsApp](${clickUrl}) |`,
     );
   }
 
@@ -142,8 +140,6 @@ export function renderSearchMarkdown(
   if (filters.serviceSlug) filterParts.push(`servicio: ${filters.serviceSlug}`);
   if (filters.traditionSlug)
     filterParts.push(`tradicion: ${filters.traditionSlug}`);
-  if (filters.professionalType)
-    filterParts.push(`profesional: ${filters.professionalType}`);
 
   const filterText = filterParts.length > 0 ? ` (${filterParts.join(', ')})` : '';
 
@@ -159,14 +155,15 @@ export function renderSearchMarkdown(
     return lines.join('\n');
   }
 
-  lines.push('| Anuncio | Profesional | Contacto |');
-  lines.push('|---------|-------------|----------|');
+  lines.push('| Anuncio | Tradición | Contacto |');
+  lines.push('|---------|-----------|----------|');
 
   for (const ad of ads) {
     const adUrl = `${APP_URL}/anuncio/${ad.slug}`;
     const clickUrl = `${APP_URL}/click/whatsapp/${ad.id}`;
+    const traditionName = ad.traditions[0]?.tradition.name ?? '';
     lines.push(
-      `| [${truncate(ad.title, 60)}](${adUrl}) | ${ad.professionalType} | [WhatsApp](${clickUrl}) |`,
+      `| [${truncate(ad.title, 60)}](${adUrl}) | ${traditionName} | [WhatsApp](${clickUrl}) |`,
     );
   }
 

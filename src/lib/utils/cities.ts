@@ -36,32 +36,10 @@ export const CITIES: Record<string, City[]> = {
 };
 
 /**
- * Maps professional type display names to URL-friendly slugs.
- * Key: professionalType value stored in DB (matches PROFESSIONAL_TYPES).
- * Value: plural slug for URL generation.
+ * Maps professional slugs to display labels (Spanish).
+ * Kept for SEO city pages URL structure (/servicios/[slug]-en-[city]).
  */
 export const PROFESSIONAL_SLUGS: Record<string, string> = {
-  'Brujo/a': 'brujos',
-  'Chamán': 'chamanes',
-  'Santero/a': 'santeros',
-  'Tarotista': 'tarotistas',
-  'Vidente': 'videntes',
-  'Médium': 'mediums',
-  'Astrólogo/a': 'astrologos',
-  'Curandero/a': 'curanderos',
-};
-
-/**
- * Reverse lookup: slug -> professional type display name.
- */
-export const SLUG_TO_PROFESSIONAL: Record<string, string> = Object.fromEntries(
-  Object.entries(PROFESSIONAL_SLUGS).map(([name, slug]) => [slug, name]),
-);
-
-/**
- * Human-readable plural labels for professional type slugs (Spanish).
- */
-export const PROFESSIONAL_LABELS: Record<string, string> = {
   brujos: 'Brujos',
   chamanes: 'Chamanes',
   santeros: 'Santeros',
@@ -71,6 +49,16 @@ export const PROFESSIONAL_LABELS: Record<string, string> = {
   astrologos: 'Astrólogos',
   curanderos: 'Curanderos',
 };
+
+/**
+ * Reverse lookup: slug -> label. Same as PROFESSIONAL_SLUGS since keys are now slugs.
+ */
+export const SLUG_TO_PROFESSIONAL: Record<string, string> = PROFESSIONAL_SLUGS;
+
+/**
+ * Human-readable plural labels for professional type slugs (Spanish).
+ */
+export const PROFESSIONAL_LABELS: Record<string, string> = PROFESSIONAL_SLUGS;
 
 /**
  * Find a city by slug across all countries. Returns city + country code.

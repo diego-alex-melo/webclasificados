@@ -110,17 +110,15 @@ export default async function CityProfessionalPage({
   const { professionalSlug, citySlug } = parsed;
   const label =
     PROFESSIONAL_LABELS[professionalSlug] ?? professionalSlug;
-  const professionalType = SLUG_TO_PROFESSIONAL[professionalSlug]!;
   const cityInfo = findCityBySlug(citySlug)!;
   const cityName = cityInfo.city.name;
   const countryCode = cityInfo.countryCode;
 
-  // Fetch ads matching professional type + country
+  // Fetch ads matching country
   // City-level filtering is approximate — ads don't store city yet
   const ads = await prisma.ad.findMany({
     where: {
       status: 'ACTIVE',
-      professionalType,
       advertiser: { countryCode },
     },
     include: {

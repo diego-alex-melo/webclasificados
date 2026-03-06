@@ -16,7 +16,6 @@ interface CreateAdInput {
   description: string;
   imageUrl?: string;
   services: string[]; // service slugs
-  professionalType: string;
   traditions: string[]; // tradition slugs
   advertiserId: string;
   whatsappNumber: string;
@@ -30,7 +29,6 @@ interface UpdateAdInput {
   description: string;
   imageUrl?: string;
   services: string[];
-  professionalType: string;
   traditions: string[];
   advertiserId: string;
   whatsappNumber: string;
@@ -50,7 +48,6 @@ interface SearchFilters {
   countryCode?: string;
   serviceSlug?: string;
   traditionSlug?: string;
-  professionalType?: string;
 }
 
 const AD_EXPIRY_DAYS = 60;
@@ -168,7 +165,6 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
     description,
     imageUrl,
     services,
-    professionalType,
     traditions,
     advertiserId,
     whatsappNumber,
@@ -241,7 +237,6 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
       whatsappNumber,
       countryCode,
       websiteUrl: websiteUrl ?? null,
-      professionalType,
       status: spamResult.passed ? 'ACTIVE' : 'REJECTED',
       publishedAt: spamResult.passed ? now : null,
       expiresAt: spamResult.passed ? expiresAt() : null,
@@ -278,7 +273,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
 
 export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
   const {
-    title, description, imageUrl, services, professionalType,
+    title, description, imageUrl, services,
     traditions, advertiserId, whatsappNumber, countryCode, websiteUrl,
   } = data;
 
@@ -339,7 +334,6 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
       whatsappNumber,
       countryCode,
       websiteUrl: websiteUrl ?? null,
-      professionalType,
       ...(wasRejected
         ? {
             status: newStatus,
@@ -499,42 +493,6 @@ export async function getAdsByTradition(
   };
 }
 
-// ── List by professional type ───────────────────────────────────────────────
-
-export async function getAdsByProfessional(
-  countryCode: string,
-  professionalType: string,
-  page = 1,
-  pageSize = DEFAULT_PAGE_SIZE,
-): Promise<PaginatedAds> {
-  const p = paginate(page, pageSize);
-
-  const where = {
-    status: 'ACTIVE' as const,
-    countryCode,
-    professionalType,
-  };
-
-  const [ads, total] = await Promise.all([
-    prisma.ad.findMany({
-      where,
-      include: activeAdIncludes,
-      orderBy: activeAdOrderBy,
-      skip: p.skip,
-      take: p.take,
-    }),
-    prisma.ad.count({ where }),
-  ]);
-
-  return {
-    ads,
-    total,
-    page: p.page,
-    pageSize: p.pageSize,
-    totalPages: Math.ceil(total / p.pageSize),
-  };
-}
-
 // ── Search ──────────────────────────────────────────────────────────────────
 
 export async function searchAds(
@@ -561,9 +519,6 @@ export async function searchAds(
   }
   if (filters.traditionSlug) {
     where.traditions = { some: { tradition: { slug: filters.traditionSlug } } };
-  }
-  if (filters.professionalType) {
-    where.professionalType = filters.professionalType;
   }
 
   const [ads, total] = await Promise.all([

@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 /* eslint-disable @next/next/no-img-element */
 
-import { PROFESSIONAL_TYPES } from '@/types';
 import { countryFromPhone, countriesFromPhone } from '@/lib/utils/country-from-phone';
 import { COUNTRY_MAP } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
@@ -25,7 +24,6 @@ interface ExistingAd {
   title: string;
   description: string;
   imageUrl: string | null;
-  professionalType: string;
   whatsappNumber: string;
   countryCode: string;
   websiteUrl: string | null;
@@ -43,7 +41,6 @@ export default function AnuncioPage() {
   // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [professionalType, setProfessionalType] = useState('');
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedTraditions, setSelectedTraditions] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -137,7 +134,6 @@ export default function AnuncioPage() {
     setEditingAd(ad);
     setTitle(ad.title);
     setDescription(ad.description);
-    setProfessionalType(ad.professionalType);
     setSelectedServices(ad.services.map((s) => s.service.slug));
     setSelectedTraditions(ad.traditions.map((t) => t.tradition.slug));
     setImageUrl(ad.imageUrl);
@@ -154,7 +150,6 @@ export default function AnuncioPage() {
     setEditingAd(null);
     setTitle('');
     setDescription('');
-    setProfessionalType('');
     setSelectedServices([]);
     setSelectedTraditions([]);
     setImageUrl(null);
@@ -255,7 +250,6 @@ export default function AnuncioPage() {
         ...(isUpdating ? { adId: editingAd.id } : {}),
         title: title.trim(),
         description: description.trim(),
-        professionalType,
         services: selectedServices,
         traditions: selectedTraditions,
         imageUrl: imageUrl ?? undefined,
@@ -553,22 +547,6 @@ export default function AnuncioPage() {
               />
             </div>
 
-            {/* Professional type */}
-            <div>
-              <label className="block text-sm text-[#a090b8] mb-1.5">Tipo de profesional</label>
-              <select
-                value={professionalType}
-                onChange={(e) => setProfessionalType(e.target.value)}
-                required
-                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] focus:border-[#7b2ff2] focus:outline-none transition-colors appearance-none"
-              >
-                <option value="" className="bg-[#1a0e2e]">Selecciona...</option>
-                {PROFESSIONAL_TYPES.map((type) => (
-                  <option key={type} value={type} className="bg-[#1a0e2e]">{type}</option>
-                ))}
-              </select>
-            </div>
-
             {/* Services */}
             <div>
               <label className="block text-sm text-[#a090b8] mb-2">Servicios</label>
@@ -600,9 +578,9 @@ export default function AnuncioPage() {
 
             {/* Traditions */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-2">Tradiciones</label>
+              <label className="block text-sm text-[#a090b8] mb-2">Especialidades</label>
               {traditionOptions.length === 0 ? (
-                <p className="text-xs text-[#6b5a80]">Cargando tradiciones...</p>
+                <p className="text-xs text-[#6b5a80]">Cargando especialidades...</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {traditionOptions.map((trad) => (

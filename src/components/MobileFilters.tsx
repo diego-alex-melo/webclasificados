@@ -118,7 +118,7 @@ export default function MobileFilters({
           {/* Traditions — horizontal scroll */}
           {traditions.length > 0 && (
             <div>
-              <h3 className="mb-2 text-xs font-semibold text-text-secondary uppercase tracking-wide">Tradici&oacute;n</h3>
+              <h3 className="mb-2 text-xs font-semibold text-text-secondary uppercase tracking-wide">Especialidad</h3>
               <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
                 {traditions.map((t) => (
                   <a

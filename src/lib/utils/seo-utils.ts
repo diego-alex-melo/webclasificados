@@ -29,7 +29,6 @@ interface AdForJsonLd {
   description: string;
   slug: string;
   imageUrl: string | null;
-  professionalType: string;
   countryCode: string;
   services: Array<{ service: { name: string; slug: string } }>;
 }
@@ -83,7 +82,6 @@ export function generateAdJsonLd(ad: AdForJsonLd) {
       name: countryName(ad.countryCode),
     },
     ...(serviceTypes.length > 0 ? { serviceType: serviceTypes } : {}),
-    additionalType: ad.professionalType,
   };
 }
 

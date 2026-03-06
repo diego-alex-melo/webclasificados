@@ -16,7 +16,7 @@ interface PageProps {
 export const metadata: Metadata = {
   title: 'Buscar Servicios Esotéricos',
   description:
-    'Busca y encuentra servicios esotéricos profesionales. Filtra por país, servicio, tradición y tipo de profesional.',
+    'Busca y encuentra servicios esotéricos profesionales. Filtra por país, servicio, especialidad y tipo de profesional.',
 };
 
 export default async function SearchPage({ searchParams }: PageProps) {
@@ -25,7 +25,6 @@ export default async function SearchPage({ searchParams }: PageProps) {
   const serviceFilter = typeof sp.service === 'string' ? sp.service : '';
   const countryFilter = typeof sp.country === 'string' ? sp.country : '';
   const traditionFilter = typeof sp.tradition === 'string' ? sp.tradition : '';
-  const professionalFilter = typeof sp.professional === 'string' ? sp.professional : '';
   const page = Math.max(1, Number(sp.page) || 1);
   const pageSize = 12;
 
@@ -47,10 +46,6 @@ export default async function SearchPage({ searchParams }: PageProps) {
   if (traditionFilter) {
     where.traditions = { some: { tradition: { slug: traditionFilter } } };
   }
-  if (professionalFilter) {
-    where.professionalType = professionalFilter;
-  }
-
   const skip = (page - 1) * pageSize;
 
   const [ads, total, services, traditions] = await Promise.all([
@@ -86,9 +81,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
   if (serviceFilter) paginationParams.service = serviceFilter;
   if (countryFilter) paginationParams.country = countryFilter;
   if (traditionFilter) paginationParams.tradition = traditionFilter;
-  if (professionalFilter) paginationParams.professional = professionalFilter;
 
-  const hasActiveFilters = !!(countryFilter || serviceFilter || traditionFilter || professionalFilter);
+  const hasActiveFilters = !!(countryFilter || serviceFilter || traditionFilter);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -118,12 +112,6 @@ export default async function SearchPage({ searchParams }: PageProps) {
             <ActiveFilter
               label={traditions.find((t) => t.slug === traditionFilter)?.name ?? traditionFilter}
               removeHref={buildFilterUrl({ ...paginationParams, tradition: '' })}
-            />
-          )}
-          {professionalFilter && (
-            <ActiveFilter
-              label={professionalFilter}
-              removeHref={buildFilterUrl({ ...paginationParams, professional: '' })}
             />
           )}
           <a
@@ -179,7 +167,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
           </FilterSection>
 
           {traditions.length > 0 && (
-            <FilterSection title="Tradici&oacute;n">
+            <FilterSection title="Especialidad">
               {traditions.map((t) => (
                 <FilterLink
                   key={t.slug}

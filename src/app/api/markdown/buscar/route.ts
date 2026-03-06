@@ -9,9 +9,8 @@ export async function GET(request: NextRequest) {
     const countryCode = searchParams.get('country') ?? undefined;
     const serviceSlug = searchParams.get('service') ?? undefined;
     const traditionSlug = searchParams.get('tradition') ?? undefined;
-    const professionalType = searchParams.get('type') ?? undefined;
 
-    const filters = { countryCode, serviceSlug, traditionSlug, professionalType };
+    const filters = { countryCode, serviceSlug, traditionSlug };
 
     const result = await searchAds(query, filters, 1, 50);
     const markdown = renderSearchMarkdown(result.ads as unknown as MarkdownAd[], query, filters, result.total);

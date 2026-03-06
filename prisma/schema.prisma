@@ -97,7 +97,6 @@ model Ad {
   countryCode     String   @db.VarChar(2)
   websiteUrl      String?
   status          AdStatus @default(PENDING)
-  professionalType String
   publishedAt     DateTime?
   expiresAt       DateTime?
   lastBumpedAt    DateTime?

@@ -11,7 +11,6 @@ interface FavoriteAd {
   slug: string;
   description: string;
   imageUrl: string | null;
-  professionalType: string;
   publishedAt: string | null;
   countryCode: string;
   websiteUrl: string | null;

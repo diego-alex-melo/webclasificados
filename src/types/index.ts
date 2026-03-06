@@ -17,19 +17,6 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   };
 }
 
-export const PROFESSIONAL_TYPES = [
-  'Brujo/a',
-  'Chamán',
-  'Santero/a',
-  'Tarotista',
-  'Vidente',
-  'Médium',
-  'Astrólogo/a',
-  'Curandero/a',
-] as const;
-
-export type ProfessionalType = typeof PROFESSIONAL_TYPES[number];
-
 export const COUNTRY_CODES: Record<string, string> = {
   '+57': 'CO',
   '+52': 'MX',

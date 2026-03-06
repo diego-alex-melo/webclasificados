@@ -8,12 +8,10 @@ import {
   getAdsByCountry,
   getAdsByService,
   getAdsByTradition,
-  getAdsByProfessional,
   searchAds,
   AdError,
 } from '@/lib/services/ad-service';
 import { serverError, logError } from '@/lib/services/error-logger';
-import { PROFESSIONAL_TYPES } from '@/types';
 
 import type { ApiResponse, PaginatedResponse } from '@/types';
 
@@ -31,7 +29,6 @@ const createAdSchema = z.object({
   services: z
     .array(z.string())
     .min(1, 'Debes seleccionar al menos un servicio'),
-  professionalType: z.enum(PROFESSIONAL_TYPES),
   traditions: z
     .array(z.string())
     .min(1, 'Debes seleccionar al menos una tradicion'),
@@ -119,7 +116,6 @@ const updateAdSchema = z.object({
   services: z
     .array(z.string())
     .min(1, 'Debes seleccionar al menos un servicio'),
-  professionalType: z.enum(PROFESSIONAL_TYPES),
   traditions: z
     .array(z.string())
     .min(1, 'Debes seleccionar al menos una tradicion'),
@@ -191,7 +187,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<PaginatedR
     const country = searchParams.get('country') ?? undefined;
     const service = searchParams.get('service') ?? undefined;
     const tradition = searchParams.get('tradition') ?? undefined;
-    const professional = searchParams.get('professional') ?? undefined;
     const q = searchParams.get('q') ?? undefined;
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
     const pageSize = Math.min(
@@ -207,14 +202,11 @@ export async function GET(request: NextRequest): Promise<NextResponse<PaginatedR
         countryCode: country,
         serviceSlug: service,
         traditionSlug: tradition,
-        professionalType: professional,
       }, page, pageSize);
     } else if (service && country) {
       result = await getAdsByService(country, service, page, pageSize);
     } else if (tradition && country) {
       result = await getAdsByTradition(country, tradition, page, pageSize);
-    } else if (professional && country) {
-      result = await getAdsByProfessional(country, professional, page, pageSize);
     } else if (country) {
       result = await getAdsByCountry(country, page, pageSize);
     } else {
