@@ -13,6 +13,7 @@ import {
   generateOgTags,
   generateBreadcrumbJsonLd,
   generateCategoryJsonLd,
+  safeJsonLd,
 } from '@/lib/utils/seo-utils';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
@@ -179,7 +180,7 @@ export default async function CityProfessionalPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
+          __html: safeJsonLd(
             generateBreadcrumbJsonLd(breadcrumbItems),
           ),
         }}
@@ -190,7 +191,7 @@ export default async function CityProfessionalPage({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(
+            __html: safeJsonLd(
               generateCategoryJsonLd(
                 ads,
                 `${label} en ${cityName}`,
@@ -205,7 +206,7 @@ export default async function CityProfessionalPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: safeJsonLd({
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
             mainEntity: faqs.map((faq) => ({

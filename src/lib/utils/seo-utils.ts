@@ -11,6 +11,17 @@ const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 const SITE_NAME = 'BrujosClassifieds';
 
+/**
+ * Safely serialize an object for embedding inside a <script> tag.
+ * Escapes characters that could break out of the JSON-LD script block.
+ */
+export function safeJsonLd(obj: unknown): string {
+  return JSON.stringify(obj)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+}
+
 // ── Types for function inputs ───────────────────────────────────────────────
 
 interface AdForJsonLd {

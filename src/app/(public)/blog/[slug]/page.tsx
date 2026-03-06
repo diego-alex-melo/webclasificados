@@ -6,6 +6,7 @@ import {
   generateOgTags,
   generateArticleJsonLd,
   generateBreadcrumbJsonLd,
+  safeJsonLd,
 } from '@/lib/utils/seo-utils';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
@@ -38,11 +39,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
+ * Strip raw HTML tags to prevent XSS when rendering markdown.
+ */
+function stripHtml(text: string): string {
+  return text.replace(/<[^>]*>/g, '');
+}
+
+/**
  * Convert basic markdown to HTML.
  * Handles: headings (##, ###), bold (**), italic (*), links, paragraphs.
  */
 function markdownToHtml(md: string): string {
-  return md
+  return stripHtml(md)
     // Headings
     .replace(/^### (.+)$/gm, '<h3 class="mt-6 mb-3 text-lg font-semibold">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 class="mt-8 mb-4 text-xl font-bold">$1</h2>')
@@ -92,7 +100,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateArticleJsonLd(post)),
+          __html: safeJsonLd(generateArticleJsonLd(post)),
         }}
       />
 
@@ -100,7 +108,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbItems)),
+          __html: safeJsonLd(generateBreadcrumbJsonLd(breadcrumbItems)),
         }}
       />
 

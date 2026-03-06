@@ -8,6 +8,7 @@ import {
   generateAdJsonLd,
   generateBreadcrumbJsonLd,
   generateOgTags,
+  safeJsonLd,
 } from '@/lib/utils/seo-utils';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import WhatsAppButton from '@/components/WhatsAppButton';
@@ -182,7 +183,7 @@ export default async function AdDetailPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateAdJsonLd(ad)),
+          __html: safeJsonLd(generateAdJsonLd(ad)),
         }}
       />
 
@@ -190,7 +191,7 @@ export default async function AdDetailPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
+          __html: safeJsonLd(
             generateBreadcrumbJsonLd([
               { name: 'Inicio', url: baseUrl },
               { name: `${countryName}`, url: `${baseUrl}/${countrySlug}` },

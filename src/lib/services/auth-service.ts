@@ -5,7 +5,13 @@ import jwt from 'jsonwebtoken';
 
 import { prisma } from '@/lib/db/prisma';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`${name} environment variable is required`);
+  return value;
+}
+
+const JWT_SECRET = requireEnv('JWT_SECRET');
 const JWT_EXPIRES_IN = '30d';
 const BCRYPT_ROUNDS = 12;
 
