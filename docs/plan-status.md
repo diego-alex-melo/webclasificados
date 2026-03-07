@@ -10,12 +10,12 @@ Last updated: 2026-03-06
 | 2 | Publicacion exitosa de anuncio | `ad-service.ts`, `api/ads/route.ts`, spam pipeline, image upload to R2 |
 | 3 | Anti-spam bloquea telefono en texto | `spam-pipeline.ts` step 2, `text-validator.ts` |
 | 5 | Duplicado detectado | `content-hash.ts`, `text-similarity.ts`, spam pipeline steps 3-4 |
-| 6 | Click tracking WhatsApp | `click/whatsapp/[id]`, `click/web/[id]`, `click-tracker.ts` (DB records) |
-| 7 | Expiracion y reactivacion | `cron-service.ts` (processExpirations), `api/ads/reactivate`, tokens + emails |
-| 8 | Republicar (Bump) | `api/ads/bump`, `BumpButton.tsx`, 48h cooldown, `lastBumpedAt` sort |
+| 6 | Click tracking WhatsApp | `click/whatsapp/[id]` (con titulo del anuncio), `click/web/[id]`, `click-tracker.ts` |
+| 7 | Expiracion, renovacion y reactivacion | `cron-service.ts`, `api/ads/reactivate`, `api/ads/[id]/renew` (7 dias antes), tokens + emails |
+| 8 | Republicar (Bump) | `api/ads/bump`, `BumpButton.tsx`, 48h cooldown, `lastBumpedAt` sort, `bumpCount` tracked |
 | 9 | Paginas SEO auto-generadas | `[country]/page.tsx`, `[country]/[service]/page.tsx` (DB queries reales) |
 | 10 | Validacion de texto estricta | `text-validator.ts` + tests |
-| 11 | Limite de anuncios por cuenta | `spam-pipeline.ts` step 0: `checkAdLimit()` — max 1 activo/cuenta |
+| 11 | Limite de anuncios por cuenta | `spam-pipeline.ts` step 0: `checkAdLimit()` — max 3 activos/cuenta |
 | 12 | Compartir anuncio (WhatsApp preview) | `ShareButton.tsx`, OG meta tags en `anuncio/[slug]/page.tsx` |
 | 13 | Google indexa correctamente | `sitemap.ts` (dinamico con ads + blog), `robots.ts`, JSON-LD breadcrumbs |
 | 14 | Favoritos | localStorage — suficiente para el flujo anonimo del visitante. No requiere cuenta. |
@@ -24,18 +24,44 @@ Last updated: 2026-03-06
 | 17 | Paginas legales | `legal/terminos`, `privacidad`, `responsabilidad`, `faq` (contenido real) |
 | 18 | Version machine (markdown) | Middleware content negotiation (`Accept: text/markdown`) + `api/markdown/*` (5 rutas) |
 | 19 | Push notifications | `api/push/route.ts`, `push-service.ts` (VAPID, 3 tipos de notificacion) |
-| 20 | Backlink progresivo por reputacion | `anuncio/[slug]/page.tsx:175`: `rel={reputation >= 150 ? 'ugc' : 'ugc nofollow'}` |
-| 21 | SEO programatico por ciudad | `servicios/[slug]/page.tsx` — 225+ pages (8 profesionales x 20 ciudades), FAQs, JSON-LD, internal links |
-| 22 | Referral "Invita a un colega" | `referral-service.ts`, `api/referrals`, `dashboard/referidos` (+5 rep, boost) |
+| 20 | Backlink progresivo por reputacion | <80 oculto, 80-149 nofollow, 150+ dofollow |
+| 21 | SEO programatico por ciudad | `servicios/[slug]/page.tsx` — pages por ciudad, FAQs, JSON-LD, internal links |
+| 22 | Referral "Invita a un colega" | `referral-service.ts`, `api/referrals`, `dashboard/referidos` (+10 rep) |
 | 23 | PWA instalable | `manifest.ts` (standalone, iconos, colores) |
 | 25 | Badge de verificacion (parcial) | `dashboard/badge` genera HTML snippet. Falta cron de verificacion automatica |
 | 27 | Blog con contenido SEO | `blog/page.tsx`, `blog/[slug]`, `blog-service.ts` (DB, categorias, paginacion) |
 
-## Implementados (pipeline anti-spam completo)
+## Categorias (5)
+
+| Categoria | Slug |
+|---|---|
+| Amarres y Alejamientos | `amarres-y-alejamientos` |
+| Prosperidad y Dinero | `prosperidad-y-dinero` |
+| Limpiezas y Sanacion | `limpiezas-y-sanacion` |
+| Tarot y Lecturas | `tarot-y-lecturas` |
+| Tiendas Esotericas | `tiendas-esotericas` |
+
+## Especialidades (13, reemplaza professionalType + tradiciones)
+
+angelologia, astrologia, brujeria, cartomancia, chamanismo, curanderismo, espiritismo, herbolaria, magia-blanca, numerologia, santeria, videncia, vudu
+
+## Reputacion
+
+| Accion | Puntos |
+|---|---|
+| Badge verificado en web | +30 |
+| Referir amigo | +10 |
+| Renovar antes de expirar | +10 |
+| Primer bump | +5 |
+| Anuncio rechazado | -30 |
+
+Base: 100 | Rango: 0-200 | Backlink: <80 oculto, 80-149 nofollow, 150+ dofollow
+
+## Pipeline anti-spam
 
 | Step | Check | Estado |
 |---|---|---|
-| 0 | Limite de anuncios (max 1 activo/cuenta) | Real |
+| 0 | Limite de anuncios (max 3 activos/cuenta) | Real |
 | 1 | Rate limit (5 min entre publicaciones) | Real (Redis, fail-open) |
 | 2 | Validacion de texto (mayusculas, telefonos, URLs) | Real |
 | 3 | Duplicado exacto (hash titulo+desc+whatsapp) | Real |
@@ -57,6 +83,7 @@ Last updated: 2026-03-06
 |---|---|
 | OCR (#4) | `checkOcr()` stub. Requiere Google Cloud Vision API key (~$1.50/1000 imagenes) |
 | Badge verificacion (#25) | Genera snippet pero no verifica automaticamente si el badge esta en el sitio externo |
+| Tests | 8 tests unitarios rotos por mocks desactualizados |
 
 ## Cron scheduling
 
