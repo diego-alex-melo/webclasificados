@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Set required env vars before module import (vi.hoisted runs before vi.mock factories)
+vi.hoisted(() => {
+  process.env.JWT_SECRET = 'test-secret-for-vitest';
+});
+
 // Mock Prisma before importing auth-service
 vi.mock('@/lib/db/prisma', () => ({
   prisma: {
@@ -86,7 +91,7 @@ describe('auth-service', () => {
       expect(result.email).toBe('test@example.com');
     });
 
-    it('detects country code from WhatsApp number (+57 → CO)', async () => {
+    it('stores whatsappNumber when provided', async () => {
       mockPrisma.advertiser.findUnique.mockResolvedValue(null);
       mockPrisma.advertiser.findFirst.mockResolvedValue(null);
       mockPrisma.advertiser.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
@@ -105,7 +110,7 @@ describe('auth-service', () => {
       });
 
       const createCall = mockPrisma.advertiser.create.mock.calls[0][0].data;
-      expect(createCall.countryCode).toBe('CO');
+      expect(createCall.whatsappNumber).toBe('+573001234567');
     });
 
     it('returns error for duplicate email', async () => {
@@ -128,17 +133,25 @@ describe('auth-service', () => {
       ).rejects.toThrow('Ya existe una cuenta con este email');
     });
 
-    it('returns error for duplicate WhatsApp number', async () => {
-      mockPrisma.advertiser.findUnique.mockResolvedValue(null); // email not taken
-      mockPrisma.advertiser.findFirst.mockResolvedValue({ id: 'existing' }); // phone taken
-
-      await expect(
-        register({
-          email: 'new@example.com',
-          password: 'securepass123',
-          whatsappNumber: '+573001234567',
+    it('allows registration without whatsappNumber', async () => {
+      mockPrisma.advertiser.findUnique.mockResolvedValue(null);
+      mockPrisma.advertiser.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
+        Promise.resolve({
+          id: 'uuid-1',
+          ...data,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         }),
-      ).rejects.toThrow('Ya existe una cuenta con este número de WhatsApp');
+      );
+
+      const result = await register({
+        email: 'new@example.com',
+        password: 'securepass123',
+      });
+
+      const createCall = mockPrisma.advertiser.create.mock.calls[0][0].data;
+      expect(createCall.whatsappNumber).toBeUndefined();
+      expect(result.email).toBe('new@example.com');
     });
   });
 
@@ -168,7 +181,7 @@ describe('auth-service', () => {
       expect(result.advertiser).not.toHaveProperty('passwordHash');
       expect(result.advertiser.email).toBe('test@example.com');
       expect(jwt.sign).toHaveBeenCalledWith(
-        { advertiserId: 'uuid-1', email: 'test@example.com', countryCode: 'CO' },
+        { advertiserId: 'uuid-1', email: 'test@example.com' },
         expect.any(String),
         { expiresIn: '30d' },
       );

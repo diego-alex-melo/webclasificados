@@ -82,8 +82,8 @@ Base: 100 | Rango: 0-200 | Backlink: <80 oculto, 80-149 nofollow, 150+ dofollow
 | Area | Detalle |
 |---|---|
 | OCR (#4) | `checkOcr()` stub. Requiere Google Cloud Vision API key (~$1.50/1000 imagenes) |
-| Badge verificacion (#25) | Genera snippet pero no verifica automaticamente si el badge esta en el sitio externo |
-| Tests | 8 tests unitarios rotos por mocks desactualizados |
+| Badge verificacion (#25) | Cron quincenal implementado (`/api/cron/badge`, dias 1 y 15 del mes) |
+| Tests | 29/29 passing (fixed 2026-03-06) |
 
 ## Cron scheduling
 

@@ -321,3 +321,95 @@ export async function processOnboardingEmails(): Promise<{ sent: number }> {
   logCron('onboarding', `Complete: ${sent} onboarding emails sent`);
   return { sent };
 }
+
+// ── Badge Verification ────────────────────────────────────────────────────
+
+const BADGE_FETCH_TIMEOUT = 8000;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
+/**
+ * Verify badge presence on advertiser websites (runs biweekly).
+ * Fetches each advertiser's websiteUrl and checks for a link to brujosclassifieds.com
+ * containing the badge image. Updates badgeVerified and recalculates reputation.
+ */
+export async function processBadgeVerification(): Promise<{ verified: number; revoked: number; skipped: number }> {
+  const advertisers = await prisma.advertiser.findMany({
+    where: {
+      websiteUrl: { not: null },
+      ads: { some: { status: 'ACTIVE' } },
+    },
+    select: {
+      id: true,
+      websiteUrl: true,
+      badgeVerified: true,
+      ads: {
+        where: { status: 'ACTIVE' },
+        select: { slug: true },
+      },
+    },
+  });
+
+  logCron('badge', `Checking ${advertisers.length} advertisers with websites`);
+
+  let verified = 0;
+  let revoked = 0;
+  let skipped = 0;
+
+  for (const advertiser of advertisers) {
+    if (!advertiser.websiteUrl) {
+      skipped++;
+      continue;
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), BADGE_FETCH_TIMEOUT);
+
+      const res = await fetch(advertiser.websiteUrl, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'BrujosClassifieds-BadgeBot/1.0' },
+      });
+      clearTimeout(timeout);
+
+      if (!res.ok) {
+        logCron('badge', `HTTP ${res.status} for ${advertiser.websiteUrl} — skipping`);
+        skipped++;
+        continue;
+      }
+
+      const html = await res.text();
+
+      // Check if the page contains a link to any of their ad slugs with badge.svg
+      const adSlugs = advertiser.ads.map((a) => a.slug);
+      const hasBadge = adSlugs.some((slug) => {
+        const adUrl = `${BASE_URL}/anuncio/${slug}`;
+        return html.includes(adUrl) && html.includes(`${BASE_URL}/badge.svg`);
+      });
+
+      if (hasBadge && !advertiser.badgeVerified) {
+        await prisma.advertiser.update({
+          where: { id: advertiser.id },
+          data: { badgeVerified: true },
+        });
+        await updateReputation(advertiser.id);
+        verified++;
+        logCron('badge', `Verified: ${advertiser.websiteUrl}`);
+      } else if (!hasBadge && advertiser.badgeVerified) {
+        await prisma.advertiser.update({
+          where: { id: advertiser.id },
+          data: { badgeVerified: false },
+        });
+        await updateReputation(advertiser.id);
+        revoked++;
+        logCron('badge', `Revoked: ${advertiser.websiteUrl}`);
+      }
+    } catch (err) {
+      // Fetch failed (timeout, DNS, etc.) — don't change badge status
+      logCron('badge', `Fetch error for ${advertiser.websiteUrl}: ${err}`);
+      skipped++;
+    }
+  }
+
+  logCron('badge', `Complete: ${verified} verified, ${revoked} revoked, ${skipped} skipped`);
+  return { verified, revoked, skipped };
+}

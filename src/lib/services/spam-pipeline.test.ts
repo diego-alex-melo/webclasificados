@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/lib/db/prisma', () => ({
   prisma: {
     ad: {
+      count: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
     },
@@ -29,6 +30,7 @@ import { runSpamPipeline } from './spam-pipeline';
 
 const mockPrisma = prisma as unknown as {
   ad: {
+    count: ReturnType<typeof vi.fn>;
     findFirst: ReturnType<typeof vi.fn>;
     findMany: ReturnType<typeof vi.fn>;
   };
@@ -51,6 +53,7 @@ describe('runSpamPipeline', () => {
     vi.clearAllMocks();
 
     // Default mocks: everything passes
+    mockPrisma.ad.count.mockResolvedValue(0);
     mockPrisma.ad.findFirst.mockResolvedValue(null);
     mockPrisma.ad.findMany.mockResolvedValue([]);
     mockPrisma.advertiser.findUnique.mockResolvedValue({

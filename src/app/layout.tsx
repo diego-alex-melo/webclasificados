@@ -29,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        <meta name="google-site-verification" content="nmN9OmgSk8IVTTH6h4DW0f20P5Y9SwckSIb1ZyvJSUs" />
         <meta name="theme-color" content="#1a0a2e" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -49,6 +50,11 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js')});}`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","vrs15l7vo3");`,
           }}
         />
       </head>

@@ -8,6 +8,7 @@ import {
   processCleanup,
   processGoogleReviewRequest,
   processOnboardingEmails,
+  processBadgeVerification,
 } from '@/lib/services/cron-service';
 
 import type { ApiResponse } from '@/types';
@@ -22,6 +23,7 @@ const bodySchema = z.object({
     'cleanup',
     'review-request',
     'onboarding',
+    'badge-verification',
   ]),
 });
 
@@ -34,6 +36,7 @@ const JOB_HANDLERS: Record<CronJob, () => Promise<Record<string, number>>> = {
   cleanup: processCleanup,
   'review-request': processGoogleReviewRequest,
   onboarding: processOnboardingEmails,
+  'badge-verification': processBadgeVerification,
 };
 
 /**
