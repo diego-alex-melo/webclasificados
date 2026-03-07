@@ -31,6 +31,12 @@ export default function RootLayout({
       <head>
         <meta name="google-site-verification" content="nmN9OmgSk8IVTTH6h4DW0f20P5Y9SwckSIb1ZyvJSUs" />
         <meta name="theme-color" content="#1a0a2e" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-BTM6MNLXKD" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BTM6MNLXKD');`,
+          }}
+        />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
