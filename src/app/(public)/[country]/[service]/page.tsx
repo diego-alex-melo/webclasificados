@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db/prisma';
-import { COUNTRY_MAP, countryCodeFromSlug } from '@/lib/utils/countries';
+import { COUNTRY_MAP, countryCodeFromSlug, generateHreflangs } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
 import { getServiceBySlug } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -27,7 +27,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${svc.name} en ${info.name}`,
     description: `${svc.description}. Encuentra profesionales de ${svc.name} en ${info.name}. Publica tu anuncio gratis.`,
-    alternates: { canonical: `${BASE_URL}/${country}/${service}` },
+    alternates: {
+      canonical: `${BASE_URL}/${country}/${service}`,
+      languages: generateHreflangs(`/{country}/${service}`, BASE_URL),
+    },
   };
 }
 

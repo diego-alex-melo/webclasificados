@@ -37,3 +37,30 @@ export function getCountrySlug(code: string): string {
 export function countryCodeFromSlug(slug: string): string {
   return slug.toUpperCase();
 }
+
+/** Map country code → hreflang locale (BCP 47). */
+const HREFLANG_MAP: Record<string, string> = {
+  CO: 'es-CO', MX: 'es-MX', US: 'es-US', CA: 'es-CA', PR: 'es-PR',
+  ES: 'es-ES', PE: 'es-PE', CL: 'es-CL', AR: 'es-AR', EC: 'es-EC',
+  VE: 'es-VE', PA: 'es-PA', CR: 'es-CR', GT: 'es-GT', SV: 'es-SV',
+  HN: 'es-HN', NI: 'es-NI', BO: 'es-BO', PY: 'es-PY', UY: 'es-UY',
+  DO: 'es-DO',
+};
+
+/**
+ * Generate hreflang alternates for a path pattern.
+ * @param pathTemplate - e.g. "/{country}" or "/{country}/amarres-y-alejamientos"
+ * @returns Record<locale, url> for Next.js alternates.languages
+ */
+export function generateHreflangs(
+  pathTemplate: string,
+  baseUrl: string,
+): Record<string, string> {
+  const languages: Record<string, string> = {};
+  for (const [code, locale] of Object.entries(HREFLANG_MAP)) {
+    const path = pathTemplate.replace('{country}', code.toLowerCase());
+    languages[locale] = `${baseUrl}${path}`;
+  }
+  languages['x-default'] = `${baseUrl}${pathTemplate.replace('{country}', 'co')}`;
+  return languages;
+}

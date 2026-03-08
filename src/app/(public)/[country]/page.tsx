@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/db/prisma';
-import { COUNTRY_MAP, getCountryName, countryCodeFromSlug } from '@/lib/utils/countries';
+import { COUNTRY_MAP, getCountryName, countryCodeFromSlug, generateHreflangs } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -24,7 +24,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `Servicios Esotéricos en ${info.name}`,
     description: `Encuentra brujos, tarotistas, santeros, videntes y más profesionales esotéricos en ${info.name}. Publica tu anuncio gratis.`,
-    alternates: { canonical: `${BASE_URL}/${country}` },
+    alternates: {
+      canonical: `${BASE_URL}/${country}`,
+      languages: generateHreflangs('/{country}', BASE_URL),
+    },
   };
 }
 
