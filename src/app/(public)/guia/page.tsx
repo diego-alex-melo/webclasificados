@@ -2,10 +2,14 @@ import type { Metadata } from 'next';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import Link from 'next/link';
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
 export const metadata: Metadata = {
   title: 'Guia del Anunciante',
   description:
     'Todo lo que necesitas saber para publicar y gestionar tus anuncios en BrujosClassifieds: reputacion, limites, sello verificado y mas.',
+  alternates: { canonical: `${BASE_URL}/guia` },
 };
 
 export default function GuiaPage() {

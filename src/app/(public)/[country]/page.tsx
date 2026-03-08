@@ -8,6 +8,9 @@ import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
 interface PageProps {
   params: Promise<{ country: string }>;
 }
@@ -21,6 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `Servicios Esotéricos en ${info.name}`,
     description: `Encuentra brujos, tarotistas, santeros, videntes y más profesionales esotéricos en ${info.name}. Publica tu anuncio gratis.`,
+    alternates: { canonical: `${BASE_URL}/${country}` },
   };
 }
 

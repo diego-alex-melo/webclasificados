@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
 export const metadata: Metadata = {
   title: 'Descargo de Responsabilidad',
   description: 'Descargo de responsabilidad sobre los servicios esotéricos publicados en BrujosClassifieds.',
+  alternates: { canonical: `${BASE_URL}/legal/responsabilidad` },
 };
 
 export default function ResponsabilidadPage() {

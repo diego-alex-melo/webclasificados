@@ -213,6 +213,7 @@ export function generateOgTags(
   return {
     title,
     description,
+    alternates: { canonical: resolvedUrl },
     openGraph: {
       title,
       description,

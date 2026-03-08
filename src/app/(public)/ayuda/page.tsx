@@ -3,9 +3,13 @@ import Link from 'next/link';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ContactForm from './ContactForm';
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
 export const metadata: Metadata = {
   title: 'Ayuda',
   description: 'Preguntas frecuentes y formulario de contacto de BrujosClassifieds.',
+  alternates: { canonical: `${BASE_URL}/ayuda` },
 };
 
 const faqs = [

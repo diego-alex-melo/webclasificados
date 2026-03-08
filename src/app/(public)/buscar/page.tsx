@@ -13,10 +13,14 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
 export const metadata: Metadata = {
   title: 'Buscar Servicios Esotéricos',
   description:
     'Busca y encuentra servicios esotéricos profesionales. Filtra por país, servicio, especialidad y tipo de profesional.',
+  alternates: { canonical: `${BASE_URL}/buscar` },
 };
 
 export default async function SearchPage({ searchParams }: PageProps) {

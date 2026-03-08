@@ -1,8 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/db/prisma';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import SearchBar from '@/components/SearchBar';
 import AdCard from '@/components/AdCard';
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
+export const metadata: Metadata = {
+  alternates: { canonical: BASE_URL },
+};
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 

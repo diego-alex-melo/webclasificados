@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
 export const metadata: Metadata = {
   title: 'Preguntas Frecuentes',
   description: 'Preguntas frecuentes sobre BrujosClassifieds, la plataforma de servicios esotéricos.',
+  alternates: { canonical: `${BASE_URL}/legal/faq` },
 };
 
 const faqs = [

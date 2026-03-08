@@ -8,6 +8,9 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
 import Pagination from '@/components/Pagination';
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
+
 interface PageProps {
   params: Promise<{ country: string; service: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -24,6 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${svc.name} en ${info.name}`,
     description: `${svc.description}. Encuentra profesionales de ${svc.name} en ${info.name}. Publica tu anuncio gratis.`,
+    alternates: { canonical: `${BASE_URL}/${country}/${service}` },
   };
 }
 
