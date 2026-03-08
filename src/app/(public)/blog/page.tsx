@@ -13,12 +13,19 @@ interface PageProps {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  return generateOgTags(
-    'Blog — Oraciones, Guías y Consejos Esotéricos',
-    'Artículos sobre oraciones, guías espirituales, rituales y consejos de profesionales esotéricos en Latinoamérica.',
-    undefined,
-    `${BASE_URL}/blog`,
-  );
+  const { getPublishedPosts: getPosts } = await import('@/lib/services/blog-service');
+  const { total } = await getPosts(1, 1);
+
+  return {
+    ...generateOgTags(
+      'Blog — Oraciones, Guías y Consejos Esotéricos',
+      'Artículos sobre oraciones, guías espirituales, rituales y consejos de profesionales esotéricos en Latinoamérica.',
+      undefined,
+      `${BASE_URL}/blog`,
+    ),
+    // noindex until there's actual content
+    ...(total === 0 ? { robots: { index: false, follow: true } } : {}),
+  };
 }
 
 export default async function BlogListPage({ searchParams }: PageProps) {

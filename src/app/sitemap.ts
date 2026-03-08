@@ -26,13 +26,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.6,
     },
-    {
+  ];
+
+  // Only include /blog in sitemap when there are published posts
+  const blogPostCount = await prisma.blogPost.count({
+    where: { publishedAt: { not: null } },
+  });
+  if (blogPostCount > 0) {
+    staticPages.push({
       url: `${BASE_URL}/blog`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.6,
-    },
-  ];
+    });
+  }
 
   // ── Legal pages ─────────────────────────────────────────────────────────
   const legalSlugs = ['terminos', 'privacidad', 'responsabilidad', 'faq'];
