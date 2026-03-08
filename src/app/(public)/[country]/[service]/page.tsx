@@ -107,7 +107,7 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
       />
 
       <h1 className="mb-2 text-3xl font-bold">
-        {svc.emoji} {svc.name} en {info.name}
+        {svc.name} en {info.name}
       </h1>
       <p className="mb-8 text-text-secondary">{svc.description}</p>
 
