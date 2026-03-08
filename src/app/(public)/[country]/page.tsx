@@ -7,6 +7,7 @@ import CountryFlag from '@/components/CountryFlag';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
+import { generateBreadcrumbJsonLd, safeJsonLd } from '@/lib/utils/seo-utils';
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
@@ -73,8 +74,17 @@ export default async function CountryPage({ params }: PageProps) {
     take: 6,
   });
 
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Inicio', url: BASE_URL },
+    { name: countryName, url: `${BASE_URL}/${country}` },
+  ]);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
+      />
       <Breadcrumbs
         items={[
           { label: 'Inicio', href: '/' },

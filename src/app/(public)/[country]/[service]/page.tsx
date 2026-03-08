@@ -7,6 +7,7 @@ import { getServiceBySlug } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
 import Pagination from '@/components/Pagination';
+import { generateBreadcrumbJsonLd, safeJsonLd } from '@/lib/utils/seo-utils';
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
@@ -85,8 +86,18 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
   const paginationParams: Record<string, string> = {};
   if (traditionFilter) paginationParams.tradition = traditionFilter;
 
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Inicio', url: BASE_URL },
+    { name: info.name, url: `${BASE_URL}/${country}` },
+    { name: svc.name, url: `${BASE_URL}/${country}/${service}` },
+  ]);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
+      />
       <Breadcrumbs
         items={[
           { label: 'Inicio', href: '/' },
