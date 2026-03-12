@@ -92,7 +92,7 @@ export default function ReferidosPage() {
       </div>
 
       {/* Referral code and links */}
-      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6 space-y-4">
+      <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6 space-y-4">
         <div>
           <p className="text-xs text-text-secondary mb-1">Tu codigo de referido</p>
           <p className="text-2xl font-mono font-bold text-accent-gold tracking-wider">
@@ -135,18 +135,18 @@ export default function ReferidosPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4">
+        <div className="bg-bg-card border border-accent-purple/25 rounded-xl p-4">
           <p className="text-xs text-text-secondary mb-1">Total referidos</p>
           <p className="text-2xl font-bold text-accent-purple">{data.referrals}</p>
         </div>
-        <div className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4">
+        <div className="bg-bg-card border border-accent-purple/25 rounded-xl p-4">
           <p className="text-xs text-text-secondary mb-1">Republicaciones bonus</p>
           <p className="text-2xl font-bold text-accent-gold">{data.bonusRepublications}</p>
         </div>
       </div>
 
       {/* Referred users list */}
-      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+      <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6">
         <h2 className="text-sm font-medium text-text-secondary mb-4">Usuarios referidos</h2>
 
         {data.referredUsers.length === 0 ? (

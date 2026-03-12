@@ -94,7 +94,7 @@ export default function PerfilPage() {
       </div>
 
       {/* Read-only info */}
-      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6 space-y-3">
+      <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6 space-y-3">
         <div>
           <span className="text-xs text-text-secondary/70">Email</span>
           <p className="text-sm text-text-primary">{profile?.email}</p>

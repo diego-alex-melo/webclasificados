@@ -86,7 +86,7 @@ export default function BadgePage() {
       </div>
 
       {/* Badge preview */}
-      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+      <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6">
         <h2 className="text-sm font-medium text-text-secondary mb-4">Vista previa</h2>
         <div className="flex items-center justify-center py-8 bg-white/5 rounded-lg">
           <Image
@@ -100,7 +100,7 @@ export default function BadgePage() {
 
       {/* HTML snippet */}
       {selectedSlug ? (
-        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6 space-y-4">
+        <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6 space-y-4">
           <h2 className="text-sm font-medium text-text-secondary">Codigo HTML</h2>
           <p className="text-xs text-text-secondary/70">
             Copia y pega este codigo en tu sitio web para mostrar el sello.
@@ -129,7 +129,7 @@ export default function BadgePage() {
           </div>
         </section>
       ) : (
-        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+        <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6">
           <p className="text-sm text-text-secondary/70 text-center py-4">
             Publica un anuncio primero para obtener tu codigo de sello.
           </p>

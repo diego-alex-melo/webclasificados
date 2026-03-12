@@ -228,7 +228,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Weekly chart */}
-      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6 overflow-hidden">
+      <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6 overflow-hidden">
         <h2 className="text-sm font-medium text-text-secondary mb-4">
           Actividad semanal (ultimas 8 semanas)
         </h2>
@@ -240,7 +240,7 @@ export default function DashboardPage() {
       {/* Reputation + Bump */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Reputation */}
-        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+        <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6">
           <h2 className="text-sm font-medium text-text-secondary mb-3">Reputacion</h2>
           <div className="flex items-baseline gap-2 mb-3">
             <span className="text-3xl font-bold text-text-primary">
@@ -265,7 +265,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Bump */}
-        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+        <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6">
           <h2 className="text-sm font-medium text-text-secondary mb-3">Republicar anuncio</h2>
           <p className="text-xs text-text-secondary/70 mb-4">
             Lleva tu anuncio al inicio de la lista. Disponible cada 48 horas.
@@ -276,7 +276,7 @@ export default function DashboardPage() {
 
       {/* Renew */}
       {ad.expiresAt && (
-        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+        <section className="bg-bg-card border border-accent-purple/25 rounded-xl p-4 lg:p-6">
           <h2 className="text-sm font-medium text-text-secondary mb-3">Renovar anuncio</h2>
           <p className="text-xs text-text-secondary/70 mb-4">
             Renueva tu anuncio por 60 dias mas. Disponible en los ultimos 7 dias antes de expirar.
@@ -301,7 +301,7 @@ function RejectedAdsSection({ ads }: { ads: AdData[] }) {
       </h2>
       <div className="space-y-3">
         {ads.map((ad) => (
-          <div key={ad.id} className="bg-bg-elevated border border-red-500/20 rounded-lg p-4">
+          <div key={ad.id} className="bg-bg-card border border-red-500/25 rounded-lg p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-text-primary truncate">{ad.title}</p>
@@ -337,7 +337,7 @@ function MetricCard({
   suffix?: string;
 }) {
   return (
-    <div className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4">
+    <div className="bg-bg-card border border-accent-purple/25 rounded-xl p-4">
       <p className="text-xs text-text-secondary mb-1">{label}</p>
       <p className="text-2xl font-bold" style={{ color }}>
         {value}
