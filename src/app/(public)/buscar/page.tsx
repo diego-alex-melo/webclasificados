@@ -166,7 +166,9 @@ export default async function SearchPage({ searchParams }: PageProps) {
                 href={buildFilterUrl({ ...paginationParams, service: s.slug })}
                 active={serviceFilter === s.slug}
               >
-                {s.emoji} {s.name}
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-5 text-center shrink-0">{s.emoji}</span> {s.name}
+                </span>
               </FilterLink>
             ))}
           </FilterSection>
