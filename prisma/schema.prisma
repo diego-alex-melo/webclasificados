@@ -21,6 +21,7 @@ enum AdStatus {
   ACTIVE
   EXPIRED
   REJECTED
+  DELETED
 }
 
 enum ClickType {

@@ -187,6 +187,34 @@ function AnuncioContent() {
     setSuccess(null);
   }
 
+  // ── Delete ad handler ────────────────────────────────────────────────────
+
+  async function handleDeleteAd(adId: string) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este anuncio? Esta acción no se puede deshacer.')) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const res = await fetch(`/api/ads/${adId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const json = await res.json();
+        setError(json.error ?? 'Error al eliminar anuncio');
+        return;
+      }
+
+      setExistingAds((prev) => prev.filter((a) => a.id !== adId));
+      if (editingAd?.id === adId) resetForm();
+      setSuccess('Anuncio eliminado correctamente');
+    } catch {
+      setError('Error al eliminar anuncio');
+    }
+  }
+
   // ── Image upload handler ──────────────────────────────────────────────────
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -354,33 +382,44 @@ function AnuncioContent() {
             {existingAds.map((ad) => {
               const country = COUNTRY_MAP[ad.countryCode];
               return (
-                <button
+                <div
                   key={ad.id}
-                  type="button"
-                  onClick={() => editingAd?.id === ad.id ? resetForm() : loadAdIntoForm(ad)}
                   className={`w-full text-left p-3 rounded-lg border transition-colors ${
                     editingAd?.id === ad.id
                       ? 'border-accent-purple bg-accent-purple/10'
                       : 'border-accent-purple/25 bg-bg-card hover:border-accent-purple/50'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <CountryFlag code={ad.countryCode} size={16} />
-                    <p className="text-sm text-text-primary truncate">{ad.title}</p>
-                  </div>
-                  <p className="text-xs text-text-secondary/70 mt-0.5">
-                    {country?.name ?? ad.countryCode} &middot;{' '}
-                    <span className={
-                      ad.status === 'ACTIVE' ? 'text-[#25D366]' :
-                      ad.status === 'REJECTED' ? 'text-red-400' :
-                      'text-accent-gold'
-                    }>
-                      {ad.status === 'ACTIVE' ? 'Activo' :
-                       ad.status === 'REJECTED' ? 'Rechazado' :
-                       ad.status === 'PENDING' ? 'Pendiente' : ad.status}
-                    </span>
-                  </p>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => editingAd?.id === ad.id ? resetForm() : loadAdIntoForm(ad)}
+                    className="w-full text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <CountryFlag code={ad.countryCode} size={16} />
+                      <p className="text-sm text-text-primary truncate">{ad.title}</p>
+                    </div>
+                    <p className="text-xs text-text-secondary/70 mt-0.5">
+                      {country?.name ?? ad.countryCode} &middot;{' '}
+                      <span className={
+                        ad.status === 'ACTIVE' ? 'text-[#25D366]' :
+                        ad.status === 'REJECTED' ? 'text-red-400' :
+                        'text-accent-gold'
+                      }>
+                        {ad.status === 'ACTIVE' ? 'Activo' :
+                         ad.status === 'REJECTED' ? 'Rechazado' :
+                         ad.status === 'PENDING' ? 'Pendiente' : ad.status}
+                      </span>
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteAd(ad.id); }}
+                    className="mt-2 text-xs text-red-400/70 hover:text-red-400 transition-colors"
+                  >
+                    Eliminar
+                  </button>
+                </div>
               );
             })}
           </div>
