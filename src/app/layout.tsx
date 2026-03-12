@@ -80,7 +80,7 @@ export default function RootLayout({
 
 function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-accent-purple/15 bg-bg-primary/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-accent-purple/10 bg-bg-secondary/50 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="text-gradient-gold text-xl font-bold tracking-tight">
           BrujosClassifieds

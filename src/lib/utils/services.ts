@@ -30,7 +30,7 @@ export const SERVICE_CATEGORIES = [
   {
     slug: 'tiendas-esotericas',
     name: 'Tiendas Esotéricas',
-    emoji: '\u{1F56F}',
+    emoji: '\u{1F6CD}',
     description: 'Velas, hierbas, amuletos, inciensos, cristales y productos esotéricos',
   },
 ] as const;
