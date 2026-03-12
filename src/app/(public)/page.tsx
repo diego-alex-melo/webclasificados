@@ -38,7 +38,15 @@ export default async function HomePage() {
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden px-4 pb-16 pt-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 to-transparent" />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-20"
+          src="/hero-bg.mp4"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary" />
         <div className="relative mx-auto max-w-3xl text-center">
           <h1 className="mb-4 text-3xl font-bold leading-tight sm:text-5xl">
             Encuentra{' '}
