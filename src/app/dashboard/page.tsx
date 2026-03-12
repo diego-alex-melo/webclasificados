@@ -181,8 +181,8 @@ export default function DashboardPage() {
                 onClick={() => handleSelectAd(a)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors ${
                   ad.id === a.id
-                    ? 'border-[#7b2ff2] bg-[#7b2ff2]/10 text-text-primary'
-                    : 'border-accent-purple/20 text-text-secondary hover:border-[#7b2ff2]/50'
+                    ? 'border-accent-purple bg-accent-purple/10 text-text-primary'
+                    : 'border-accent-purple/25 bg-bg-card text-text-secondary hover:border-accent-purple/50'
                 }`}
               >
                 <CountryFlag code={a.countryCode} size={16} />

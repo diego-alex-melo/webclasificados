@@ -361,7 +361,7 @@ function AnuncioContent() {
                   className={`w-full text-left p-3 rounded-lg border transition-colors ${
                     editingAd?.id === ad.id
                       ? 'border-accent-purple bg-accent-purple/10'
-                      : 'border-accent-purple/20 bg-bg-elevated hover:border-accent-purple/50'
+                      : 'border-accent-purple/25 bg-bg-card hover:border-accent-purple/50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
