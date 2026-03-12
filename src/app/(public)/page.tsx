@@ -43,10 +43,10 @@ export default async function HomePage() {
           muted
           loop
           playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-20"
+          className="absolute inset-0 h-full w-full object-cover opacity-40"
           src="/hero-bg.mp4"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/30 via-transparent to-bg-primary/80" />
         <div className="relative mx-auto max-w-3xl text-center">
           <h1 className="mb-4 text-3xl font-bold leading-tight sm:text-5xl">
             Encuentra{' '}
