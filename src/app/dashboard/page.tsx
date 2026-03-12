@@ -170,7 +170,7 @@ export default function DashboardPage() {
   const ad = selectedAd ?? activeAds[0];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 min-w-0">
       {/* Ad selector (only if multiple active ads) */}
       {activeAds.length > 1 && (
         <div className="flex flex-wrap gap-2">
