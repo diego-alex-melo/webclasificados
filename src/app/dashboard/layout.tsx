@@ -104,6 +104,8 @@ export default function DashboardLayout({
   }
 
   return (
+    <>
+    <meta name="robots" content="noindex, nofollow" />
     <div className="min-h-screen bg-bg-elevated text-text-primary">
       {/* Mobile header */}
       <header className="lg:hidden flex items-center justify-between p-4 border-b border-accent-purple/15">
@@ -216,5 +218,6 @@ export default function DashboardLayout({
         </main>
       </div>
     </div>
+    </>
   );
 }

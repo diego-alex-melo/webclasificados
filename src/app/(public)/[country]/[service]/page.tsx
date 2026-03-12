@@ -25,6 +25,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!info || !svc) return { title: 'Página no encontrada' };
 
+  const adCount = await prisma.ad.count({
+    where: {
+      status: 'ACTIVE',
+      countryCode: code,
+      services: { some: { service: { slug: service } } },
+    },
+  });
+
   return {
     title: `${svc.name} en ${info.name}`,
     description: `${svc.description}. Encuentra profesionales de ${svc.name} en ${info.name}. Publica tu anuncio gratis.`,
@@ -32,6 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: `${BASE_URL}/${country}/${service}`,
       languages: generateHreflangs(`/{country}/${service}`, BASE_URL),
     },
+    ...(adCount === 0 && { robots: { index: false, follow: true } }),
   };
 }
 

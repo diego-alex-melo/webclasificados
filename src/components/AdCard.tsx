@@ -26,9 +26,10 @@ interface AdCardAd {
 
 interface AdCardProps {
   ad: AdCardAd;
+  priority?: boolean;
 }
 
-export default function AdCard({ ad }: AdCardProps) {
+export default function AdCard({ ad, priority = false }: AdCardProps) {
   const countrySlug = ad.countryCode.toLowerCase();
 
   return (
@@ -42,6 +43,7 @@ export default function AdCard({ ad }: AdCardProps) {
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            priority={priority}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-purple/20 to-bg-card">
@@ -55,7 +57,7 @@ export default function AdCard({ ad }: AdCardProps) {
                     : ad.services[0]?.service.slug === 'tarot-y-lecturas'
                       ? '\u{1F0CF}'
                       : ad.services[0]?.service.slug === 'tiendas-esotericas'
-                        ? '\u{1F56F}'
+                        ? '\u{1F9FF}'
                         : '\u{1F319}'}
             </span>
           </div>

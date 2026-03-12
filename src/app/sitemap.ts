@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_MAP } from '@/lib/utils/countries';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
-import { CITIES, PROFESSIONAL_SLUGS } from '@/lib/utils/cities';
+// City pages removed — ads don't have city-level data yet
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // ── Legal pages ─────────────────────────────────────────────────────────
-  const legalSlugs = ['terminos', 'privacidad', 'responsabilidad', 'faq'];
+  const legalSlugs = ['terminos', 'privacidad', 'responsabilidad'];
   const legalPages: MetadataRoute.Sitemap = legalSlugs.map((slug) => ({
     url: `${BASE_URL}/legal/${slug}`,
     lastModified: now,
@@ -100,26 +100,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  // ── Programmatic SEO city pages ─────────────────────────────────────────
-  const professionalSlugs = Object.keys(PROFESSIONAL_SLUGS);
-  const cityPages: MetadataRoute.Sitemap = Object.values(CITIES)
-    .flat()
-    .flatMap((city) =>
-      professionalSlugs.map((profSlug) => ({
-        url: `${BASE_URL}/servicios/${profSlug}-en-${city.slug}`,
-        lastModified: now,
-        changeFrequency: 'weekly' as const,
-        priority: 0.6,
-      })),
-    );
+  // ── Help page ──────────────────────────────────────────────────────────
+  const helpPages: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/ayuda`,
+      lastModified: now,
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/guia`,
+      lastModified: now,
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+    },
+  ];
 
   return [
     ...staticPages,
     ...legalPages,
+    ...helpPages,
     ...countryPages,
     ...serviceCountryPages,
     ...adPages,
     ...blogPages,
-    ...cityPages,
   ];
 }

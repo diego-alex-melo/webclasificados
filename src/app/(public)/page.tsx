@@ -100,9 +100,10 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {recentAds.map((ad) => (
+            {recentAds.map((ad, i) => (
               <AdCard
                 key={ad.id}
+                priority={i === 0}
                 ad={{
                   ...ad,
                   publishedAt: ad.publishedAt?.toISOString() ?? null,

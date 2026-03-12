@@ -17,12 +17,19 @@ interface PageProps {
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? 'https://brujosclassifieds.com';
 
-export const metadata: Metadata = {
-  title: 'Buscar Servicios Esotéricos',
-  description:
-    'Busca y encuentra servicios esotéricos profesionales. Filtra por país, servicio, especialidad y tipo de profesional.',
-  alternates: { canonical: `${BASE_URL}/buscar` },
-};
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const sp = await searchParams;
+  const page = Number(sp.page) || 1;
+  const canonical = page > 1 ? `${BASE_URL}/buscar?page=${page}` : `${BASE_URL}/buscar`;
+
+  return {
+    title: page > 1 ? `Buscar Servicios Esotéricos — Página ${page}` : 'Buscar Servicios Esotéricos',
+    description:
+      'Busca y encuentra servicios esotéricos profesionales. Filtra por país, servicio, especialidad y tipo de profesional.',
+    alternates: { canonical },
+    ...(page > 1 && { robots: { index: false, follow: true } }),
+  };
+}
 
 export default async function SearchPage({ searchParams }: PageProps) {
   const sp = await searchParams;
@@ -200,9 +207,10 @@ export default async function SearchPage({ searchParams }: PageProps) {
           {ads.length > 0 ? (
             <>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {ads.map((ad) => (
+                {ads.map((ad, i) => (
                   <AdCard
                     key={ad.id}
+                    priority={i === 0}
                     ad={{
                       ...ad,
                       publishedAt: ad.publishedAt?.toISOString() ?? null,

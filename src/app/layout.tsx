@@ -3,6 +3,7 @@ import Link from 'next/link';
 import {
   generateOrganizationJsonLd,
   generateWebSiteJsonLd,
+  safeJsonLd,
 } from '@/lib/utils/seo-utils';
 import './globals.css';
 
@@ -36,12 +37,6 @@ export default function RootLayout({
       <head>
         <meta name="google-site-verification" content="nmN9OmgSk8IVTTH6h4DW0f20P5Y9SwckSIb1ZyvJSUs" />
         <meta name="theme-color" content="#140a26" />
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-BTM6MNLXKD" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BTM6MNLXKD');`,
-          }}
-        />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -49,13 +44,25 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(generateOrganizationJsonLd()),
+            __html: safeJsonLd(generateOrganizationJsonLd()),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(generateWebSiteJsonLd()),
+            __html: safeJsonLd(generateWebSiteJsonLd()),
+          }}
+        />
+      </head>
+      <body className="min-h-screen bg-bg-primary text-text-primary antialiased">
+        <Header />
+        <main className="min-h-[calc(100vh-160px)]">{children}</main>
+        <Footer />
+        {/* Analytics & SW — loaded after content to avoid render-blocking */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-BTM6MNLXKD" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BTM6MNLXKD');`,
           }}
         />
         <script
@@ -68,11 +75,6 @@ export default function RootLayout({
             __html: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","vrs15l7vo3");`,
           }}
         />
-      </head>
-      <body className="min-h-screen bg-bg-primary text-text-primary antialiased">
-        <Header />
-        <main className="min-h-[calc(100vh-160px)]">{children}</main>
-        <Footer />
       </body>
     </html>
   );
