@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { login, AuthError } from '@/lib/services/auth-service';
 import { serverError } from '@/lib/services/error-logger';
+import { rateLimit } from '@/lib/utils/rate-limit';
 import type { ApiResponse } from '@/types';
 
 const loginSchema = z.object({
@@ -13,6 +14,9 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await rateLimit(request, { prefix: 'auth:login', maxRequests: 5, windowSeconds: 900 });
+    if (limited) return limited;
+
     const body = await request.json();
     const parsed = loginSchema.safeParse(body);
 

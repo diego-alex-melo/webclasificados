@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/db/prisma';
-import { COUNTRY_MAP, getCountryName, countryCodeFromSlug, generateHreflangs } from '@/lib/utils/countries';
+import { COUNTRY_MAP, countryCodeFromSlug, generateHreflangs } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';

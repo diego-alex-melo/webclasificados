@@ -1,40 +1,55 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useReducer } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
+type State = { status: 'loading' | 'success' | 'error'; errorMsg: string };
+type Action = { type: 'success' } | { type: 'error'; msg: string };
+
+function reducer(_: State, action: Action): State {
+  switch (action.type) {
+    case 'success': return { status: 'success', errorMsg: '' };
+    case 'error': return { status: 'error', errorMsg: action.msg };
+  }
+}
+
 function VerificarContent() {
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [{ status, errorMsg }, dispatch] = useReducer(reducer, { status: 'loading', errorMsg: '' });
 
   useEffect(() => {
     const token = searchParams.get('token');
 
     if (!token) {
-      setStatus('error');
-      setErrorMsg('Token de verificación no proporcionado.');
+      dispatch({ type: 'error', msg: 'Token de verificación no proporcionado.' });
       return;
     }
+
+    let cancelled = false;
 
     fetch(`/api/auth/verify?token=${encodeURIComponent(token)}`, {
       redirect: 'manual',
     })
       .then((res) => {
+        if (cancelled) return;
         if (res.ok || res.status === 0 || res.type === 'opaqueredirect') {
-          setStatus('success');
+          dispatch({ type: 'success' });
         } else {
           return res.json().then((data) => {
-            setStatus('error');
-            setErrorMsg(data.error || 'Error al verificar el email.');
+            if (!cancelled) {
+              dispatch({ type: 'error', msg: data.error || 'Error al verificar el email.' });
+            }
           });
         }
       })
       .catch(() => {
-        setStatus('error');
-        setErrorMsg('Error de conexión. Intenta de nuevo.');
+        if (!cancelled) {
+          dispatch({ type: 'error', msg: 'Error de conexión. Intenta de nuevo.' });
+        }
       });
+
+    return () => { cancelled = true; };
   }, [searchParams]);
 
   return (

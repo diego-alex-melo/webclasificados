@@ -4,7 +4,6 @@ import { prisma } from '@/lib/db/prisma';
 import { contentHash } from '@/lib/utils/content-hash';
 import { generateAdSlug } from '@/lib/utils/slug';
 import { runSpamPipeline } from '@/lib/services/spam-pipeline';
-import { countryFromPhone } from '@/lib/utils/country-from-phone';
 import { isAdmin } from '@/lib/utils/admin-auth';
 
 import type { Ad } from '@/generated/prisma';
@@ -111,7 +110,10 @@ async function validateAdLimits(advertiserId: string, excludeAdId?: string) {
   }
 }
 
-// ── Validate WhatsApp uniqueness (only ACTIVE/PENDING from other advertisers) ─
+// ── Validate WhatsApp uniqueness ─────────────────────────────────────────────
+// Each WhatsApp number can only appear in ONE active/pending ad globally.
+// This prevents: (a) other advertisers reusing the number, (b) same advertiser
+// creating multiple ads with the same phone.
 
 async function validateWhatsAppUnique(
   whatsappNumber: string,
@@ -122,14 +124,16 @@ async function validateWhatsAppUnique(
     where: {
       whatsappNumber,
       status: { in: ['ACTIVE', 'PENDING'] },
-      advertiserId: { not: advertiserId },
       ...(excludeAdId ? { id: { not: excludeAdId } } : {}),
     },
-    select: { id: true },
+    select: { id: true, advertiserId: true },
   });
 
   if (existing) {
-    throw new AdError('Este numero de WhatsApp ya esta en uso por otro anunciante', 409);
+    if (existing.advertiserId !== advertiserId) {
+      throw new AdError('Este numero de WhatsApp ya esta en uso por otro anunciante', 409);
+    }
+    throw new AdError('Ya tienes un anuncio activo con este numero de WhatsApp. Usa un numero diferente para cada anuncio.', 409);
   }
 }
 
@@ -206,6 +210,7 @@ export async function createAd(data: CreateAdInput): Promise<Ad> {
       imageUrl,
       advertiserId,
       ip,
+      websiteUrl,
     });
   } catch (err) {
     console.error('[createAd] Spam pipeline error:', err);
@@ -315,6 +320,7 @@ export async function updateAd(adId: string, data: UpdateAdInput): Promise<Ad> {
       whatsappNumber,
       imageUrl,
       advertiserId,
+      websiteUrl,
     });
     newStatus = spamResult.passed ? 'ACTIVE' : 'REJECTED';
     rejectionReason = spamResult.passed ? null : (spamResult.reason ?? null);

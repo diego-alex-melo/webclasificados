@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import { bumpAd, AdError } from '@/lib/services/ad-service';
 import { serverError } from '@/lib/services/error-logger';
+import { rateLimit } from '@/lib/utils/rate-limit';
 
 import type { ApiResponse } from '@/types';
 
@@ -27,6 +28,9 @@ export async function POST(
 
     const token = authHeader.slice(7);
     const advertiser = await getAdvertiserFromToken(token);
+
+    const limited = await rateLimit(request, { prefix: 'ads:bump', maxRequests: 3, windowSeconds: 3600 }, advertiser.id);
+    if (limited) return limited;
 
     const body = await request.json();
     const parsed = bumpSchema.safeParse(body);

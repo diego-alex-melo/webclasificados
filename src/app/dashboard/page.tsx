@@ -6,7 +6,6 @@ import Link from 'next/link';
 import MetricsChart from '@/components/MetricsChart';
 import BumpButton from '@/components/BumpButton';
 import RenewButton from '@/components/RenewButton';
-import { COUNTRY_MAP } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
 
 interface AdData {
@@ -137,11 +136,11 @@ export default function DashboardPage() {
   if (activeAds.length === 0 && rejectedAds.length === 0) {
     return (
       <div className="py-16 text-center">
-        <h1 className="text-2xl font-bold text-[#e8e0f0] mb-4">Bienvenido a tu panel</h1>
-        <p className="text-[#a090b8] mb-8">Aun no tienes anuncios publicados.</p>
+        <h1 className="text-2xl font-bold text-text-primary mb-4">Bienvenido a tu panel</h1>
+        <p className="text-text-secondary mb-8">Aun no tienes anuncios publicados.</p>
         <Link
           href="/dashboard/anuncio"
-          className="inline-block px-6 py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] transition-colors"
+          className="inline-block px-6 py-3 bg-accent-gold text-bg-primary font-medium rounded-lg hover:bg-accent-gold-light transition-colors"
         >
           Crear mi primer anuncio
         </Link>
@@ -154,11 +153,11 @@ export default function DashboardPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#e8e0f0] mb-4">Bienvenido a tu panel</h1>
-          <p className="text-[#a090b8] mb-6">No tienes anuncios activos.</p>
+          <h1 className="text-2xl font-bold text-text-primary mb-4">Bienvenido a tu panel</h1>
+          <p className="text-text-secondary mb-6">No tienes anuncios activos.</p>
           <Link
             href="/dashboard/anuncio"
-            className="inline-block px-6 py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] transition-colors"
+            className="inline-block px-6 py-3 bg-accent-gold text-bg-primary font-medium rounded-lg hover:bg-accent-gold-light transition-colors"
           >
             Crear nuevo anuncio
           </Link>
@@ -176,15 +175,14 @@ export default function DashboardPage() {
       {activeAds.length > 1 && (
         <div className="flex flex-wrap gap-2">
           {activeAds.map((a) => {
-            const country = COUNTRY_MAP[a.countryCode];
             return (
               <button
                 key={a.id}
                 onClick={() => handleSelectAd(a)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors ${
                   ad.id === a.id
-                    ? 'border-[#7b2ff2] bg-[#7b2ff2]/10 text-[#e8e0f0]'
-                    : 'border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
+                    ? 'border-[#7b2ff2] bg-[#7b2ff2]/10 text-text-primary'
+                    : 'border-accent-purple/20 text-text-secondary hover:border-[#7b2ff2]/50'
                 }`}
               >
                 <CountryFlag code={a.countryCode} size={16} />
@@ -196,11 +194,24 @@ export default function DashboardPage() {
       )}
 
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[#e8e0f0]">Metricas</h1>
-        <p className="text-[#a090b8] text-sm mt-1">
-          <CountryFlag code={ad.countryCode} size={16} /> {ad.title}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Metricas</h1>
+          <p className="text-text-secondary text-sm mt-1">
+            <CountryFlag code={ad.countryCode} size={16} /> {ad.title}
+          </p>
+        </div>
+        {activeAds.length < 3 && (
+          <Link
+            href="/dashboard/anuncio?new=1"
+            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-accent-gold text-bg-primary text-sm font-medium rounded-lg hover:bg-accent-gold-light transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Nuevo anuncio
+          </Link>
+        )}
       </div>
 
       {/* Summary cards */}
@@ -217,25 +228,27 @@ export default function DashboardPage() {
       </div>
 
       {/* Weekly chart */}
-      <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6">
-        <h2 className="text-sm font-medium text-[#a090b8] mb-4">
+      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6 overflow-hidden">
+        <h2 className="text-sm font-medium text-text-secondary mb-4">
           Actividad semanal (ultimas 8 semanas)
         </h2>
-        <MetricsChart data={metrics?.weeklyData ?? []} />
+        <div className="min-w-0">
+          <MetricsChart data={metrics?.weeklyData ?? []} />
+        </div>
       </section>
 
       {/* Reputation + Bump */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Reputation */}
-        <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6">
-          <h2 className="text-sm font-medium text-[#a090b8] mb-3">Reputacion</h2>
+        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+          <h2 className="text-sm font-medium text-text-secondary mb-3">Reputacion</h2>
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-3xl font-bold text-[#e8e0f0]">
+            <span className="text-3xl font-bold text-text-primary">
               {ad.advertiser.reputation}
             </span>
-            <span className="text-sm text-[#a090b8]">/ 100</span>
+            <span className="text-sm text-text-secondary">/ 100</span>
           </div>
-          <div className="w-full h-2 bg-[#1a0e2e] rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-bg-secondary rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
@@ -252,9 +265,9 @@ export default function DashboardPage() {
         </section>
 
         {/* Bump */}
-        <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6">
-          <h2 className="text-sm font-medium text-[#a090b8] mb-3">Republicar anuncio</h2>
-          <p className="text-xs text-[#6b5a80] mb-4">
+        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+          <h2 className="text-sm font-medium text-text-secondary mb-3">Republicar anuncio</h2>
+          <p className="text-xs text-text-secondary/70 mb-4">
             Lleva tu anuncio al inicio de la lista. Disponible cada 48 horas.
           </p>
           <BumpButton adId={ad.id} lastBumpedAt={ad.lastBumpedAt} />
@@ -263,9 +276,9 @@ export default function DashboardPage() {
 
       {/* Renew */}
       {ad.expiresAt && (
-        <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6">
-          <h2 className="text-sm font-medium text-[#a090b8] mb-3">Renovar anuncio</h2>
-          <p className="text-xs text-[#6b5a80] mb-4">
+        <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+          <h2 className="text-sm font-medium text-text-secondary mb-3">Renovar anuncio</h2>
+          <p className="text-xs text-text-secondary/70 mb-4">
             Renueva tu anuncio por 60 dias mas. Disponible en los ultimos 7 dias antes de expirar.
           </p>
           <RenewButton adId={ad.id} expiresAt={ad.expiresAt} />
@@ -288,10 +301,10 @@ function RejectedAdsSection({ ads }: { ads: AdData[] }) {
       </h2>
       <div className="space-y-3">
         {ads.map((ad) => (
-          <div key={ad.id} className="bg-[#0d0015] border border-red-500/15 rounded-lg p-4">
+          <div key={ad.id} className="bg-bg-elevated border border-red-500/20 rounded-lg p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-[#e8e0f0] truncate">{ad.title}</p>
+                <p className="text-sm font-medium text-text-primary truncate">{ad.title}</p>
                 {ad.rejectionReason && (
                   <p className="text-xs text-red-300 mt-1">Motivo: {ad.rejectionReason}</p>
                 )}
@@ -324,8 +337,8 @@ function MetricCard({
   suffix?: string;
 }) {
   return (
-    <div className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4">
-      <p className="text-xs text-[#a090b8] mb-1">{label}</p>
+    <div className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4">
+      <p className="text-xs text-text-secondary mb-1">{label}</p>
       <p className="text-2xl font-bold" style={{ color }}>
         {value}
         {suffix && <span className="text-sm font-normal">{suffix}</span>}

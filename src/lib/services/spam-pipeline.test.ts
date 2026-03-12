@@ -114,6 +114,43 @@ describe('runSpamPipeline', () => {
     expect(result.step).toBe('all');
   });
 
+  // ── Backlink relevance ───────────────────────────────────────────────
+
+  it('blocks obviously non-esoteric backlink domains', async () => {
+    const result = await runSpamPipeline({
+      ...CLEAN_INPUT,
+      websiteUrl: 'https://www.escorts-bogota.com/perfil',
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.step).toBe('backlink_check');
+  });
+
+  it('blocks casino/gambling backlink domains', async () => {
+    const result = await runSpamPipeline({
+      ...CLEAN_INPUT,
+      websiteUrl: 'https://casino-online-colombia.com',
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.step).toBe('backlink_check');
+  });
+
+  it('allows esoteric or neutral backlink domains', async () => {
+    const result = await runSpamPipeline({
+      ...CLEAN_INPUT,
+      websiteUrl: 'https://tarot-maria.com',
+    });
+
+    expect(result.passed).toBe(true);
+  });
+
+  it('allows ads without backlink', async () => {
+    const result = await runSpamPipeline(CLEAN_INPUT);
+
+    expect(result.passed).toBe(true);
+  });
+
   // ── Reputation block ──────────────────────────────────────────────────
 
   it('blocks advertiser with reputation < 20', async () => {

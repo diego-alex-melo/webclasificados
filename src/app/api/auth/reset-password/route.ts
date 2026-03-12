@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { resetPassword, AuthError } from '@/lib/services/auth-service';
+import { rateLimit } from '@/lib/utils/rate-limit';
 import type { ApiResponse } from '@/types';
 
 const resetPasswordSchema = z.object({
@@ -12,6 +13,9 @@ const resetPasswordSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await rateLimit(request, { prefix: 'auth:reset', maxRequests: 5, windowSeconds: 900 });
+    if (limited) return limited;
+
     const body = await request.json();
     const parsed = resetPasswordSchema.safeParse(body);
 

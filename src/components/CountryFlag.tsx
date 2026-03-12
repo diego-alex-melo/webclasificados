@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 interface CountryFlagProps {
   code: string;
   size?: number;
@@ -6,13 +8,12 @@ interface CountryFlagProps {
 
 export default function CountryFlag({ code, size = 20, className = '' }: CountryFlagProps) {
   return (
-    <img
+    <Image
       src={`/flags/${code.toLowerCase()}.svg`}
       alt={code}
       width={size}
       height={size}
       className={`inline-block rounded-full ${className}`}
-      loading="lazy"
     />
   );
 }

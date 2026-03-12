@@ -169,7 +169,7 @@ export default function UsuariosPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#d4af37] mb-6">
+      <h1 className="text-2xl font-bold text-accent-gold mb-6">
         Gestion de Usuarios
       </h1>
 
@@ -181,11 +181,11 @@ export default function UsuariosPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Buscar por email o WhatsApp..."
-            className="flex-1 bg-[#1a0e2e] border border-[#2a1640] rounded-lg px-4 py-2 text-sm text-[#e8e0f0] placeholder-[#6b5a80] focus:outline-none focus:border-[#7b2ff2]"
+            className="flex-1 bg-bg-secondary border border-accent-purple/20 rounded-lg px-4 py-2 text-sm text-text-primary placeholder-text-secondary/70 focus:outline-none focus:border-accent-purple"
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-[#7b2ff2] hover:bg-[#6a20e0] text-white rounded-lg text-sm font-medium transition-colors"
+            className="px-4 py-2 bg-accent-purple hover:bg-accent-purple/80 text-white rounded-lg text-sm font-medium transition-colors"
           >
             Buscar
           </button>
@@ -197,8 +197,8 @@ export default function UsuariosPage() {
               onClick={() => setSort(s)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 sort === s
-                  ? 'bg-[#7b2ff2] text-white'
-                  : 'bg-[#1a0e2e] text-[#a090b8] hover:text-[#e8e0f0]'
+                  ? 'bg-accent-purple text-white'
+                  : 'bg-bg-secondary text-text-secondary hover:text-text-primary'
               }`}
             >
               {s === 'date' ? 'Por fecha' : 'Por reputacion'}
@@ -221,10 +221,10 @@ export default function UsuariosPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
         </div>
       ) : users.length === 0 ? (
-        <p className="text-[#a090b8] text-center py-10">
+        <p className="text-text-secondary text-center py-10">
           No se encontraron usuarios
         </p>
       ) : (
@@ -232,23 +232,23 @@ export default function UsuariosPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1a0e2e] text-left">
-                  <th className="pb-3 text-[#a090b8] font-medium">Email</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">WhatsApp</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Pais</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Reputacion</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Anuncios</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Verificado</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Registro</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Acciones</th>
+                <tr className="border-b border-accent-purple/15 text-left">
+                  <th className="pb-3 text-text-secondary font-medium">Email</th>
+                  <th className="pb-3 text-text-secondary font-medium">WhatsApp</th>
+                  <th className="pb-3 text-text-secondary font-medium">Pais</th>
+                  <th className="pb-3 text-text-secondary font-medium">Reputacion</th>
+                  <th className="pb-3 text-text-secondary font-medium">Anuncios</th>
+                  <th className="pb-3 text-text-secondary font-medium">Verificado</th>
+                  <th className="pb-3 text-text-secondary font-medium">Registro</th>
+                  <th className="pb-3 text-text-secondary font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id} className="border-b border-[#1a0e2e]/50 hover:bg-[#1a0e2e]/30">
+                  <tr key={user.id} className="border-b border-accent-purple/15/50 hover:bg-bg-secondary/30">
                     <td className="py-3 pr-4 max-w-[200px] truncate">{user.email}</td>
-                    <td className="py-3 pr-4 text-[#a090b8]">{user.whatsappNumber}</td>
-                    <td className="py-3 pr-4 text-[#a090b8]">{user.countryCode}</td>
+                    <td className="py-3 pr-4 text-text-secondary">{user.whatsappNumber}</td>
+                    <td className="py-3 pr-4 text-text-secondary">{user.countryCode}</td>
                     <td className="py-3 pr-4">
                       {editingRep === user.id ? (
                         <div className="flex items-center gap-1">
@@ -258,19 +258,19 @@ export default function UsuariosPage() {
                             max="100"
                             value={repValue}
                             onChange={(e) => setRepValue(e.target.value)}
-                            className="w-16 bg-[#0d0015] border border-[#7b2ff2] rounded px-2 py-0.5 text-xs text-[#e8e0f0]"
+                            className="w-16 bg-bg-elevated border border-accent-purple rounded px-2 py-0.5 text-xs text-text-primary"
                             autoFocus
                           />
                           <button
                             onClick={() => handleSetReputation(user.id)}
                             disabled={actionLoading === user.id}
-                            className="px-2 py-0.5 bg-[#7b2ff2] text-white rounded text-xs disabled:opacity-50"
+                            className="px-2 py-0.5 bg-accent-purple text-white rounded text-xs disabled:opacity-50"
                           >
                             OK
                           </button>
                           <button
                             onClick={() => { setEditingRep(null); setRepValue(''); }}
-                            className="px-2 py-0.5 bg-[#1a0e2e] text-[#a090b8] rounded text-xs"
+                            className="px-2 py-0.5 bg-bg-secondary text-text-secondary rounded text-xs"
                           >
                             X
                           </button>
@@ -285,7 +285,7 @@ export default function UsuariosPage() {
                         </button>
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-[#a090b8]">{user._count.ads}</td>
+                    <td className="py-3 pr-4 text-text-secondary">{user._count.ads}</td>
                     <td className="py-3 pr-4">
                       {user.emailVerified ? (
                         <span className="text-green-400 text-xs">Si</span>
@@ -293,7 +293,7 @@ export default function UsuariosPage() {
                         <span className="text-red-400 text-xs">No</span>
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-[#a090b8] whitespace-nowrap">
+                    <td className="py-3 pr-4 text-text-secondary whitespace-nowrap">
                       {formatDate(user.createdAt)}
                     </td>
                     <td className="py-3">
@@ -326,21 +326,21 @@ export default function UsuariosPage() {
           {/* Pagination */}
           {meta.totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <p className="text-sm text-[#a090b8]">
+              <p className="text-sm text-text-secondary">
                 Pagina {meta.page} de {meta.totalPages} ({meta.total} resultados)
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => fetchUsers(meta.page - 1)}
                   disabled={meta.page <= 1}
-                  className="px-3 py-1.5 bg-[#1a0e2e] rounded text-sm disabled:opacity-30 hover:bg-[#2a1640] transition-colors"
+                  className="px-3 py-1.5 bg-bg-secondary rounded text-sm disabled:opacity-30 hover:bg-bg-card transition-colors"
                 >
                   Anterior
                 </button>
                 <button
                   onClick={() => fetchUsers(meta.page + 1)}
                   disabled={meta.page >= meta.totalPages}
-                  className="px-3 py-1.5 bg-[#1a0e2e] rounded text-sm disabled:opacity-30 hover:bg-[#2a1640] transition-colors"
+                  className="px-3 py-1.5 bg-bg-secondary rounded text-sm disabled:opacity-30 hover:bg-bg-card transition-colors"
                 >
                   Siguiente
                 </button>

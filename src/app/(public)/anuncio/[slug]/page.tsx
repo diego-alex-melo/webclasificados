@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/db/prisma';
 import { getCountryName } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
@@ -96,9 +97,12 @@ export default async function AdDetailPage({ params }: PageProps) {
           {/* Image */}
           {ad.imageUrl && (
             <div className="mb-6 overflow-hidden rounded-xl">
-              <img
+              <Image
                 src={ad.imageUrl}
                 alt={ad.title}
+                width={1200}
+                height={900}
+                priority
                 className="w-full object-cover"
               />
             </div>

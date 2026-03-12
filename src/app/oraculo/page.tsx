@@ -30,9 +30,9 @@ function StatCard({
   accent?: boolean;
 }) {
   return (
-    <div className="bg-[#1a0e2e] rounded-lg p-5">
-      <p className="text-sm text-[#a090b8] mb-1">{label}</p>
-      <p className={`text-2xl font-bold ${accent ? 'text-[#d4af37]' : 'text-[#e8e0f0]'}`}>
+    <div className="bg-bg-secondary rounded-lg p-5">
+      <p className="text-sm text-text-secondary mb-1">{label}</p>
+      <p className={`text-2xl font-bold ${accent ? 'text-accent-gold' : 'text-text-primary'}`}>
         {value}
       </p>
     </div>
@@ -78,7 +78,7 @@ export default function AdminMetricsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -97,7 +97,7 @@ export default function AdminMetricsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#d4af37] mb-6">
+      <h1 className="text-2xl font-bold text-accent-gold mb-6">
         Panel de Administracion
       </h1>
 
@@ -115,7 +115,7 @@ export default function AdminMetricsPage() {
       </div>
 
       {/* Ads by status */}
-      <div className="bg-[#1a0e2e] rounded-lg p-5 mb-8">
+      <div className="bg-bg-secondary rounded-lg p-5 mb-8">
         <h2 className="text-lg font-semibold mb-4">Anuncios por estado</h2>
         <div className="space-y-3">
           {Object.entries(metrics.adsByStatus).map(([status, count]) => {
@@ -123,10 +123,10 @@ export default function AdminMetricsPage() {
             return (
               <div key={status}>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-[#a090b8]">{STATUS_LABELS[status] ?? status}</span>
-                  <span className="text-[#e8e0f0]">{count}</span>
+                  <span className="text-text-secondary">{STATUS_LABELS[status] ?? status}</span>
+                  <span className="text-text-primary">{count}</span>
                 </div>
-                <div className="h-2 bg-[#0d0015] rounded-full overflow-hidden">
+                <div className="h-2 bg-bg-elevated rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${STATUS_COLORS[status] ?? 'bg-purple-500'}`}
                     style={{ width: `${pct}%` }}
@@ -140,16 +140,16 @@ export default function AdminMetricsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Ads by country */}
-        <div className="bg-[#1a0e2e] rounded-lg p-5">
+        <div className="bg-bg-secondary rounded-lg p-5">
           <h2 className="text-lg font-semibold mb-4">Anuncios activos por pais</h2>
           {metrics.adsByCountry.length === 0 ? (
-            <p className="text-[#a090b8] text-sm">Sin datos</p>
+            <p className="text-text-secondary text-sm">Sin datos</p>
           ) : (
             <div className="space-y-2">
               {metrics.adsByCountry.map((entry) => (
                 <div key={entry.countryCode} className="flex justify-between text-sm">
-                  <span className="text-[#a090b8]">{entry.countryCode}</span>
-                  <span className="text-[#e8e0f0] font-medium">{entry.count}</span>
+                  <span className="text-text-secondary">{entry.countryCode}</span>
+                  <span className="text-text-primary font-medium">{entry.count}</span>
                 </div>
               ))}
             </div>
@@ -157,22 +157,22 @@ export default function AdminMetricsPage() {
         </div>
 
         {/* Top ads by WhatsApp clicks */}
-        <div className="bg-[#1a0e2e] rounded-lg p-5">
+        <div className="bg-bg-secondary rounded-lg p-5">
           <h2 className="text-lg font-semibold mb-4">Top 5 — clicks WhatsApp (mes)</h2>
           {metrics.topAdsByWhatsApp.length === 0 ? (
-            <p className="text-[#a090b8] text-sm">Sin datos</p>
+            <p className="text-text-secondary text-sm">Sin datos</p>
           ) : (
             <div className="space-y-3">
               {metrics.topAdsByWhatsApp.map((ad, idx) => (
                 <div key={ad.id} className="flex items-start gap-3">
-                  <span className="text-[#d4af37] font-bold text-lg w-6 shrink-0">
+                  <span className="text-accent-gold font-bold text-lg w-6 shrink-0">
                     {idx + 1}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-[#e8e0f0] truncate">{ad.title}</p>
-                    <p className="text-xs text-[#a090b8]">{ad.advertiser?.email}</p>
+                    <p className="text-sm text-text-primary truncate">{ad.title}</p>
+                    <p className="text-xs text-text-secondary">{ad.advertiser?.email}</p>
                   </div>
-                  <span className="text-sm text-[#d4af37] font-medium shrink-0">
+                  <span className="text-sm text-accent-gold font-medium shrink-0">
                     {ad.whatsappClicks} clicks
                   </span>
                 </div>

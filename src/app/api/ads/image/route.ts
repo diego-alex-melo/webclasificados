@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import { processAndUpload, ImageError } from '@/lib/services/image-service';
 import { serverError } from '@/lib/services/error-logger';
+import { rateLimit } from '@/lib/utils/rate-limit';
 
 import type { ApiResponse } from '@/types';
 
@@ -14,6 +15,9 @@ export async function POST(
   request: NextRequest,
 ): Promise<NextResponse<ApiResponse>> {
   try {
+    const limited = await rateLimit(request, { prefix: 'ads:image', maxRequests: 10, windowSeconds: 300 });
+    if (limited) return limited;
+
     // Auth check
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {

@@ -61,7 +61,7 @@ export default function RenewButton({
 
   if (!canRenew) {
     return (
-      <p className="text-xs text-[#6b5a80]">
+      <p className="text-xs text-text-secondary/70">
         {daysLeft > renewalWindowDays
           ? `Disponible en ${daysLeft - renewalWindowDays} dias`
           : 'El anuncio ya expiro'}
@@ -74,7 +74,7 @@ export default function RenewButton({
       <button
         onClick={handleRenew}
         disabled={loading}
-        className="px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 bg-[#25D366] text-[#0d0015] hover:bg-[#2ee87a] active:scale-95"
+        className="px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 bg-[#25D366] text-bg-primary hover:bg-[#2ee87a] active:scale-95"
       >
         {loading ? 'Renovando...' : `Renovar (${daysLeft} dias restantes)`}
       </button>

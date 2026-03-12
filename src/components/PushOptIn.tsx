@@ -1,43 +1,36 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useReducer } from 'react';
 
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 const DISMISS_KEY = 'push_optin_dismissed';
 const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+function isDismissed(): boolean {
+  if (typeof window === 'undefined') return true;
+  const dismissedAt = localStorage.getItem(DISMISS_KEY);
+  if (!dismissedAt) return false;
+  const elapsed = Date.now() - Number(dismissedAt);
+  if (elapsed < DISMISS_DURATION_MS) return true;
+  localStorage.removeItem(DISMISS_KEY);
+  return false;
+}
+
 export default function PushOptIn() {
   const { isSupported, isSubscribed, isLoading, subscribe } = usePushNotifications();
-  const [visible, setVisible] = useState(false);
+  const [hidden, hide] = useReducer(() => true, false);
 
-  useEffect(() => {
-    if (!isSupported || isSubscribed) {
-      setVisible(false);
-      return;
-    }
-
-    const dismissedAt = localStorage.getItem(DISMISS_KEY);
-    if (dismissedAt) {
-      const elapsed = Date.now() - Number(dismissedAt);
-      if (elapsed < DISMISS_DURATION_MS) {
-        setVisible(false);
-        return;
-      }
-      localStorage.removeItem(DISMISS_KEY);
-    }
-
-    setVisible(true);
-  }, [isSupported, isSubscribed]);
+  const visible = isSupported && !isSubscribed && !hidden && !isDismissed();
 
   const handleDismiss = useCallback(() => {
     localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    setVisible(false);
+    hide();
   }, []);
 
   const handleSubscribe = useCallback(async () => {
     await subscribe();
-    setVisible(false);
+    hide();
   }, [subscribe]);
 
   if (!visible) return null;

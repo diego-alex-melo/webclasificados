@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { prisma } from '@/lib/db/prisma';
 import {
   CITIES,
-  PROFESSIONAL_SLUGS,
   SLUG_TO_PROFESSIONAL,
   PROFESSIONAL_LABELS,
   findCityBySlug,

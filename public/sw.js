@@ -1,6 +1,6 @@
 // BrujosClassifieds Service Worker — PWA + Push Notifications
-const CACHE_NAME = 'wc-v1';
-const STATIC_ASSETS = ['/', '/icon-192.png', '/icon-512.png', '/icon.svg'];
+const CACHE_NAME = 'wc-v2';
+const STATIC_ASSETS = ['/', '/icon-192.png', '/icon-512.png', '/icon.svg', '/offline.html'];
 
 // Install: pre-cache essential assets
 self.addEventListener('install', (event) => {
@@ -28,10 +28,18 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // API and navigation: network-first
-  if (url.pathname.startsWith('/api') || request.mode === 'navigate') {
+  // API: network-first with cache fallback
+  if (url.pathname.startsWith('/api')) {
     event.respondWith(
       fetch(request).catch(() => caches.match(request)),
+    );
+    return;
+  }
+
+  // Navigation: network-first with offline fallback
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(() => caches.match('/offline.html')),
     );
     return;
   }

@@ -81,8 +81,8 @@ export default function BumpButton({
         disabled={inCooldown || loading}
         className={`px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
           inCooldown
-            ? 'bg-[#1a0e2e] text-[#6b5a80] cursor-not-allowed'
-            : 'bg-[#d4af37] text-[#0d0015] hover:bg-[#e8c54a] active:scale-95'
+            ? 'bg-bg-secondary text-text-secondary/70 cursor-not-allowed'
+            : 'bg-accent-gold text-bg-primary hover:bg-accent-gold-light active:scale-95'
         }`}
       >
         {loading

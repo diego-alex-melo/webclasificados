@@ -84,8 +84,8 @@ export default function AdminLayout({
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-[#0d0015] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-bg-elevated flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -96,15 +96,15 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#0d0015] text-[#e8e0f0]">
+    <div className="min-h-screen bg-bg-elevated text-text-primary">
       {/* Mobile header */}
-      <header className="lg:hidden flex items-center justify-between p-4 border-b border-[#1a0e2e]">
-        <Link href="/oraculo" className="text-[#d4af37] font-bold text-lg">
+      <header className="lg:hidden flex items-center justify-between p-4 border-b border-accent-purple/15">
+        <Link href="/oraculo" className="text-accent-gold font-bold text-lg">
           Admin Panel
         </Link>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="p-2 text-[#e8e0f0]"
+          className="p-2 text-text-primary"
           aria-label="Menu"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -124,9 +124,9 @@ export default function AdminLayout({
             className="absolute inset-0 bg-black/60"
             onClick={() => setMenuOpen(false)}
           />
-          <nav className="absolute left-0 top-0 bottom-0 w-64 bg-[#0d0015] border-r border-[#1a0e2e] p-6 flex flex-col gap-2">
+          <nav className="absolute left-0 top-0 bottom-0 w-64 bg-bg-elevated border-r border-accent-purple/15 p-6 flex flex-col gap-2">
             <div className="mb-6">
-              <span className="text-[#d4af37] font-bold text-lg">
+              <span className="text-accent-gold font-bold text-lg">
                 Admin Panel
               </span>
             </div>
@@ -137,19 +137,19 @@ export default function AdminLayout({
                 onClick={() => setMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   pathname === item.href
-                    ? 'bg-[#7b2ff2]/15 text-[#d4af37]'
-                    : 'text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0]'
+                    ? 'bg-accent-purple/15 text-accent-gold'
+                    : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary'
                 }`}
               >
                 <NavIcon type={item.icon} />
                 {item.label}
               </Link>
             ))}
-            <hr className="border-[#1a0e2e] my-2" />
+            <hr className="border-accent-purple/15 my-2" />
             <Link
               href="/dashboard"
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0] transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-colors"
             >
               Dashboard
             </Link>
@@ -167,9 +167,9 @@ export default function AdminLayout({
 
       <div className="flex">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:flex flex-col w-60 min-h-screen border-r border-[#1a0e2e] p-6 gap-2 sticky top-0 h-screen">
+        <aside className="hidden lg:flex flex-col w-60 min-h-screen border-r border-accent-purple/15 p-6 gap-2 sticky top-0 h-screen">
           <div className="mb-6">
-            <Link href="/oraculo" className="text-[#d4af37] font-bold text-lg">
+            <Link href="/oraculo" className="text-accent-gold font-bold text-lg">
               Admin Panel
             </Link>
           </div>
@@ -179,18 +179,18 @@ export default function AdminLayout({
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                 pathname === item.href
-                  ? 'bg-[#7b2ff2]/15 text-[#d4af37]'
-                  : 'text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0]'
+                  ? 'bg-accent-purple/15 text-accent-gold'
+                  : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary'
               }`}
             >
               <NavIcon type={item.icon} />
               {item.label}
             </Link>
           ))}
-          <hr className="border-[#1a0e2e] my-2" />
+          <hr className="border-accent-purple/15 my-2" />
           <Link
             href="/dashboard"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#a090b8] hover:bg-[#1a0e2e] hover:text-[#e8e0f0] transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-colors"
           >
             Dashboard
           </Link>

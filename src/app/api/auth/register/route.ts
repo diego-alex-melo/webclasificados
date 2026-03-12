@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { register, AuthError } from '@/lib/services/auth-service';
 import { serverError } from '@/lib/services/error-logger';
+import { rateLimit } from '@/lib/utils/rate-limit';
 import { sendVerificationEmail } from '@/lib/services/email-service';
 import { processReferral, validateReferralCode } from '@/lib/services/referral-service';
 import type { ApiResponse } from '@/types';
@@ -20,6 +21,9 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await rateLimit(request, { prefix: 'auth:register', maxRequests: 3, windowSeconds: 900 });
+    if (limited) return limited;
+
     const body = await request.json();
     const parsed = registerSchema.safeParse(body);
 

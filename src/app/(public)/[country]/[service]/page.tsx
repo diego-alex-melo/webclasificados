@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db/prisma';
+import { cached } from '@/lib/utils/cache';
 import { COUNTRY_MAP, countryCodeFromSlug, generateHreflangs } from '@/lib/utils/countries';
-import CountryFlag from '@/components/CountryFlag';
 import { getServiceBySlug } from '@/lib/utils/services';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AdCard from '@/components/AdCard';
@@ -78,7 +78,7 @@ export default async function ServicePage({ params, searchParams }: PageProps) {
       take: pageSize,
     }),
     prisma.ad.count({ where }),
-    prisma.tradition.findMany({ orderBy: { name: 'asc' } }),
+    cached('cache:traditions', () => prisma.tradition.findMany({ orderBy: { name: 'asc' } })),
   ]);
 
   const totalPages = Math.ceil(total / pageSize);

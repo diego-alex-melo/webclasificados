@@ -66,7 +66,7 @@ export default function ReferidosPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -85,33 +85,33 @@ export default function ReferidosPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#e8e0f0]">Programa de Referidos</h1>
-        <p className="text-[#a090b8] text-sm mt-1">
+        <h1 className="text-2xl font-bold text-text-primary">Programa de Referidos</h1>
+        <p className="text-text-secondary text-sm mt-1">
           Invita a otros profesionales y obtiene beneficios.
         </p>
       </div>
 
       {/* Referral code and links */}
-      <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6 space-y-4">
+      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6 space-y-4">
         <div>
-          <p className="text-xs text-[#a090b8] mb-1">Tu codigo de referido</p>
-          <p className="text-2xl font-mono font-bold text-[#d4af37] tracking-wider">
+          <p className="text-xs text-text-secondary mb-1">Tu codigo de referido</p>
+          <p className="text-2xl font-mono font-bold text-accent-gold tracking-wider">
             {data.code}
           </p>
         </div>
 
         <div>
-          <p className="text-xs text-[#a090b8] mb-2">Tu enlace de referido</p>
+          <p className="text-xs text-text-secondary mb-2">Tu enlace de referido</p>
           <div className="flex items-center gap-2">
             <input
               type="text"
               readOnly
               value={data.referralLink}
-              className="flex-1 bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-3 py-2 text-sm text-[#e8e0f0] font-mono truncate"
+              className="flex-1 bg-bg-secondary border border-accent-purple/20 rounded-lg px-3 py-2 text-sm text-text-primary font-mono truncate"
             />
             <button
               onClick={handleCopy}
-              className="shrink-0 px-4 py-2 bg-[#7b2ff2] text-white text-sm rounded-lg hover:bg-[#6a22e0] transition-colors"
+              className="shrink-0 px-4 py-2 bg-accent-purple text-white text-sm rounded-lg hover:bg-accent-purple/80 transition-colors"
             >
               {copied ? 'Copiado' : 'Copiar enlace'}
             </button>
@@ -135,22 +135,22 @@ export default function ReferidosPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4">
-          <p className="text-xs text-[#a090b8] mb-1">Total referidos</p>
-          <p className="text-2xl font-bold text-[#7b2ff2]">{data.referrals}</p>
+        <div className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4">
+          <p className="text-xs text-text-secondary mb-1">Total referidos</p>
+          <p className="text-2xl font-bold text-accent-purple">{data.referrals}</p>
         </div>
-        <div className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4">
-          <p className="text-xs text-[#a090b8] mb-1">Republicaciones bonus</p>
-          <p className="text-2xl font-bold text-[#d4af37]">{data.bonusRepublications}</p>
+        <div className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4">
+          <p className="text-xs text-text-secondary mb-1">Republicaciones bonus</p>
+          <p className="text-2xl font-bold text-accent-gold">{data.bonusRepublications}</p>
         </div>
       </div>
 
       {/* Referred users list */}
-      <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6">
-        <h2 className="text-sm font-medium text-[#a090b8] mb-4">Usuarios referidos</h2>
+      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6">
+        <h2 className="text-sm font-medium text-text-secondary mb-4">Usuarios referidos</h2>
 
         {data.referredUsers.length === 0 ? (
-          <p className="text-sm text-[#6b5a80] text-center py-8">
+          <p className="text-sm text-text-secondary/70 text-center py-8">
             Aun no has referido a nadie. Comparte tu enlace para empezar.
           </p>
         ) : (
@@ -158,10 +158,10 @@ export default function ReferidosPage() {
             {data.referredUsers.map((user, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between py-2 border-b border-[#1a0e2e] last:border-b-0"
+                className="flex items-center justify-between py-2 border-b border-accent-purple/15 last:border-b-0"
               >
-                <span className="text-sm text-[#e8e0f0] font-mono">{user.email}</span>
-                <span className="text-xs text-[#6b5a80]">
+                <span className="text-sm text-text-primary font-mono">{user.email}</span>
+                <span className="text-xs text-text-secondary/70">
                   {new Date(user.createdAt).toLocaleDateString('es-CO', {
                     year: 'numeric',
                     month: 'short',

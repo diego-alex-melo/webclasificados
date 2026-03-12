@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 const BASE_URL =
@@ -29,7 +30,7 @@ const faqs = [
   {
     question: '¿Cuántos anuncios puedo tener?',
     answer:
-      'Cada cuenta puede tener máximo 1 anuncio activo a la vez. Esto nos permite mantener la calidad de la plataforma y asegurar que cada anuncio reciba visibilidad.',
+      'Cada cuenta puede tener máximo 3 anuncios activos a la vez. Esto nos permite mantener la calidad de la plataforma y asegurar que cada anuncio reciba visibilidad.',
   },
   {
     question: '¿Cuánto tiempo dura mi anuncio?',
@@ -96,9 +97,9 @@ export default function FAQPage() {
 
       <div className="mt-8 text-center">
         <p className="text-text-secondary mb-3">¿No encontraste respuesta?</p>
-        <a href="/ayuda#contacto" className="text-accent-gold hover:underline font-medium">
+        <Link href="/ayuda#contacto" className="text-accent-gold hover:underline font-medium">
           Escríbenos y te responderemos en 48 horas
-        </a>
+        </Link>
       </div>
     </div>
   );

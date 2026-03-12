@@ -12,6 +12,7 @@ export interface SpamCheckInput {
   imageUrl?: string;
   advertiserId: string;
   ip?: string;
+  websiteUrl?: string;
 }
 
 export interface SpamCheckResult {
@@ -226,7 +227,7 @@ async function checkAiModeration(
       }
     }
 
-    // Step 6b: GPT-4o-mini — catches spam, scams, fake promises specific to esoteric niche
+    // Step 6b: GPT-4o-mini — catches spam, scams, off-topic, backlink abuse
     const chatRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -236,12 +237,22 @@ async function checkAiModeration(
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         temperature: 0,
-        max_tokens: 100,
+        max_tokens: 150,
         messages: [
           {
             role: 'system',
             content:
-              'Eres un moderador de una plataforma de clasificados de servicios esotéricos. Analiza el anuncio y responde SOLO con JSON: {"spam": true/false, "reason": "motivo breve"}. Marca spam=true SOLO si: es una estafa obvia (pide datos bancarios, contraseñas, pagos por adelantado a cuentas personales), incluye contenido sexual explícito, promueve violencia o daño a terceros, o no tiene ninguna relación con servicios esotéricos. Todo lo demás es VÁLIDO: promesas de resultados, plazos de tiempo, amarres, trabajos garantizados, recuperar el amor, etc. son prácticas normales del nicho esotérico y NO deben marcarse como spam.',
+              `Eres un moderador de BrujosClassifieds, plataforma EXCLUSIVA de servicios esotéricos (tarot, amarres, limpiezas, brujería, santería, videncia, etc.).
+
+Responde SOLO con JSON: {"spam": true/false, "reason": "motivo breve"}
+
+Marca spam=true si:
+1. NO es un servicio esotérico genuino. Ejemplos de rechazo: escuelas de conducción, servicios de acompañantes/escorts, venta de productos no-esotéricos, servicios legales, médicos, financieros, inmobiliarios, tecnológicos, o cualquier negocio que no sea esotérico.
+2. Es contenido esotérico superficial/genérico cuyo propósito real parece ser promocionar un negocio no-esotérico (ej: menciona tarot de pasada pero el 80% del texto habla de otro servicio).
+3. Es una estafa obvia (pide datos bancarios, contraseñas, pagos adelantados a cuentas personales).
+4. Incluye contenido sexual explícito o promueve violencia/daño a terceros.
+
+Marca spam=false si: es un servicio esotérico legítimo. Promesas de resultados, plazos, amarres garantizados, recuperar el amor, prosperidad, etc. son prácticas normales del nicho y son VÁLIDOS.`,
           },
           {
             role: 'user',
@@ -277,7 +288,59 @@ async function checkAiModeration(
   }
 }
 
-// ── Step 7: Reputation check ────────────────────────────────────────────────
+// ── Step 7: Backlink relevance check ────────────────────────────────────────
+// Validates that the website URL (if provided) is plausibly related to esoteric
+// services, not a completely unrelated business trying to farm backlinks.
+
+const ESOTERIC_DOMAIN_KEYWORDS = [
+  'tarot', 'bruj', 'esoteric', 'espiritual', 'videncia', 'vidente', 'amarre',
+  'santeria', 'santeri', 'limpieza', 'chamanismo', 'chaman', 'curandero',
+  'magia', 'astro', 'horoscopo', 'numerolog', 'herbol', 'ritual', 'hechiz',
+  'oraculo', 'medium', 'psiquic', 'mystic', 'mistico', 'reiki', 'energia',
+  'crystal', 'cristal', 'angel', 'vudu', 'wicca', 'pagan',
+];
+
+// Obvious non-esoteric domains to block
+const BLOCKED_DOMAIN_PATTERNS = [
+  /escort|acompañante|companion/i,
+  /casino|apuesta|bet|gambling/i,
+  /porn|xxx|adult|sex/i,
+  /pharmacy|farma|viagra|cialis/i,
+  /loan|prestamo|credito|credit/i,
+  /autoescuela|driving.?school|conduccion/i,
+];
+
+function checkBacklinkRelevance(websiteUrl?: string): SpamCheckResult {
+  const step = 'backlink_check';
+
+  if (!websiteUrl) return { passed: true, step };
+
+  // Extract domain for analysis
+  let domain: string;
+  try {
+    domain = new URL(websiteUrl).hostname.toLowerCase();
+  } catch {
+    return { passed: false, step, reason: 'URL del sitio web no válida' };
+  }
+
+  // Block obviously non-esoteric/harmful domains
+  for (const pattern of BLOCKED_DOMAIN_PATTERNS) {
+    if (pattern.test(domain) || pattern.test(websiteUrl)) {
+      return {
+        passed: false,
+        step,
+        reason: 'El sitio web no está relacionado con servicios esotéricos',
+      };
+    }
+  }
+
+  // For generic domains (personal names, random words), we allow them —
+  // the AI moderation already checks the ad content is esoteric.
+  // We only block domains that are OBVIOUSLY non-esoteric businesses.
+  return { passed: true, step };
+}
+
+// ── Step 8: Reputation check ────────────────────────────────────────────────
 
 async function checkReputation(advertiserId: string): Promise<SpamCheckResult> {
   const step = 'reputation_check';
@@ -317,7 +380,7 @@ async function checkReputation(advertiserId: string): Promise<SpamCheckResult> {
 // ── Pipeline orchestrator ───────────────────────────────────────────────────
 
 export async function runSpamPipeline(input: SpamCheckInput): Promise<SpamCheckResult> {
-  const { title, description, whatsappNumber, imageUrl, advertiserId, ip } = input;
+  const { title, description, whatsappNumber, imageUrl, advertiserId, ip, websiteUrl } = input;
 
   // Step 0: Ad limit per account
   const limitResult = await checkAdLimit(advertiserId);
@@ -347,7 +410,11 @@ export async function runSpamPipeline(input: SpamCheckInput): Promise<SpamCheckR
   const aiResult = await checkAiModeration(title, description);
   if (!aiResult.passed) return aiResult;
 
-  // Step 7: Reputation check
+  // Step 7: Backlink relevance check
+  const backlinkResult = checkBacklinkRelevance(websiteUrl);
+  if (!backlinkResult.passed) return backlinkResult;
+
+  // Step 8: Reputation check
   const repResult = await checkReputation(advertiserId);
   if (!repResult.passed) return repResult;
 

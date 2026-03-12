@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { prisma } from '@/lib/db/prisma';
 import { sendVerificationEmail } from '@/lib/services/email-service';
+import { rateLimit } from '@/lib/utils/rate-limit';
 import type { ApiResponse } from '@/types';
 
 const schema = z.object({
@@ -12,6 +13,9 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await rateLimit(request, { prefix: 'auth:resend', maxRequests: 3, windowSeconds: 900 });
+    if (limited) return limited;
+
     const body = await request.json();
     const parsed = schema.safeParse(body);
 

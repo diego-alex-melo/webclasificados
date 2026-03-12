@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db/prisma';
+import { cached } from '@/lib/utils/cache';
 import { SERVICE_CATEGORIES } from '@/lib/utils/services';
 import { COUNTRY_MAP } from '@/lib/utils/countries';
 import SearchBar from '@/components/SearchBar';
@@ -73,8 +74,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
       take: pageSize,
     }),
     prisma.ad.count({ where }),
-    prisma.service.findMany({ orderBy: { name: 'asc' } }),
-    prisma.tradition.findMany({ orderBy: { name: 'asc' } }),
+    cached('cache:services', () => prisma.service.findMany({ orderBy: { name: 'asc' } })),
+    cached('cache:traditions', () => prisma.tradition.findMany({ orderBy: { name: 'asc' } })),
   ]);
 
   const totalPages = Math.ceil(total / pageSize);
@@ -143,7 +144,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
         {/* Filters Sidebar — desktop only */}
-        <aside className="hidden lg:block space-y-6 rounded-xl bg-bg-secondary/30 p-4">
+        <aside className="hidden lg:block space-y-6 rounded-xl bg-bg-secondary border border-accent-purple/10 p-4">
           <FilterSection title="Pa&iacute;s">
             {Object.entries(COUNTRY_MAP).map(([code, { name }]) => (
               <FilterLink

@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 /* eslint-disable @next/next/no-img-element */
 
-import { countryFromPhone, countriesFromPhone } from '@/lib/utils/country-from-phone';
+import { countriesFromPhone } from '@/lib/utils/country-from-phone';
 import { COUNTRY_MAP } from '@/lib/utils/countries';
 import CountryFlag from '@/components/CountryFlag';
 
@@ -34,6 +35,21 @@ interface ExistingAd {
 }
 
 export default function AnuncioPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20">
+        <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <AnuncioContent />
+    </Suspense>
+  );
+}
+
+function AnuncioContent() {
+  const searchParams = useSearchParams();
+  const isNewMode = searchParams.get('new') === '1';
+
   // Which ad to edit (null = new ad form)
   const [editingAd, setEditingAd] = useState<ExistingAd | null>(null);
   const [existingAds, setExistingAds] = useState<ExistingAd[]>([]);
@@ -65,6 +81,7 @@ export default function AnuncioPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const submitRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -104,6 +121,14 @@ export default function AnuncioPage() {
 
     loadData();
   }, []);
+
+  // When arriving with ?new=1, ensure form is in create mode and scroll to it
+  useEffect(() => {
+    if (!loading && isNewMode && formRef.current) {
+      setEditingAd(null);
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [loading, isNewMode]);
 
   // ── WhatsApp number change → detect country ──────────────────────────────
 
@@ -309,7 +334,7 @@ export default function AnuncioPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -321,7 +346,7 @@ export default function AnuncioPage() {
     <div className="flex flex-col lg:flex-row lg:gap-6">
       {/* Left column: Ad list */}
       <div className="lg:w-1/3 lg:sticky lg:top-24 lg:self-start mb-6 lg:mb-0">
-        <h2 className="text-lg font-semibold text-[#e8e0f0] mb-3">
+        <h2 className="text-lg font-semibold text-text-primary mb-3">
           Mis anuncios ({existingAds.filter((a) => a.status !== 'REJECTED').length}/3)
         </h2>
         {existingAds.length > 0 && (
@@ -335,20 +360,20 @@ export default function AnuncioPage() {
                   onClick={() => editingAd?.id === ad.id ? resetForm() : loadAdIntoForm(ad)}
                   className={`w-full text-left p-3 rounded-lg border transition-colors ${
                     editingAd?.id === ad.id
-                      ? 'border-[#7b2ff2] bg-[#7b2ff2]/10'
-                      : 'border-[#2a1a4e] bg-[#0d0015] hover:border-[#7b2ff2]/50'
+                      ? 'border-accent-purple bg-accent-purple/10'
+                      : 'border-accent-purple/20 bg-bg-elevated hover:border-accent-purple/50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <CountryFlag code={ad.countryCode} size={16} />
-                    <p className="text-sm text-[#e8e0f0] truncate">{ad.title}</p>
+                    <p className="text-sm text-text-primary truncate">{ad.title}</p>
                   </div>
-                  <p className="text-xs text-[#6b5a80] mt-0.5">
+                  <p className="text-xs text-text-secondary/70 mt-0.5">
                     {country?.name ?? ad.countryCode} &middot;{' '}
                     <span className={
                       ad.status === 'ACTIVE' ? 'text-[#25D366]' :
                       ad.status === 'REJECTED' ? 'text-red-400' :
-                      'text-[#d4af37]'
+                      'text-accent-gold'
                     }>
                       {ad.status === 'ACTIVE' ? 'Activo' :
                        ad.status === 'REJECTED' ? 'Rechazado' :
@@ -365,24 +390,24 @@ export default function AnuncioPage() {
           <button
             type="button"
             onClick={resetForm}
-            className="mt-3 w-full py-2.5 border border-dashed border-[#2a1a4e] rounded-lg text-sm text-[#a090b8] hover:border-[#7b2ff2] hover:text-[#e8e0f0] transition-colors"
+            className="mt-3 w-full py-2.5 border border-dashed border-accent-purple/20 rounded-lg text-sm text-text-secondary hover:border-accent-purple hover:text-text-primary transition-colors"
           >
             + Crear nuevo anuncio
           </button>
         )}
 
         {!canCreateNew && !editingAd && existingAds.length > 0 && (
-          <p className="mt-4 text-[#6b5a80] text-xs text-center">
+          <p className="mt-4 text-text-secondary/70 text-xs text-center">
             Limite de 3 anuncios alcanzado
           </p>
         )}
       </div>
 
       {/* Right column: Form */}
-      <div className="lg:w-2/3">
+      <div className="lg:w-2/3" ref={formRef}>
       {(editingAd || canCreateNew || existingAds.length === 0) && (
         <>
-          <h1 className="text-2xl font-bold text-[#e8e0f0] mb-2">
+          <h1 className="text-2xl font-bold text-text-primary mb-2">
             {isEdit ? 'Editar anuncio' : 'Crear anuncio'}
           </h1>
 
@@ -390,7 +415,7 @@ export default function AnuncioPage() {
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
               <p className="text-red-400 text-sm font-medium mb-1">Anuncio rechazado</p>
               <p className="text-red-300 text-sm">{editingAd.rejectionReason}</p>
-              <p className="text-[#a090b8] text-xs mt-2">Corrige los problemas y vuelve a enviar.</p>
+              <p className="text-text-secondary text-xs mt-2">Corrige los problemas y vuelve a enviar.</p>
             </div>
           )}
 
@@ -409,7 +434,7 @@ export default function AnuncioPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* WhatsApp number */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-1.5">
+              <label className="block text-sm text-text-secondary mb-1.5">
                 WhatsApp (con codigo de pais)
               </label>
               <input
@@ -417,10 +442,10 @@ export default function AnuncioPage() {
                 value={whatsappNumber}
                 onChange={(e) => handleWhatsAppChange(e.target.value)}
                 required
-                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
+                className="w-full bg-bg-secondary border border-accent-purple/20 rounded-lg px-4 py-2.5 text-text-primary placeholder-text-secondary/70 focus:border-accent-purple focus:outline-none transition-colors"
                 placeholder="+573001234567"
               />
-              <p className="text-xs text-[#6b5a80] mt-1">
+              <p className="text-xs text-text-secondary/70 mt-1">
                 Este numero sera el contacto de este anuncio. El pais se detecta automaticamente.
               </p>
             </div>
@@ -428,7 +453,7 @@ export default function AnuncioPage() {
             {/* Country selector (only for +1) */}
             {showCountrySelector && (
               <div>
-                <label className="block text-sm text-[#a090b8] mb-1.5">
+                <label className="block text-sm text-text-secondary mb-1.5">
                   Selecciona el pais del anuncio
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -441,8 +466,8 @@ export default function AnuncioPage() {
                         onClick={() => setCountryCode(code)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors ${
                           countryCode === code
-                            ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
-                            : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
+                            ? 'bg-accent-purple/20 border-accent-purple text-text-primary'
+                            : 'bg-bg-secondary border-accent-purple/20 text-text-secondary hover:border-accent-purple/50'
                         }`}
                       >
                         <CountryFlag code={code} size={16} />
@@ -456,9 +481,9 @@ export default function AnuncioPage() {
 
             {/* Detected country display */}
             {countryCode && !showCountrySelector && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-[#1a0e2e] rounded-lg border border-[#2a1a4e]">
+              <div className="flex items-center gap-2 px-3 py-2 bg-bg-secondary rounded-lg border border-accent-purple/20">
                 <CountryFlag code={countryCode} size={16} />
-                <span className="text-sm text-[#e8e0f0]">
+                <span className="text-sm text-text-primary">
                   {COUNTRY_MAP[countryCode]?.name ?? countryCode}
                 </span>
               </div>
@@ -466,37 +491,41 @@ export default function AnuncioPage() {
 
             {/* Title */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-1.5">Titulo</label>
+              <label className="block text-sm text-text-secondary mb-1.5">Titulo</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={100}
                 required
-                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
+                spellCheck
+                lang="es"
+                className="w-full bg-bg-secondary border border-accent-purple/20 rounded-lg px-4 py-2.5 text-text-primary placeholder-text-secondary/70 focus:border-accent-purple focus:outline-none transition-colors"
                 placeholder="Ej: Lectura de Tarot profesional en Bogota"
               />
-              <p className="text-xs text-[#6b5a80] mt-1 text-right">{title.length}/100</p>
+              <p className="text-xs text-text-secondary/70 mt-1 text-right">{title.length}/100</p>
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-1.5">Descripcion</label>
+              <label className="block text-sm text-text-secondary mb-1.5">Descripcion</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={2000}
                 required
                 rows={6}
-                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors resize-y"
+                spellCheck
+                lang="es"
+                className="w-full bg-bg-secondary border border-accent-purple/20 rounded-lg px-4 py-2.5 text-text-primary placeholder-text-secondary/70 focus:border-accent-purple focus:outline-none transition-colors resize-y"
                 placeholder="Describe tus servicios, experiencia y lo que ofreces..."
               />
-              <p className="text-xs text-[#6b5a80] mt-1 text-right">{description.length}/2000</p>
+              <p className="text-xs text-text-secondary/70 mt-1 text-right">{description.length}/2000</p>
             </div>
 
             {/* Image upload */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-1.5">Imagen (opcional)</label>
+              <label className="block text-sm text-text-secondary mb-1.5">Imagen (opcional)</label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -506,7 +535,7 @@ export default function AnuncioPage() {
               />
               <div className="flex items-start gap-4">
                 {imagePreview ? (
-                  <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[#2a1a4e]">
+                  <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-accent-purple/20">
                     <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                     <button
                       type="button"
@@ -525,33 +554,33 @@ export default function AnuncioPage() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="px-4 py-2 bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg text-sm text-[#a090b8] hover:border-[#7b2ff2] transition-colors"
+                  className="px-4 py-2 bg-bg-secondary border border-accent-purple/20 rounded-lg text-sm text-text-secondary hover:border-accent-purple transition-colors"
                 >
                   {uploading ? 'Subiendo...' : imagePreview ? 'Cambiar imagen' : 'Subir imagen'}
                 </button>
               </div>
-              <p className="text-xs text-[#6b5a80] mt-1">JPEG, PNG, WebP o GIF. Maximo 5 MB.</p>
+              <p className="text-xs text-text-secondary/70 mt-1">JPEG, PNG, WebP o GIF. Maximo 5 MB.</p>
             </div>
 
             {/* Website URL */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-1.5">
+              <label className="block text-sm text-text-secondary mb-1.5">
                 Sitio web (opcional)
               </label>
               <input
                 type="url"
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
-                className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
+                className="w-full bg-bg-secondary border border-accent-purple/20 rounded-lg px-4 py-2.5 text-text-primary placeholder-text-secondary/70 focus:border-accent-purple focus:outline-none transition-colors"
                 placeholder="https://tu-sitio-web.com"
               />
             </div>
 
             {/* Services */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-2">Servicios</label>
+              <label className="block text-sm text-text-secondary mb-2">Servicios</label>
               {serviceOptions.length === 0 ? (
-                <p className="text-xs text-[#6b5a80]">Cargando servicios...</p>
+                <p className="text-xs text-text-secondary/70">Cargando servicios...</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {serviceOptions.map((svc) => (
@@ -559,8 +588,8 @@ export default function AnuncioPage() {
                       key={svc.slug}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors ${
                         selectedServices.includes(svc.slug)
-                          ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
-                          : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
+                          ? 'bg-accent-purple/20 border-accent-purple text-text-primary'
+                          : 'bg-bg-secondary border-accent-purple/20 text-text-secondary hover:border-accent-purple/50'
                       }`}
                     >
                       <input
@@ -578,9 +607,9 @@ export default function AnuncioPage() {
 
             {/* Traditions */}
             <div>
-              <label className="block text-sm text-[#a090b8] mb-2">Especialidades</label>
+              <label className="block text-sm text-text-secondary mb-2">Especialidades</label>
               {traditionOptions.length === 0 ? (
-                <p className="text-xs text-[#6b5a80]">Cargando especialidades...</p>
+                <p className="text-xs text-text-secondary/70">Cargando especialidades...</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {traditionOptions.map((trad) => (
@@ -588,8 +617,8 @@ export default function AnuncioPage() {
                       key={trad.slug}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors ${
                         selectedTraditions.includes(trad.slug)
-                          ? 'bg-[#7b2ff2]/20 border-[#7b2ff2] text-[#e8e0f0]'
-                          : 'bg-[#1a0e2e] border-[#2a1a4e] text-[#a090b8] hover:border-[#7b2ff2]/50'
+                          ? 'bg-accent-purple/20 border-accent-purple text-text-primary'
+                          : 'bg-bg-secondary border-accent-purple/20 text-text-secondary hover:border-accent-purple/50'
                       }`}
                     >
                       <input
@@ -610,7 +639,7 @@ export default function AnuncioPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-accent-gold text-bg-primary font-medium rounded-lg hover:bg-accent-gold-light active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting
                   ? 'Enviando...'

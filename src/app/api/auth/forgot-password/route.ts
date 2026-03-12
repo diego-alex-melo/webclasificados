@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { requestPasswordReset } from '@/lib/services/auth-service';
 import { sendPasswordResetEmail } from '@/lib/services/email-service';
+import { rateLimit } from '@/lib/utils/rate-limit';
 import type { ApiResponse } from '@/types';
 
 const forgotPasswordSchema = z.object({
@@ -12,6 +13,9 @@ const forgotPasswordSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await rateLimit(request, { prefix: 'auth:forgot', maxRequests: 3, windowSeconds: 900 });
+    if (limited) return limited;
+
     const body = await request.json();
     const parsed = forgotPasswordSchema.safeParse(body);
 

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import { renewAd, AdError } from '@/lib/services/ad-service';
 import { updateReputation } from '@/lib/services/reputation-service';
+import { rateLimit } from '@/lib/utils/rate-limit';
 import { prisma } from '@/lib/db/prisma';
 import type { ApiResponse } from '@/types';
 
@@ -30,6 +31,10 @@ export async function POST(
 
     const token = authHeader.slice(7);
     const advertiser = await getAdvertiserFromToken(token);
+
+    const limited = await rateLimit(request, { prefix: 'ads:renew', maxRequests: 3, windowSeconds: 3600 }, advertiser.id);
+    if (limited) return limited;
+
     const { id } = await context.params;
 
     // Verify ownership

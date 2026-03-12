@@ -35,7 +35,7 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <meta name="google-site-verification" content="nmN9OmgSk8IVTTH6h4DW0f20P5Y9SwckSIb1ZyvJSUs" />
-        <meta name="theme-color" content="#1a0a2e" />
+        <meta name="theme-color" content="#140a26" />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-BTM6MNLXKD" />
         <script
           dangerouslySetInnerHTML={{
@@ -111,7 +111,7 @@ function Header() {
           </li>
           <li>
             <Link
-              href="/dashboard"
+              href="/dashboard/anuncio?new=1"
               className="glow-gold inline-flex items-center gap-1.5 rounded-full bg-accent-gold/10 px-3 sm:px-4 py-1.5 text-accent-gold transition-all hover:bg-accent-gold/20"
             >
               Publicar

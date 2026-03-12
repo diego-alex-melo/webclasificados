@@ -201,8 +201,8 @@ export default function SoportePage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-[#0d0015] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-bg-elevated flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -215,9 +215,9 @@ export default function SoportePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0d0015] text-[#e8e0f0] p-4 lg:p-8">
+    <div className="min-h-screen bg-bg-elevated text-text-primary p-4 lg:p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-[#d4af37] mb-6">
+        <h1 className="text-2xl font-bold text-accent-gold mb-6">
           Soporte - Tickets
         </h1>
 
@@ -229,8 +229,8 @@ export default function SoportePage() {
               onClick={() => setFilter(tab.key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === tab.key
-                  ? 'bg-[#7b2ff2] text-white'
-                  : 'bg-[#1a0e2e] text-[#a090b8] hover:bg-[#251540]'
+                  ? 'bg-accent-purple text-white'
+                  : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary'
               }`}
             >
               {tab.label}
@@ -238,7 +238,7 @@ export default function SoportePage() {
                 className={`ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs ${
                   filter === tab.key
                     ? 'bg-white/20 text-white'
-                    : 'bg-[#7b2ff2]/20 text-[#a090b8]'
+                    : 'bg-accent-purple/20 text-text-secondary'
                 }`}
               >
                 {tab.count}
@@ -257,13 +257,13 @@ export default function SoportePage() {
         {/* Loading */}
         {loading && (
           <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
         {/* Empty state */}
         {!loading && tickets.length === 0 && (
-          <div className="text-center py-16 text-[#a090b8]">
+          <div className="text-center py-16 text-text-secondary">
             <svg
               className="mx-auto mb-4 w-12 h-12 opacity-40"
               fill="none"
@@ -287,15 +287,15 @@ export default function SoportePage() {
             {tickets.map((ticket) => (
               <div
                 key={ticket.id}
-                className="border border-[#1a0e2e] rounded-xl bg-[#110a1f] overflow-hidden"
+                className="border border-accent-purple/15 rounded-xl bg-bg-secondary overflow-hidden"
               >
                 {/* Ticket summary row */}
                 <button
                   onClick={() => handleExpand(ticket)}
-                  className="w-full text-left p-4 hover:bg-[#1a0e2e]/50 transition-colors"
+                  className="w-full text-left p-4 hover:bg-bg-secondary/50 transition-colors"
                 >
                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <span className="text-xs text-[#a090b8]">
+                    <span className="text-xs text-text-secondary">
                       {formatDate(ticket.createdAt)}
                     </span>
                     <span
@@ -309,8 +309,8 @@ export default function SoportePage() {
                       {STATUS_LABELS[ticket.status]}
                     </span>
                   </div>
-                  <p className="text-sm text-[#a090b8] mb-1">{ticket.email}</p>
-                  <p className="text-sm text-[#e8e0f0]">
+                  <p className="text-sm text-text-secondary mb-1">{ticket.email}</p>
+                  <p className="text-sm text-text-primary">
                     {ticket.message.length > 100
                       ? ticket.message.slice(0, 100) + '...'
                       : ticket.message}
@@ -319,34 +319,34 @@ export default function SoportePage() {
 
                 {/* Expanded view */}
                 {expandedId === ticket.id && (
-                  <div className="border-t border-[#1a0e2e] p-4 space-y-4 bg-[#0d0015]/50">
+                  <div className="border-t border-accent-purple/15 p-4 space-y-4 bg-bg-elevated/50">
                     {/* Full message */}
                     <div>
-                      <label className="block text-xs text-[#a090b8] mb-1 uppercase tracking-wide">
+                      <label className="block text-xs text-text-secondary mb-1 uppercase tracking-wide">
                         Mensaje completo
                       </label>
-                      <p className="text-sm text-[#e8e0f0] whitespace-pre-wrap bg-[#1a0e2e] rounded-lg p-3">
+                      <p className="text-sm text-text-primary whitespace-pre-wrap bg-bg-secondary rounded-lg p-3">
                         {ticket.message}
                       </p>
                     </div>
 
                     {/* Admin notes */}
                     <div>
-                      <label className="block text-xs text-[#a090b8] mb-1 uppercase tracking-wide">
+                      <label className="block text-xs text-text-secondary mb-1 uppercase tracking-wide">
                         Notas del admin
                       </label>
                       <textarea
                         value={editNotes}
                         onChange={(e) => setEditNotes(e.target.value)}
                         rows={3}
-                        className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg p-3 text-sm text-[#e8e0f0] placeholder-[#a090b8]/50 focus:outline-none focus:border-[#7b2ff2] resize-none"
+                        className="w-full bg-bg-secondary border border-accent-purple/20 rounded-lg p-3 text-sm text-text-primary placeholder-text-secondary/50 focus:outline-none focus:border-accent-purple resize-none"
                         placeholder="Notas internas..."
                       />
                     </div>
 
                     {/* Status select */}
                     <div>
-                      <label className="block text-xs text-[#a090b8] mb-1 uppercase tracking-wide">
+                      <label className="block text-xs text-text-secondary mb-1 uppercase tracking-wide">
                         Estado
                       </label>
                       <select
@@ -354,7 +354,7 @@ export default function SoportePage() {
                         onChange={(e) =>
                           setEditStatus(e.target.value as TicketStatus)
                         }
-                        className="bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-3 py-2 text-sm text-[#e8e0f0] focus:outline-none focus:border-[#7b2ff2]"
+                        className="bg-bg-secondary border border-accent-purple/20 rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-purple"
                       >
                         <option value="OPEN">Abierto</option>
                         <option value="RESPONDED">Respondido</option>
@@ -367,13 +367,13 @@ export default function SoportePage() {
                       <button
                         onClick={() => handleSave(ticket.id)}
                         disabled={saving}
-                        className="px-4 py-2 bg-[#7b2ff2] hover:bg-[#6a1fe0] disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="px-4 py-2 bg-accent-purple hover:bg-accent-purple/80 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
                       >
                         {saving ? 'Guardando...' : 'Guardar'}
                       </button>
                       <button
                         onClick={() => handleCopyEmail(ticket.email)}
-                        className="px-4 py-2 bg-[#1a0e2e] hover:bg-[#251540] text-[#a090b8] text-sm rounded-lg transition-colors border border-[#2a1a4e]"
+                        className="px-4 py-2 bg-bg-secondary hover:bg-bg-secondary text-text-secondary text-sm rounded-lg transition-colors border border-accent-purple/20"
                       >
                         {copySuccess ? 'Copiado' : 'Copiar email'}
                       </button>

@@ -79,7 +79,7 @@ export default function PerfilPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -87,21 +87,21 @@ export default function PerfilPage() {
   return (
     <div className="max-w-lg space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-[#e8e0f0]">Mi Perfil</h1>
-        <p className="text-[#a090b8] text-sm mt-1">
+        <h1 className="text-2xl font-bold text-text-primary">Mi Perfil</h1>
+        <p className="text-text-secondary text-sm mt-1">
           Actualiza tu informacion de contacto.
         </p>
       </div>
 
       {/* Read-only info */}
-      <section className="bg-[#0d0015] border border-[#1a0e2e] rounded-xl p-4 lg:p-6 space-y-3">
+      <section className="bg-bg-elevated border border-accent-purple/15 rounded-xl p-4 lg:p-6 space-y-3">
         <div>
-          <span className="text-xs text-[#6b5a80]">Email</span>
-          <p className="text-sm text-[#e8e0f0]">{profile?.email}</p>
+          <span className="text-xs text-text-secondary/70">Email</span>
+          <p className="text-sm text-text-primary">{profile?.email}</p>
         </div>
         <div>
-          <span className="text-xs text-[#6b5a80]">Codigo de referido</span>
-          <p className="text-sm text-[#d4af37] font-mono">{profile?.referralCode}</p>
+          <span className="text-xs text-text-secondary/70">Codigo de referido</span>
+          <p className="text-sm text-accent-gold font-mono">{profile?.referralCode}</p>
         </div>
       </section>
 
@@ -120,22 +120,22 @@ export default function PerfilPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm text-[#a090b8] mb-1.5">
-            Sitio web <span className="text-[#6b5a80]">(opcional)</span>
+          <label className="block text-sm text-text-secondary mb-1.5">
+            Sitio web <span className="text-text-secondary/70">(opcional)</span>
           </label>
           <input
             type="url"
             value={websiteUrl}
             onChange={(e) => setWebsiteUrl(e.target.value)}
             placeholder="https://tusitio.com"
-            className="w-full bg-[#1a0e2e] border border-[#2a1a4e] rounded-lg px-4 py-2.5 text-[#e8e0f0] placeholder-[#6b5a80] focus:border-[#7b2ff2] focus:outline-none transition-colors"
+            className="w-full bg-bg-secondary border border-accent-purple/20 rounded-lg px-4 py-2.5 text-text-primary placeholder-text-secondary/70 focus:border-accent-purple focus:outline-none transition-colors"
           />
         </div>
 
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-3 bg-[#d4af37] text-[#0d0015] font-medium rounded-lg hover:bg-[#e8c54a] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-accent-gold text-bg-primary font-medium rounded-lg hover:bg-accent-gold-light active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? 'Guardando...' : 'Guardar cambios'}
         </button>

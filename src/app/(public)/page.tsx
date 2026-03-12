@@ -56,7 +56,7 @@ export default async function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="bg-bg-secondary/40 py-16">
+      <section className="section-divider bg-bg-secondary py-16">
         <div className="mx-auto max-w-6xl px-4">
         <h2 className="mb-6 text-center text-2xl font-bold">Servicios</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -80,7 +80,7 @@ export default async function HomePage() {
 
       {/* Recent Ads */}
       {recentAds.length > 0 && (
-        <section className="py-16">
+        <section className="section-divider py-16">
           <div className="mx-auto max-w-6xl px-4">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Anuncios recientes</h2>
@@ -107,8 +107,8 @@ export default async function HomePage() {
       )}
 
       {/* CTA */}
-      <section className="bg-bg-secondary/40 py-16 px-4">
-        <div className="mx-auto max-w-2xl rounded-2xl bg-gradient-to-br from-accent-purple/20 to-bg-card p-8 text-center sm:p-12">
+      <section className="section-divider bg-bg-secondary py-16 px-4">
+        <div className="mx-auto max-w-2xl rounded-2xl border border-accent-purple/20 bg-gradient-to-br from-accent-purple/20 to-bg-elevated p-8 text-center sm:p-12">
           <h2 className="mb-3 text-2xl font-bold">
             ¿Eres profesional esotérico?
           </h2>
@@ -117,7 +117,7 @@ export default async function HomePage() {
             en toda Latinoamérica.
           </p>
           <Link
-            href="/dashboard"
+            href="/dashboard/anuncio?new=1"
             className="glow-gold inline-block rounded-full bg-accent-gold px-8 py-3 font-semibold text-bg-primary transition-all hover:bg-accent-gold-light"
           >
             Publicar anuncio gratis

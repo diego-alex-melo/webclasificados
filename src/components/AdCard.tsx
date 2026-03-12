@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import FavoriteButton from '@/components/FavoriteButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import CountryFlag from '@/components/CountryFlag';
@@ -35,11 +36,12 @@ export default function AdCard({ ad }: AdCardProps) {
       {/* Image or Placeholder */}
       <Link href={`/anuncio/${ad.slug}`} prefetch={false} className="relative aspect-[4/3] overflow-hidden">
         {ad.imageUrl ? (
-          <img
+          <Image
             src={ad.imageUrl}
             alt={ad.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-purple/20 to-bg-card">

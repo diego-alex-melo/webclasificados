@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { getAdvertiserFromToken, AuthError } from '@/lib/services/auth-service';
 import { serverError } from '@/lib/services/error-logger';
+import { rateLimit } from '@/lib/utils/rate-limit';
 import { prisma } from '@/lib/db/prisma';
 import type { ApiResponse } from '@/types';
 
@@ -53,6 +54,9 @@ export async function PUT(request: NextRequest): Promise<NextResponse<ApiRespons
 
     const token = authHeader.slice(7);
     const advertiser = await getAdvertiserFromToken(token);
+
+    const limited = await rateLimit(request, { prefix: 'profile', maxRequests: 10, windowSeconds: 300 }, advertiser.id);
+    if (limited) return limited;
 
     const body = await request.json();
     const parsed = updateProfileSchema.safeParse(body);

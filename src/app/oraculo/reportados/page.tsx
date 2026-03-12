@@ -152,7 +152,7 @@ export default function AnunciosPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#d4af37] mb-6">
+      <h1 className="text-2xl font-bold text-accent-gold mb-6">
         Gestion de Anuncios
       </h1>
 
@@ -164,8 +164,8 @@ export default function AnunciosPage() {
             onClick={() => setStatusFilter(s)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               statusFilter === s
-                ? 'bg-[#7b2ff2] text-white'
-                : 'bg-[#1a0e2e] text-[#a090b8] hover:text-[#e8e0f0]'
+                ? 'bg-accent-purple text-white'
+                : 'bg-bg-secondary text-text-secondary hover:text-text-primary'
             }`}
           >
             {STATUS_LABELS[s]}
@@ -187,10 +187,10 @@ export default function AnunciosPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#7b2ff2] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
         </div>
       ) : ads.length === 0 ? (
-        <p className="text-[#a090b8] text-center py-10">
+        <p className="text-text-secondary text-center py-10">
           No hay anuncios {statusFilter !== 'ALL' ? `con estado ${STATUS_LABELS[statusFilter]?.toLowerCase()}` : ''}
         </p>
       ) : (
@@ -198,25 +198,25 @@ export default function AnunciosPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1a0e2e] text-left">
-                  <th className="pb-3 text-[#a090b8] font-medium">Titulo</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Email</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Estado</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Fecha</th>
-                  <th className="pb-3 text-[#a090b8] font-medium">Acciones</th>
+                <tr className="border-b border-accent-purple/15 text-left">
+                  <th className="pb-3 text-text-secondary font-medium">Titulo</th>
+                  <th className="pb-3 text-text-secondary font-medium">Email</th>
+                  <th className="pb-3 text-text-secondary font-medium">Estado</th>
+                  <th className="pb-3 text-text-secondary font-medium">Fecha</th>
+                  <th className="pb-3 text-text-secondary font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {ads.map((ad) => (
-                  <tr key={ad.id} className="border-b border-[#1a0e2e]/50 hover:bg-[#1a0e2e]/30">
+                  <tr key={ad.id} className="border-b border-accent-purple/15/50 hover:bg-bg-secondary/30">
                     <td className="py-3 pr-4 max-w-[200px] truncate">{ad.title}</td>
-                    <td className="py-3 pr-4 text-[#a090b8]">{ad.advertiser.email}</td>
+                    <td className="py-3 pr-4 text-text-secondary">{ad.advertiser.email}</td>
                     <td className="py-3 pr-4">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_BADGE[ad.status] ?? 'bg-gray-500/15 text-gray-400'}`}>
                         {ad.status}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 text-[#a090b8] whitespace-nowrap">
+                    <td className="py-3 pr-4 text-text-secondary whitespace-nowrap">
                       {formatDate(ad.createdAt)}
                     </td>
                     <td className="py-3">
@@ -266,21 +266,21 @@ export default function AnunciosPage() {
           {/* Pagination */}
           {meta.totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <p className="text-sm text-[#a090b8]">
+              <p className="text-sm text-text-secondary">
                 Pagina {meta.page} de {meta.totalPages} ({meta.total} resultados)
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => fetchAds(meta.page - 1)}
                   disabled={meta.page <= 1}
-                  className="px-3 py-1.5 bg-[#1a0e2e] rounded text-sm disabled:opacity-30 hover:bg-[#2a1640] transition-colors"
+                  className="px-3 py-1.5 bg-bg-secondary rounded text-sm disabled:opacity-30 hover:bg-bg-card transition-colors"
                 >
                   Anterior
                 </button>
                 <button
                   onClick={() => fetchAds(meta.page + 1)}
                   disabled={meta.page >= meta.totalPages}
-                  className="px-3 py-1.5 bg-[#1a0e2e] rounded text-sm disabled:opacity-30 hover:bg-[#2a1640] transition-colors"
+                  className="px-3 py-1.5 bg-bg-secondary rounded text-sm disabled:opacity-30 hover:bg-bg-card transition-colors"
                 >
                   Siguiente
                 </button>

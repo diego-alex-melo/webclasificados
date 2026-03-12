@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Prisma } from '@/generated/prisma';
 import { prisma } from '@/lib/db/prisma';
 import { getAdvertiserFromToken } from '@/lib/services/auth-service';
+import { rateLimit } from '@/lib/utils/rate-limit';
 
 // ---------------------------------------------------------------------------
 // Validation
@@ -49,6 +50,9 @@ export async function POST(request: NextRequest) {
 
     const advertiser = await getAdvertiserFromToken(token);
 
+    const limited = await rateLimit(request, { prefix: 'push:sub', maxRequests: 5, windowSeconds: 300 }, advertiser.id);
+    if (limited) return limited;
+
     const body = await request.json();
     const parsed = subscriptionSchema.safeParse(body);
     if (!parsed.success) {
@@ -89,6 +93,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     const advertiser = await getAdvertiserFromToken(token);
+
+    const limited = await rateLimit(request, { prefix: 'push:unsub', maxRequests: 5, windowSeconds: 300 }, advertiser.id);
+    if (limited) return limited;
 
     await prisma.advertiser.update({
       where: { id: advertiser.id },

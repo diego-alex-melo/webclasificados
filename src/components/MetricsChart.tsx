@@ -14,7 +14,7 @@ interface MetricsChartProps {
 export default function MetricsChart({ data }: MetricsChartProps) {
   if (!data.length) {
     return (
-      <p className="text-[#a090b8] text-sm py-8 text-center">
+      <p className="text-text-secondary text-sm py-8 text-center">
         Sin datos de esta semana todavia.
       </p>
     );
@@ -27,10 +27,10 @@ export default function MetricsChart({ data }: MetricsChartProps) {
   );
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="flex items-end gap-2 min-w-[480px] h-48 px-2 pb-6 relative">
+    <div className="w-full overflow-x-auto max-w-full">
+      <div className="flex items-end gap-2 h-48 px-2 pb-6 relative">
         {/* Y-axis label */}
-        <span className="absolute left-0 top-0 text-[10px] text-[#a090b8]">
+        <span className="absolute left-0 top-0 text-[10px] text-text-secondary">
           {maxVal}
         </span>
 
@@ -79,7 +79,7 @@ export default function MetricsChart({ data }: MetricsChartProps) {
                   title={`Web: ${week.website}`}
                 />
               </div>
-              <span className="text-[10px] text-[#a090b8] whitespace-nowrap">
+              <span className="text-[10px] text-text-secondary whitespace-nowrap">
                 {dateLabel}
               </span>
             </div>
@@ -88,7 +88,7 @@ export default function MetricsChart({ data }: MetricsChartProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 mt-2 text-xs text-[#a090b8]">
+      <div className="flex items-center justify-center gap-4 mt-2 text-xs text-text-secondary">
         <span className="flex items-center gap-1">
           <span className="inline-block w-2.5 h-2.5 rounded-sm bg-[#7b2ff2]" />
           Vistas
